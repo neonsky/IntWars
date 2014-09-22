@@ -110,6 +110,10 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 30*1000000, 30*1000000) {
 
 void SummonersRift::update(long long diff) {
    Map::update(diff);
+   
+   if(gameTime >= 120*1000000){
+      setKillReduction(false);
+   }
 }
 
 bool SummonersRift::spawn() {

@@ -22,9 +22,10 @@ protected:
    uint64 nextSpawnTime;
    Game* game;
    bool firstBlood;
+   bool killReduction;
    
 public:
-   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true) { }
+   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true){ }
    
    virtual ~Map() { }
    virtual void update(long long diff);
@@ -49,6 +50,9 @@ public:
    
    bool getFirstBlood() { return firstBlood; }
    bool setFirstBlood(bool state) { firstBlood = state; }
+   
+   bool getKillReduction() { return killReduction; }
+   bool setKillReduction(bool state) { killReduction = state; }
 };
 
 #endif

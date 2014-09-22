@@ -187,7 +187,7 @@ const std::string& Unit::getModel() {
 }
 
 void Unit::die(Unit* killer) {
-    map->getGame()->notifyNpcDie(this, killer);
+   map->getGame()->notifyNpcDie(this, killer);
 
 	float exp = map->getExpFor(this);
 	auto champs = map->getChampionsInRange(this, EXP_RANGE);
@@ -204,7 +204,7 @@ void Unit::die(Unit* killer) {
 	}
 
 
-    Champion* cKiller = dynamic_cast<Champion*>(killer);
+   Champion* cKiller = dynamic_cast<Champion*>(killer);
     
 	if (!cKiller) {
       return;
@@ -219,8 +219,18 @@ void Unit::die(Unit* killer) {
 	cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
 	map->getGame()->notifyAddGold(cKiller, this, gold);
 
-    setToRemove();
-    map->stopTargeting(this);
+   if(cKiller->killDeathCounter < 0){
+      cKiller->setChampionGoldFromMinions(cKiller->getChampionGoldFromMinions()+gold);
+      printf("Adding gold form minions to reduce death spree: %f\n", cKiller->getChampionGoldFromMinions());
+   }
+   
+   if(cKiller->getChampionGoldFromMinions() >= 50 && cKiller->killDeathCounter < 0){
+      cKiller->setChampionGoldFromMinions(0);
+      cKiller->killDeathCounter += 1;
+   }
+   
+   setToRemove();
+   map->stopTargeting(this);
 }
 
 void Unit::setUnitTarget(Unit* target) {

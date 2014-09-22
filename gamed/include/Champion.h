@@ -15,6 +15,7 @@ protected:
    uint8 skin;
    int64 respawnTimer;
    Inventory inventory;
+   float championGoldFromMinions;
 
    
 public:
@@ -43,6 +44,9 @@ public:
    
    virtual void die(Unit* killer) override;
    int64 getRespawnTimer() const { return respawnTimer; }
+   
+   float getChampionGoldFromMinions() { return championGoldFromMinions; }
+   float setChampionGoldFromMinions(float gold) { this->championGoldFromMinions = gold; }
    
 
 };

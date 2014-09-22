@@ -241,8 +241,10 @@ void Champion::die(Unit* killer) {
       return;
    }
    
+   cKiller->setChampionGoldFromMinions(0);
+   
    float gold = map->getGoldFor(this);
-   printf("Before: getGoldFromChamp: %f\n Killdc: %i\n Killnc33q4t3246t4 %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
+   printf("Before: getGoldFromChamp: %f\n Killer: %i\n Victim: %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
    
    if(cKiller->killDeathCounter < 0){
       cKiller->killDeathCounter = 0;
@@ -260,10 +262,15 @@ void Champion::die(Unit* killer) {
       this->killDeathCounter -= 1;
    }
     
-    if(!gold) {
+   if(!gold) {
       return;
-    }
+   }
     
+   if(map->getKillReduction() && !map->getFirstBlood()){
+      gold -= gold*0.25f;
+      printf("Still some minutes for full gold reward on champion kills");
+   }
+   
    if(map->getFirstBlood()){
       gold += 100;
       map->setFirstBlood(false);
@@ -272,7 +279,7 @@ void Champion::die(Unit* killer) {
 	cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
 	map->getGame()->notifyAddGold(cKiller, this, gold);
    
-   printf("After: getGoldFromChamp: %f\n Killdc: %i\n Killnc33q4t3246t4 %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
+   printf("After: getGoldFromChamp: %f\n Killer: %i\n Victim: %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
    
    map->stopTargeting(this);
 }
