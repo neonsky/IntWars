@@ -36,7 +36,8 @@ public:
    void addObject(Object* o);
    void removeObject(Object* o);
    const std::vector<uint32>& getExpToLevelUp() { return expToLevelUp; }
-   
+   uint64 getGameTime() { return gameTime; }
+   uint64 getFirstSpawnTime() { return firstSpawnTime; }
    virtual const Target getRespawnLoc(int side) const = 0;
    virtual float getGoldFor(Unit* u) const = 0;
    virtual float getExpFor(Unit* u) const = 0 ;

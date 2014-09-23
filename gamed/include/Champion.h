@@ -8,6 +8,7 @@
 
 class Champion : public Unit {
 
+
 protected:
    std::string type;
    std::vector<Spell*> spells;

@@ -59,9 +59,10 @@ void Stats::update(int64 diff) {
       newMana = std::min(getMaxMana(), newMana);
       setCurrentMana(newMana);
    }
-   if(getGoldPerSecond() > 0){//todo: only generate gold if time > whatever time gold starts generating
-     float newGold = getGold()+getGoldPerSecond()*(diff*0.000001f);
-     setGold(newGold);
+   if(generatingGold && getGoldPerSecond() > 0){
+      puts("Generating Gold??");
+      float newGold = getGold()+getGoldPerSecond()*(diff*0.000001f);
+      setGold(newGold);
    }
 }
 
