@@ -20,12 +20,13 @@ protected:
    const uint64 spawnInterval;
    uint64 gameTime;
    uint64 nextSpawnTime;
+   uint64 firstGoldTime; // Time that gold should begin to generate
    Game* game;
    bool firstBlood;
    bool killReduction;
    
 public:
-   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true){ }
+   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true){ }
    
    virtual ~Map() { }
    virtual void update(long long diff);
@@ -36,7 +37,8 @@ public:
    void addObject(Object* o);
    void removeObject(Object* o);
    const std::vector<uint32>& getExpToLevelUp() { return expToLevelUp; }
-   
+   uint64 getGameTime() { return gameTime; }
+   uint64 getFirstGoldTime() { return firstGoldTime; }
    virtual const Target getRespawnLoc(int side) const = 0;
    virtual float getGoldFor(Unit* u) const = 0;
    virtual float getExpFor(Unit* u) const = 0 ;

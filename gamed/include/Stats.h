@@ -79,6 +79,7 @@ protected:
     float adPerLevel, armorPerLevel, magicArmorPerLevel;
     float hp5RegenPerLevel, mp5RegenPerLevel;
     float movementSpeedPercentageModifier;
+    bool generatingGold; // Used to determine if the stats update should include generating gold. Changed in Champion.h
 
     float baseMovement, baseAttackSpeed;
     
@@ -89,10 +90,10 @@ public:
     Stats() : updatedHealth(false), goldPerSecond(0), healthPerLevel(0), manaPerLevel(0), adPerLevel(0), armorPerLevel(0), magicArmorPerLevel(0),
               hp5RegenPerLevel(0), mp5RegenPerLevel(0), movementSpeedPercentageModifier(0), baseMovement(0), baseAttackSpeed(0.625f), spellCostReduction(0), critDamagePct (2) {
     }
-
     float getStat(uint8 blockId, uint32 stat) const;
     void setStat(uint8 blockId, uint32 stat, float value);
-
+    bool isGeneratingGold() { return generatingGold; }
+    void setGeneratingGold(bool b) {generatingGold = b;}
     const std::map<uint8, std::set<uint32> >& getUpdatedStats() const {
         return updatedStats;
     }

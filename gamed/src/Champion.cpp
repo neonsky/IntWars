@@ -10,6 +10,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
    stats->setGold(475.0f);
    stats->setAttackSpeedMultiplier(1.0f);
    stats->setGoldPerSecond(map->getGoldPerSecond());
+   stats->setGeneratingGold(false);
 
    std::vector<unsigned char> iniFile;
    if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/"+type+".inibin", iniFile)) {
@@ -121,6 +122,11 @@ Spell* Champion::levelUpSpell(uint8 slot) {
 
 void Champion::update(int64 diff) {
    Unit::update(diff);
+
+   if(!stats->isGeneratingGold() && map->getGameTime() >= map->getFirstGoldTime()) {
+   		stats->setGeneratingGold(true);
+   		puts("Generating Gold!");
+   }
 
    if (respawnTimer > 0) {
       respawnTimer -= diff;
