@@ -10,7 +10,7 @@ players = {
 		["ribbon"] = 2, -- [ 1 = Leader (Yellow) ]	[ 2 = Mentor (Blue) ]	[ 4 = Cooperative (Green) ]
 		["icon"] = 0 -- Summoner Icon ID
 	},
-	
+   
 	--[[, -- uncomment this for more players! you can also add more, up to 12!
 
 	["player2"] = {
