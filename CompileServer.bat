@@ -2,6 +2,6 @@
 echo Building IntWars Server.
 echo ------------------------------
 cd build
-mingw32-make -j8 all
+mingw32-make all
 cd ..
 pause
