@@ -60,7 +60,6 @@ void Stats::update(int64 diff) {
       setCurrentMana(newMana);
    }
    if(generatingGold && getGoldPerSecond() > 0){
-      puts("Generating Gold??");
       float newGold = getGold()+getGoldPerSecond()*(diff*0.000001f);
       setGold(newGold);
    }

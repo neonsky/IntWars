@@ -123,7 +123,7 @@ Spell* Champion::levelUpSpell(uint8 slot) {
 void Champion::update(int64 diff) {
    Unit::update(diff);
 
-   if(!stats->isGeneratingGold() && map->getGameTime() >= map->getFirstSpawnTime()) {
+   if(!stats->isGeneratingGold() && map->getGameTime() >= map->getFirstGoldTime()) {
    		stats->setGeneratingGold(true);
    		puts("Generating Gold!");
    }
