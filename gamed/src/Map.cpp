@@ -1,7 +1,15 @@
 #include "Map.h"
 #include "Game.h"
 
+Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true)
+{
+   collisionHandler = new CollisionHandler();
+   collisionHandler->setMap(this);
+}
+
+
 void Map::update(int64 diff) {
+   collisionHandler->update(diff);
    for(auto kv = objects.begin(); kv != objects.end();) {
       if(kv->second->isToRemove() && kv->second->getAttackerCount() == 0) {
          delete kv->second;

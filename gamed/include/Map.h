@@ -7,6 +7,7 @@
 #include "stdafx.h"
 #include "Object.h"
 #include "Champion.h"
+#include "CollisionHandler.h"
 
 class Game;
 
@@ -24,11 +25,12 @@ protected:
    Game* game;
    bool firstBlood;
    bool killReduction;
+
+   CollisionHandler *collisionHandler;
    
 public:
-   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true){ }
-   
-   virtual ~Map() { }
+   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime);
+   virtual ~Map() { delete collisionHandler; }
    virtual void update(long long diff);
    virtual float getGoldPerSecond() = 0;
    virtual bool spawn() = 0;
