@@ -17,13 +17,14 @@ protected:
    int64 respawnTimer;
    Inventory inventory;
    float championGoldFromMinions;
-
+   int64 championHitFlagTimer = 0;
    
 public:
    Spell* getSpell(int index){ return spells[index]; }
    Champion(const std::string& type, Map* map, uint32 id, uint32 playerId);
    const std::string& getType() { return type; }
    uint32 playerId;
+   uint32 playerHitId;
    int getTeamSize();
    std::pair<float, float> getRespawnPosition();
    Spell* castSpell(uint8 slot, float x, float y, Unit* target, uint32 futureProjNetId);
@@ -49,7 +50,9 @@ public:
    float getChampionGoldFromMinions() { return championGoldFromMinions; }
    float setChampionGoldFromMinions(float gold) { this->championGoldFromMinions = gold; }
    
+   bool setChampionHitFlagTimer(int64 time) { this->championHitFlagTimer = time; }
 
+   virtual void dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source) override;
 };
 
 #endif

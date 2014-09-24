@@ -156,7 +156,12 @@ void Champion::update(int64 diff) {
       s->update(diff);
    }
 
-
+   if (championHitFlagTimer > 0) {
+      championHitFlagTimer -= diff;
+      if (championHitFlagTimer <= 0) {
+         championHitFlagTimer = 0;
+      }
+   }
 }
 
 uint32 Champion::getChampionHash() {
@@ -238,14 +243,22 @@ std::pair<float, float> Champion::getRespawnPosition() {
    return std::make_pair(teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "X"), teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "Y"));
 }
 void Champion::die(Unit* killer) {
-  respawnTimer = 5000000 + getStats().getLevel()*2500000;
-   map->getGame()->notifyChampionDie(this, killer);
+   respawnTimer = 5000000 + getStats().getLevel()*2500000;
+   map->stopTargeting(this);
    
    Champion* cKiller = dynamic_cast<Champion*>(killer);
    
-	if (!cKiller) {
+	if(!cKiller && this->championHitFlagTimer > 0){
+      cKiller = dynamic_cast<Champion*>(map->getObjectById(this->playerHitId));
+      printf("Killed by turret, minion or monster, but still  give gold to the enemy.\n");
+   }
+   
+   if (!cKiller) {
+      map->getGame()->notifyChampionDie(this, killer);
       return;
    }
+   
+   map->getGame()->notifyChampionDie(this, cKiller);
    
    cKiller->setChampionGoldFromMinions(0);
    
@@ -289,6 +302,22 @@ void Champion::die(Unit* killer) {
    
    map->stopTargeting(this);
 }
+
+void Champion::dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source) {
+   Unit::dealDamageTo(target,damage,type,source);;
+   
+   Champion* cTarget = dynamic_cast<Champion*>(target);
+   
+   if (!cTarget) {
+      return;
+   }
+   
+   cTarget->setChampionHitFlagTimer(15*1000000); //15 seconds timer, so when you get executed the last enemy champion who hit you gets the gold
+   cTarget->playerHitId = this->id;
+   printf("15 second execution timer on you. Do not get killed by a minion, turret or monster!\n");
+}
+
+
 int Champion::getTeamSize(){
    LuaScript script(false);
 
