@@ -1,6 +1,8 @@
 #ifndef TARGET_H_
 #define TARGET_H_
 
+#include "Vector2.h"
+
 class Target {
 
 public:
@@ -15,6 +17,7 @@ public:
    float getY() const { return y; }
 
    void setPosition(float x, float y) { this->x = x; this->y = y; }
+   Vector2 getPosition() { return Vector2(x, y); }
 
    virtual bool isSimpleTarget() { return true; }
 

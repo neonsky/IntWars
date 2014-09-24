@@ -67,6 +67,8 @@ public:
    virtual ~Object();
    Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius);
 
+   virtual void onCollision(Object *collider) {}
+
    /**
    * Moves the object depending on its target, updating its coordinate.
    * @param diff the amount of milliseconds the object is supposed to move
