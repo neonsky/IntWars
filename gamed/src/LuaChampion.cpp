@@ -37,6 +37,7 @@ void LuaScript::addChampion() {
             "Stats", statsCtr,
             "getTotalAp", &Stats::getTotalAp,
             "getTotalAd", &Stats::getTotalAd,
+            "getBonusAdFlat", &Stats::getBonusAdFlat,
             "getArmot", &Stats::getArmor,
             "getMagicResist", &Stats::getMagicArmor,
             "getRange", &Stats::getRange,
