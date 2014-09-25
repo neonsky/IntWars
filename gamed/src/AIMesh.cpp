@@ -40,8 +40,11 @@ bool AIMesh::load(std::string a_File)
 
    // LEVELS/Map1/AIPath.aimesh
 
+   m_Buffer.clear();
+   std::cout << "Before reading" << std::endl;
    if (RAFManager::getInstance()->readFile(a_File, m_Buffer)) // Our file exists. Load it.
    {
+      std::cout << "After reading" << std::endl;
       for (int i = 0; i < 1024; i++) // For every scanline for the triangle rendering
       {
          m_Lowest[i].u = m_Lowest[i].v = m_Lowest[i].x = m_Lowest[i].y = m_Lowest[i].z = 1e10f; // Init to zero
@@ -233,10 +236,6 @@ void AIMesh::DrawTriangle(Triangle a_Triangle, float *a_Info, unsigned a_Width, 
    FillScanLine(m_Vertex[1], m_Vertex[2]);
    FillScanLine(m_Vertex[2], m_Vertex[0]);
 
-   ScanLine *m_Lowest = m_Lowest;
-   ScanLine *m_Highest = m_Highest;
-   // Get the scanline arrays
-
    float t_Width = a_Width;
    float t_Height = a_Height;
    // target width and height
@@ -339,8 +338,6 @@ void AIMesh::FillScanLine(Vertex a_V1, Vertex a_V2)
    t_DeltaPos.y = a_V2.y - a_V1.y;
    t_DeltaPos.z = a_V2.z - a_V1.z;
 
-   ScanLine *m_Lowest = m_Lowest;
-   ScanLine *m_Highest = m_Highest;
    float t_Width = 1024;
    float t_Height = 1024;
 
