@@ -15,12 +15,10 @@ end
 
 function applyEffects()
    
-   dealPhysicalDamage(getEffectValue(0))
-   
+   dealPhysicalDamage(getEffectValue(0)+getOwner():getStats():getTotalAd()+(0.4*getOwner():getStats():getTotalAp()))
    -- TODO this can be fetched from projectile inibin "HitEffectName"
    addParticleTarget("Ezreal_mysticshot_tar.troy", getTarget())
    
    destroyProjectile()
-   
-   print("Ezreal Q hit something!")
+
 end
