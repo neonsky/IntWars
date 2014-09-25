@@ -63,7 +63,7 @@ private:
 
    double m_LowX, m_LowY, m_HighX, m_HighY;
    ScanLine m_Lowest[1024], m_Highest[1024];
-   float *m_Info;
+   float *m_Heightmap;
 };
 
 #endif

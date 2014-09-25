@@ -10,19 +10,20 @@
 
 // TODO: Clean this junk up
 
-AIMesh::AIMesh() :m_File(0), m_Info(0)
+AIMesh::AIMesh() :m_File(0), m_Heightmap(0)
 {
 }
 
 
 AIMesh::~AIMesh()
 {
-   if (m_Info!=0)
-      delete[] m_Info;
+   if (m_Heightmap!=0)
+      delete[] m_Heightmap;
 }
 
 bool AIMesh::load(std::string a_File)
 {
+   // Old direct file loading code
 	/*std::ifstream t_FileStream(a_File, std::ios::binary);
 	t_FileStream.seekg(0, std::ios::end);
 	std::streamsize size = t_FileStream.tellg();
@@ -39,15 +40,15 @@ bool AIMesh::load(std::string a_File)
 
    // LEVELS/Map1/AIPath.aimesh
 
-   if (RAFManager::getInstance()->readFile(a_File, m_Buffer))
+   if (RAFManager::getInstance()->readFile(a_File, m_Buffer)) // Our file exists. Load it.
    {
-      for (int i = 0; i < 1024; i++)
+      for (int i = 0; i < 1024; i++) // For every scanline for the triangle rendering
       {
-         m_Lowest[i].u = m_Lowest[i].v = m_Lowest[i].x = m_Lowest[i].y = m_Lowest[i].z = 1e10f;
+         m_Lowest[i].u = m_Lowest[i].v = m_Lowest[i].x = m_Lowest[i].y = m_Lowest[i].z = 1e10f; // Init to zero
          m_Highest[i].u = m_Highest[i].v = m_Highest[i].x = m_Highest[i].y = m_Highest[i].z = -1e10f;
       }
-      m_Info = new float[1024 * 1024]; // Shows occupied or not
 
+      m_Heightmap = new float[1024 * 1024]; // Shows occupied or not
       m_File = (__AIMESHFILE*)m_Buffer.data();
       OutputMesh(1024, 1024);
 
@@ -59,25 +60,30 @@ bool AIMesh::load(std::string a_File)
 
 bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
 {
-	for (unsigned i = 0; i < a_Width*a_Height; i++) m_Info[i] = 0.0f; // Clear it
+	for (unsigned i = 0; i < a_Width*a_Height; i++) m_Heightmap[i] = 0.0f; // Clear the map
 
-   m_LowX = 9e9, m_LowY = 9e9, m_HighX = 0, m_HighY = 0;
-	for (unsigned i = 0; i < m_File->triangle_count; i++)
+   m_LowX = 9e9, m_LowY = 9e9, m_HighX = 0, m_HighY = 0; // Init triangle
+
+	for (unsigned i = 0; i < m_File->triangle_count; i++) 
+   // Need to find the absolute values.. So we can map it to 1024x1024 instead of 13000x15000
 	{
+      // Triangle low X check
 		if (m_File->triangles[i].Face.v1[0] < m_LowX)
 			m_LowX = m_File->triangles[i].Face.v1[0];
 		if (m_File->triangles[i].Face.v2[0] < m_LowX)
 			m_LowX = m_File->triangles[i].Face.v2[0];
 		if (m_File->triangles[i].Face.v3[0] < m_LowX)
 			m_LowX = m_File->triangles[i].Face.v3[0];		
-		
+
+      // Triangle low Y check
 		if (m_File->triangles[i].Face.v1[2] < m_LowY)
 			m_LowY = m_File->triangles[i].Face.v1[2];
 		if (m_File->triangles[i].Face.v2[2] < m_LowY)
 			m_LowY = m_File->triangles[i].Face.v2[2];
 		if (m_File->triangles[i].Face.v3[2] < m_LowY)
 			m_LowY = m_File->triangles[i].Face.v3[2];
-		
+
+      // Triangle high X check
 		if (m_File->triangles[i].Face.v1[0] > m_HighX)
 			m_HighX = m_File->triangles[i].Face.v1[0];
 		if (m_File->triangles[i].Face.v2[0] > m_HighX)
@@ -85,6 +91,7 @@ bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
 		if (m_File->triangles[i].Face.v3[0] > m_HighX)
 			m_HighX = m_File->triangles[i].Face.v3[0];
 		
+      // Triangle high Y check
 		if (m_File->triangles[i].Face.v1[2] > m_HighY)
 			m_HighY = m_File->triangles[i].Face.v1[2];
 		if (m_File->triangles[i].Face.v2[2] > m_HighY)
@@ -93,20 +100,23 @@ bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
 			m_HighY = m_File->triangles[i].Face.v3[2];
 	}
 
+   // If the width or height larger?
    if ((m_HighY - m_LowY) < (m_HighX - m_LowX))
    {
-      m_HighX = 1.0f / (m_HighX - m_LowX)*a_Width;
-      m_HighY = 1.0f / (m_HighX - m_LowX)*a_Height;
+      m_HighX = 1.0f / (m_HighX - m_LowX)*a_Width; // We're wider than we're high, map on width
+      m_HighY = m_HighX; // Keep aspect ratio Basically, 1 y should be 1 x.
+      m_LowY = 0; // Though we need to project this in the middle, no offset
    }
    else
    {
-      m_HighX = 1.0f / (m_HighY - m_LowY)*a_Width;
-      m_HighY = 1.0f / (m_HighY - m_LowY)*a_Height;
+      m_HighY = 1.0f / (m_HighY - m_LowY)*a_Height; // We're higher than we're wide, map on height
+      m_HighX = m_HighY; // Keep aspect ratio Basically, 1 x should be 1 y.
+      // m_LowX = 0; // X is already in the middle? ??????
    }
 
    for (unsigned i = 0; i <m_File->triangle_count; i++) // For every triangle
 	{
-      Triangle t_Triangle;
+      Triangle t_Triangle; // Create a triangle that is warped to heightmap coordinates
       t_Triangle.Face.v1[0] = (m_File->triangles[i].Face.v1[0] - m_LowX)*m_HighX;
       t_Triangle.Face.v1[1] = m_File->triangles[i].Face.v1[1];
       t_Triangle.Face.v1[2] = (m_File->triangles[i].Face.v1[2] - m_LowY)*m_HighY;
@@ -120,12 +130,14 @@ bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
       t_Triangle.Face.v3[2] = (m_File->triangles[i].Face.v3[2] - m_LowY)*m_HighY;
 
       /*
+      // Draw just the wireframe.
       Line(t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Info, a_Width, a_Height);
       Line(t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Info, a_Width, a_Height);
       Line(t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Info, a_Width, a_Height);
       */
 
-      DrawTriangle(t_Triangle, m_Info, a_Width, a_Height);
+      // Draw this triangle onto the heightmap using an awesome triangle drawing function
+      DrawTriangle(t_Triangle, m_Heightmap, a_Width, a_Height);
 	}
 
 	//WriteToFile(t_Info, a_Width, a_Height);
@@ -134,8 +146,8 @@ bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
 
 float AIMesh::getY(float a_X, float a_Y)
 {
-   unsigned t_Pos = (unsigned)((a_X - m_LowX)*m_HighX * 1024) + (a_Y - m_LowY)*m_HighY;
-   return m_Info[t_Pos];
+   unsigned t_Pos = (unsigned)((a_X - m_LowX)*m_HighX * 1024.0f) + (a_Y - m_LowY)*m_HighY;
+   return m_Heightmap[t_Pos];
 }
 
 void AIMesh::Line(float x1, float y1, float x2, float y2, char *a_Info, unsigned m_Width, unsigned m_Height)
