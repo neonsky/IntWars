@@ -19,8 +19,8 @@ public:
 	void update(float a_DT);
 protected:
 	Map * m_Map;
-	Object **m_CollisionData;
-	uint32 m_Width, m_Height;
+	Object **collisionData;
+	uint32 width, height;
 };
 
 #endif

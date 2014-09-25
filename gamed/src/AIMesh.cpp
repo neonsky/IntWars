@@ -10,50 +10,50 @@
 
 // TODO: Clean this junk up
 
-AIMesh::AIMesh() :m_File(0), m_Heightmap(0)
+AIMesh::AIMesh() :fileStream(0), heightMap(0)
 {
 }
 
 
 AIMesh::~AIMesh()
 {
-   if (m_Heightmap!=0)
-      delete[] m_Heightmap;
+   if (heightMap!=0)
+      delete[] heightMap;
 }
 
-bool AIMesh::load(std::string a_File)
+bool AIMesh::load(std::string inputFile)
 {
    // Old direct file loading code
-	/*std::ifstream t_FileStream(a_File, std::ios::binary);
+	/*std::ifstream t_FileStream(inputFile, std::ios::binary);
 	t_FileStream.seekg(0, std::ios::end);
 	std::streamsize size = t_FileStream.tellg();
 	t_FileStream.seekg(0, std::ios::beg);
 
-	m_Buffer.resize((unsigned)size);
+	buffer.resize((unsigned)size);
 
-	if (t_FileStream.read(m_Buffer.data(), size))
+	if (t_FileStream.read(buffer.data(), size))
 	{
-		m_File = (__AIMESHFILE*)m_Buffer.data();
-		OutputMesh(1024, 1024);
+		fileStream = (__AIMESHFILE*)buffer.data();
+		outputMesh(1024, 1024);
 		return true;
 	}*/
 
    // LEVELS/Map1/AIPath.aimesh
 
-   m_Buffer.clear();
+   buffer.clear();
    std::cout << "Before reading" << std::endl;
-   if (RAFManager::getInstance()->readFile(a_File, m_Buffer)) // Our file exists. Load it.
+   if (RAFManager::getInstance()->readFile(inputFile, buffer)) // Our file exists. Load it.
    {
       std::cout << "After reading" << std::endl;
       for (int i = 0; i < 1024; i++) // For every scanline for the triangle rendering
       {
-         m_Lowest[i].u = m_Lowest[i].v = m_Lowest[i].x = m_Lowest[i].y = m_Lowest[i].z = 1e10f; // Init to zero
-         m_Highest[i].u = m_Highest[i].v = m_Highest[i].x = m_Highest[i].y = m_Highest[i].z = -1e10f;
+         scanlineLowest[i].u = scanlineLowest[i].v = scanlineLowest[i].x = scanlineLowest[i].y = scanlineLowest[i].z = 1e10f; // Init to zero
+         scanlineHighest[i].u = scanlineHighest[i].v = scanlineHighest[i].x = scanlineHighest[i].y = scanlineHighest[i].z = -1e10f;
       }
 
-      m_Heightmap = new float[1024 * 1024]; // Shows occupied or not
-      m_File = (__AIMESHFILE*)m_Buffer.data();
-      OutputMesh(1024, 1024);
+      heightMap = new float[1024 * 1024]; // Shows occupied or not
+      fileStream = (__AIMESHFILE*)buffer.data();
+      outputMesh(1024, 1024);
 
       std::cout << "Opened AIMesh file for this map." << std::endl;
       return true;
@@ -61,102 +61,106 @@ bool AIMesh::load(std::string a_File)
    return false;
 }
 
-bool AIMesh::OutputMesh(unsigned a_Width, unsigned a_Height)
+bool AIMesh::outputMesh(unsigned width, unsigned height)
 {
-	for (unsigned i = 0; i < a_Width*a_Height; i++) m_Heightmap[i] = 0.0f; // Clear the map
+   mapHeight = mapWidth = 0;
+	for (unsigned i = 0; i < width*height; i++) heightMap[i] = 0.0f; // Clear the map
 
-   m_LowX = 9e9, m_LowY = 9e9, m_HighX = 0, m_HighY = 0; // Init triangle
+   lowX = 9e9, lowY = 9e9, highX = 0, highY = 0; // Init triangle
 
-	for (unsigned i = 0; i < m_File->triangle_count; i++) 
+	for (unsigned i = 0; i < fileStream->triangle_count; i++) 
    // Need to find the absolute values.. So we can map it to 1024x1024 instead of 13000x15000
 	{
       // Triangle low X check
-		if (m_File->triangles[i].Face.v1[0] < m_LowX)
-			m_LowX = m_File->triangles[i].Face.v1[0];
-		if (m_File->triangles[i].Face.v2[0] < m_LowX)
-			m_LowX = m_File->triangles[i].Face.v2[0];
-		if (m_File->triangles[i].Face.v3[0] < m_LowX)
-			m_LowX = m_File->triangles[i].Face.v3[0];		
+		if (fileStream->triangles[i].Face.v1[0] < lowX)
+			lowX = fileStream->triangles[i].Face.v1[0];
+		if (fileStream->triangles[i].Face.v2[0] < lowX)
+			lowX = fileStream->triangles[i].Face.v2[0];
+		if (fileStream->triangles[i].Face.v3[0] < lowX)
+			lowX = fileStream->triangles[i].Face.v3[0];		
 
       // Triangle low Y check
-		if (m_File->triangles[i].Face.v1[2] < m_LowY)
-			m_LowY = m_File->triangles[i].Face.v1[2];
-		if (m_File->triangles[i].Face.v2[2] < m_LowY)
-			m_LowY = m_File->triangles[i].Face.v2[2];
-		if (m_File->triangles[i].Face.v3[2] < m_LowY)
-			m_LowY = m_File->triangles[i].Face.v3[2];
+		if (fileStream->triangles[i].Face.v1[2] < lowY)
+			lowY = fileStream->triangles[i].Face.v1[2];
+		if (fileStream->triangles[i].Face.v2[2] < lowY)
+			lowY = fileStream->triangles[i].Face.v2[2];
+		if (fileStream->triangles[i].Face.v3[2] < lowY)
+			lowY = fileStream->triangles[i].Face.v3[2];
 
       // Triangle high X check
-		if (m_File->triangles[i].Face.v1[0] > m_HighX)
-			m_HighX = m_File->triangles[i].Face.v1[0];
-		if (m_File->triangles[i].Face.v2[0] > m_HighX)
-			m_HighX = m_File->triangles[i].Face.v2[0];
-		if (m_File->triangles[i].Face.v3[0] > m_HighX)
-			m_HighX = m_File->triangles[i].Face.v3[0];
+		if (fileStream->triangles[i].Face.v1[0] > highX)
+			highX = fileStream->triangles[i].Face.v1[0];
+		if (fileStream->triangles[i].Face.v2[0] > highX)
+			highX = fileStream->triangles[i].Face.v2[0];
+		if (fileStream->triangles[i].Face.v3[0] > highX)
+			highX = fileStream->triangles[i].Face.v3[0];
 		
       // Triangle high Y check
-		if (m_File->triangles[i].Face.v1[2] > m_HighY)
-			m_HighY = m_File->triangles[i].Face.v1[2];
-		if (m_File->triangles[i].Face.v2[2] > m_HighY)
-			m_HighY = m_File->triangles[i].Face.v2[2];
-		if (m_File->triangles[i].Face.v3[2] > m_HighY)
-			m_HighY = m_File->triangles[i].Face.v3[2];
+		if (fileStream->triangles[i].Face.v1[2] > highY)
+			highY = fileStream->triangles[i].Face.v1[2];
+		if (fileStream->triangles[i].Face.v2[2] > highY)
+			highY = fileStream->triangles[i].Face.v2[2];
+		if (fileStream->triangles[i].Face.v3[2] > highY)
+			highY = fileStream->triangles[i].Face.v3[2];
 	}
 
-   // If the width or height larger?
-   if ((m_HighY - m_LowY) < (m_HighX - m_LowX))
+   mapWidth = (highX - lowX);
+   mapHeight = (highY - lowY);
+   
+   // If the width or width larger?
+   if ((highY - lowY) < (highX - lowX))
    {
-      m_HighX = 1.0f / (m_HighX - m_LowX)*a_Width; // We're wider than we're high, map on width
-      m_HighY = m_HighX; // Keep aspect ratio Basically, 1 y should be 1 x.
-      m_LowY = 0; // Though we need to project this in the middle, no offset
+      highX = 1.0f / (highX - lowX)*width; // We're wider than we're high, map on width
+      highY = highX; // Keep aspect ratio Basically, 1 y should be 1 x.
+      lowY = 0; // Though we need to project this in the middle, no offset
    }
    else
    {
-      m_HighY = 1.0f / (m_HighY - m_LowY)*a_Height; // We're higher than we're wide, map on height
-      m_HighX = m_HighY; // Keep aspect ratio Basically, 1 x should be 1 y.
-      // m_LowX = 0; // X is already in the middle? ??????
+      highY = 1.0f / (highY - lowY)*height; // We're higher than we're wide, map on width
+      highX = highY; // Keep aspect ratio Basically, 1 x should be 1 y.
+      // lowX = 0; // X is already in the middle? ??????
    }
 
-   for (unsigned i = 0; i <m_File->triangle_count; i++) // For every triangle
+   for (unsigned i = 0; i <fileStream->triangle_count; i++) // For every triangle
 	{
       Triangle t_Triangle; // Create a triangle that is warped to heightmap coordinates
-      t_Triangle.Face.v1[0] = (m_File->triangles[i].Face.v1[0] - m_LowX)*m_HighX;
-      t_Triangle.Face.v1[1] = m_File->triangles[i].Face.v1[1];
-      t_Triangle.Face.v1[2] = (m_File->triangles[i].Face.v1[2] - m_LowY)*m_HighY;
+      t_Triangle.Face.v1[0] = (fileStream->triangles[i].Face.v1[0] - lowX)*highX;
+      t_Triangle.Face.v1[1] = fileStream->triangles[i].Face.v1[1];
+      t_Triangle.Face.v1[2] = (fileStream->triangles[i].Face.v1[2] - lowY)*highY;
 
-      t_Triangle.Face.v2[0] = (m_File->triangles[i].Face.v2[0] - m_LowX)*m_HighX;
-      t_Triangle.Face.v2[1] = m_File->triangles[i].Face.v2[1];
-      t_Triangle.Face.v2[2] = (m_File->triangles[i].Face.v2[2] - m_LowY)*m_HighY;
+      t_Triangle.Face.v2[0] = (fileStream->triangles[i].Face.v2[0] - lowX)*highX;
+      t_Triangle.Face.v2[1] = fileStream->triangles[i].Face.v2[1];
+      t_Triangle.Face.v2[2] = (fileStream->triangles[i].Face.v2[2] - lowY)*highY;
 
-      t_Triangle.Face.v3[0] = (m_File->triangles[i].Face.v3[0] - m_LowX)*m_HighX;
-      t_Triangle.Face.v3[1] = m_File->triangles[i].Face.v3[1];
-      t_Triangle.Face.v3[2] = (m_File->triangles[i].Face.v3[2] - m_LowY)*m_HighY;
+      t_Triangle.Face.v3[0] = (fileStream->triangles[i].Face.v3[0] - lowX)*highX;
+      t_Triangle.Face.v3[1] = fileStream->triangles[i].Face.v3[1];
+      t_Triangle.Face.v3[2] = (fileStream->triangles[i].Face.v3[2] - lowY)*highY;
 
       /*
       // Draw just the wireframe.
-      Line(t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Info, a_Width, a_Height);
-      Line(t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Info, a_Width, a_Height);
-      Line(t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Info, a_Width, a_Height);
+      drawLine(t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Info, width, height);
+      drawLine(t_Triangle.Face.v2[0], t_Triangle.Face.v2[2], t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Info, width, height);
+      drawLine(t_Triangle.Face.v3[0], t_Triangle.Face.v3[2], t_Triangle.Face.v1[0], t_Triangle.Face.v1[2], t_Info, width, height);
       */
 
       // Draw this triangle onto the heightmap using an awesome triangle drawing function
-      DrawTriangle(t_Triangle, m_Heightmap, a_Width, a_Height);
+      drawTriangle(t_Triangle, heightMap, width, height);
 	}
 
-	//WriteToFile(t_Info, a_Width, a_Height);
+	//writeFile(t_Info, width, height);
 	return true;
 }
 
-float AIMesh::getY(float a_X, float a_Y)
+float AIMesh::getY(float argX, float argY)
 {
-   unsigned t_Pos = (unsigned)((a_X - m_LowX)*m_HighX * 1024.0f) + (a_Y - m_LowY)*m_HighY;
-   return m_Heightmap[t_Pos];
+   unsigned pos = (unsigned)((argX - lowX)*highX * 1024.0f) + (argY - lowY)*highY;
+   return heightMap[pos];
 }
 
-void AIMesh::Line(float x1, float y1, float x2, float y2, char *a_Info, unsigned m_Width, unsigned m_Height)
+void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height)
 {
-   if ((x1 < 0) || (y1 < 0) || (x1 >= m_Width) || (y1 >= m_Height) ||
-      (x2 < 0) || (y2 < 0) || (x2 >= m_Width) || (y2 >= m_Height))
+   if ((x1 < 0) || (y1 < 0) || (x1 >= width) || (y1 >= height) ||
+      (x2 < 0) || (y2 < 0) || (x2 >= width) || (y2 >= height))
    {
       return;
    }
@@ -169,35 +173,35 @@ void AIMesh::Line(float x1, float y1, float x2, float y2, char *a_Info, unsigned
    float dy = h / (float)l;
    for (int i = 0; i <= il; i++)
    {
-      a_Info[(unsigned)x1 + (unsigned)y1 * m_Width] = (char)255;
+      heightInfo[(unsigned)x1 + (unsigned)y1 * width] = (char)255;
       x1 += dx, y1 += dy;
    }
 }
 
-bool AIMesh::WriteToFile(float *a_PixelInfo, unsigned a_Width, unsigned a_Height)
+bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
 {
-   std::ofstream t_TGA("maps/test.tga", std::ios::binary);
-   if (!t_TGA) return false;
+   std::ofstream imageFile("maps/test.tga", std::ios::binary);
+   if (!imageFile) return false;
 
    // The image header
    unsigned char header[18] = { 0 };
    header[2] = 1;  // truecolor
-   header[12] = a_Width & 0xFF;
-   header[13] = (a_Width >> 8) & 0xFF;
-   header[14] = a_Height & 0xFF;
-   header[15] = (a_Height >> 8) & 0xFF;
+   header[12] = width & 0xFF;
+   header[13] = (width >> 8) & 0xFF;
+   header[14] = height & 0xFF;
+   header[15] = (height >> 8) & 0xFF;
    header[16] = 24;  // bits per pit_Xel
 
-   t_TGA.write((const char*)header, 18);
+   imageFile.write((const char*)header, 18);
 
    // The image data is stored bottom-to-top, left-to-right
-   for (int t_Y = a_Height - 1; t_Y >= 0; t_Y--)
-      //for (int t_Y = 0; t_Y<a_Height; t_Y++)
-   for (int t_X = 0; t_X < a_Width; t_X++)
+   for (int y = height - 1; y >= 0; y--)
+      //for (int y = 0; y<height; y++)
+   for (int x = 0; x < width; x++)
    {
-      t_TGA.put((char)(a_PixelInfo[(t_Y * a_Width) + t_X]));
-      t_TGA.put((char)(a_PixelInfo[(t_Y * a_Width) + t_X]));
-      t_TGA.put((char)(a_PixelInfo[(t_Y * a_Width) + t_X]));
+      imageFile.put((char)(pixelInfo[(y * width) + x]));
+      imageFile.put((char)(pixelInfo[(y * width) + x]));
+      imageFile.put((char)(pixelInfo[(y * width) + x]));
    }
 
    // The file footer. This part is totally optional.
@@ -206,186 +210,178 @@ bool AIMesh::WriteToFile(float *a_PixelInfo, unsigned a_Width, unsigned a_Height
       "\0\0\0\0"  // no developer directort_Y
       "TRUEVISION-XFILE"  // Yep, this is a TGA file
       ".";
-   t_TGA.write(footer, 26);
+   imageFile.write(footer, 26);
 
-   t_TGA.close();
+   imageFile.close();
    return true;
 }
 
-void AIMesh::DrawTriangle(Triangle a_Triangle, float *a_Info, unsigned a_Width, unsigned a_Height)
+void AIMesh::drawTriangle(Triangle triangle, float *heightInfo, unsigned width, unsigned height)
 {
 #define MIN(a,b) (((a)>(b))?(b):(a))
 #define MAX(a,b) (((a)>(b))?(a):(b))
    // The heart of the rasterizer
 
-   Vertex m_Vertex[3];
+   Vertex tempVertex[3];
 
-   m_Vertex[0].x = a_Triangle.Face.v1[0];
-   m_Vertex[0].y = a_Triangle.Face.v1[2];
-   m_Vertex[0].z = a_Triangle.Face.v1[1];
+   tempVertex[0].x = triangle.Face.v1[0];
+   tempVertex[0].y = triangle.Face.v1[2];
+   tempVertex[0].z = triangle.Face.v1[1];
 
-   m_Vertex[1].x = a_Triangle.Face.v2[0];
-   m_Vertex[1].y = a_Triangle.Face.v2[2];
-   m_Vertex[1].z = a_Triangle.Face.v2[1];
+   tempVertex[1].x = triangle.Face.v2[0];
+   tempVertex[1].y = triangle.Face.v2[2];
+   tempVertex[1].z = triangle.Face.v2[1];
 
-   m_Vertex[2].x = a_Triangle.Face.v3[0];
-   m_Vertex[2].y = a_Triangle.Face.v3[2];
-   m_Vertex[2].z = a_Triangle.Face.v3[1];
+   tempVertex[2].x = triangle.Face.v3[0];
+   tempVertex[2].y = triangle.Face.v3[2];
+   tempVertex[2].z = triangle.Face.v3[1];
 
-   FillScanLine(m_Vertex[0], m_Vertex[1]);
-   FillScanLine(m_Vertex[1], m_Vertex[2]);
-   FillScanLine(m_Vertex[2], m_Vertex[0]);
+   fillScanLine(tempVertex[0], tempVertex[1]);
+   fillScanLine(tempVertex[1], tempVertex[2]);
+   fillScanLine(tempVertex[2], tempVertex[0]);
 
-   float t_Width = a_Width;
-   float t_Height = a_Height;
-   // target width and height
+   float tempWidth = width;
+   float tempHeight = height;
+   // target width and width
 
-   int t_StartY = (int)MIN(m_Vertex[0].y, MIN(m_Vertex[1].y, m_Vertex[2].y));
-   int t_EndY = (int)MAX(m_Vertex[0].y, MAX(m_Vertex[1].y, m_Vertex[2].y));
+   int startY = (int)MIN(tempVertex[0].y, MIN(tempVertex[1].y, tempVertex[2].y));
+   int endY = (int)MAX(tempVertex[0].y, MAX(tempVertex[1].y, tempVertex[2].y));
    // Get the scanline where we start drawing and where we stop.
 
-   t_EndY = MIN(t_EndY, a_Height - 1);
-   t_StartY = MAX(0, t_StartY);
+   endY = MIN(endY, height - 1);
+   startY = MAX(0, startY);
 
-   for (int y = t_StartY; y <= t_EndY; y++) // for each scanline
+   for (int y = startY; y <= endY; y++) // for each scanline
    {
-      if (m_Lowest[y].x<m_Highest[y].x) // If we actually have something filled in this scanline
+      if (scanlineLowest[y].x<scanlineHighest[y].x) // If we actually have something filled in this scanline
       {
-         int yw = y * a_Height;
+         int yw = y * height;
 
-         float z = m_Lowest[y].z;
-         float u = m_Lowest[y].u;
-         float v = m_Lowest[y].v;
+         float z = scanlineLowest[y].z;
+         float u = scanlineLowest[y].u;
+         float v = scanlineLowest[y].v;
          // The start of the Z, U, and V coordinate.
 
-         float t_DeltaX = 1.f / (m_Highest[y].x - m_Lowest[y].x);
+         float deltaX = 1.f / (scanlineHighest[y].x - scanlineLowest[y].x);
          // Interpolation over X (change in X between the two, then reverse it so it's usable as multiplication
          // in divisions
 
-         float t_DeltaZ = (m_Highest[y].z - m_Lowest[y].z) * t_DeltaX;
-         float t_DeltaU = (m_Highest[y].u - m_Lowest[y].u) * t_DeltaX;
-         float t_DeltaV = (m_Highest[y].v - m_Lowest[y].v) * t_DeltaX;
+         float deltaZ = (scanlineHighest[y].z - scanlineLowest[y].z) * deltaX;
+         float deltaU = (scanlineHighest[y].u - scanlineLowest[y].u) * deltaX;
+         float deltaV = (scanlineHighest[y].v - scanlineLowest[y].v) * deltaX;
          // The interpolation in Z, U and V in respect to the interpolation of X	
 
          // Sub-texel correction
-         int x = (int)m_Lowest[y].x;
-         int t_X = x + 1;
-         int t_Distance = (int)(m_Highest[y].x) - (int)(m_Lowest[y].x);
-         if (t_Distance > 0.0f)
+         int x = (int)scanlineLowest[y].x;
+         int tx = x + 1;
+         int distInt = (int)(scanlineHighest[y].x) - (int)(scanlineLowest[y].x);
+         if (distInt > 0.0f)
          {
-            u += (((float)(t_X)) - t_X) * t_DeltaU;
-            v += (((float)(t_X)) - t_X) * t_DeltaV;
-            z += (((float)(t_X)) - t_X) * t_DeltaZ;
+            u += (((float)(tx)) - tx) * deltaU;
+            v += (((float)(tx)) - tx) * deltaV;
+            z += (((float)(tx)) - tx) * deltaZ;
          }
 
-         if (!(m_Highest[y].x<0 || x >= a_Height))
-         for (; x<(int)m_Highest[y].x; x++) // for each piece of the scanline
+         if (!(scanlineHighest[y].x<0 || x >= height))
+         for (; x<(int)scanlineHighest[y].x; x++) // for each piece of the scanline
          {
-            if (x >= a_Height) break; // If we're out of screen, break out this loop
+            if (x >= height) break; // If we're out of screen, break out this loop
 
             if (x<0)
             {
-               int t_InverseX = abs(x);
-               z += t_DeltaZ * t_InverseX;
-               u += t_DeltaU * t_InverseX;
-               v += t_DeltaV * t_InverseX;
+               int inverseX = abs(x);
+               z += deltaZ * inverseX;
+               u += deltaU * inverseX;
+               v += deltaV * inverseX;
                x = 0;
             }        
 
 
             {
-               //LeaveCriticalSection(&(a_Target->GetDrawingCS()));
-
-               float t_InverseZ = 1.f / z;
-               float t_DrawU = u * t_InverseZ;
-               float t_DrawV = v * t_InverseZ;
-
-               t_DrawU = (t_DrawU>0) ? (t_DrawU - (int)t_DrawU) : ((1.f + t_DrawU) - (int)t_DrawU);
-               t_DrawV = (1.0f) - (((t_DrawV>0) ? (t_DrawV - (int)t_DrawV) : ((t_DrawV + t_DrawV) - (int)t_DrawV)));
                // Get the point on the texture that we need to draw. It basically picks a pixel based on the uv.
 
-               //a_Target->GetRenderTarget()->Plot(x, t_Height - y, 255);
-               a_Info[a_Height-x + y * a_Height] = z;
+               //a_Target->GetRenderTarget()->Plot(x, tempHeight - y, 255);
+               heightInfo[height-x + y * height] = z;
             }
 
-            z += t_DeltaZ;
-            u += t_DeltaU;
-            v += t_DeltaV;
+            z += deltaZ;
+            u += deltaU;
+            v += deltaV;
             // interpolate
          }
       }
 
-      m_Lowest[y].x = 1e10f;
-      m_Highest[y].x = -1e10f;
+      scanlineLowest[y].x = 1e10f;
+      scanlineHighest[y].x = -1e10f;
    }
 }
 
-void AIMesh::FillScanLine(Vertex a_V1, Vertex a_V2)
+void AIMesh::fillScanLine(Vertex vertex1, Vertex vertex2)
 {
    // Fills a scanline structure with information about the triangle on this y scanline.
 
-   if (a_V1.y > a_V2.y)
-      return FillScanLine(a_V2, a_V1);
+   if (vertex1.y > vertex2.y)
+      return fillScanLine(vertex2, vertex1);
    // We need to go from low to high so switch if the other one is higher
 
-   if (a_V2.y < 0 || a_V1.y >= 1024)
+   if (vertex2.y < 0 || vertex1.y >= 1024)
       return;
    // There's nothing on this line
 
-   Vertex t_DeltaPos;
+   Vertex deltaPos;
    
-   t_DeltaPos.x = a_V2.x - a_V1.x;
-   t_DeltaPos.y = a_V2.y - a_V1.y;
-   t_DeltaPos.z = a_V2.z - a_V1.z;
+   deltaPos.x = vertex2.x - vertex1.x;
+   deltaPos.y = vertex2.y - vertex1.y;
+   deltaPos.z = vertex2.z - vertex1.z;
 
-   float t_Width = 1024;
-   float t_Height = 1024;
+   float tempWidth = 1024;
+   float tempHeight = 1024;
 
-   float t_DYResp = t_DeltaPos.y == 0 ? 0 : 1.f / t_DeltaPos.y;
-   int t_StartY = (int)a_V1.y, t_EndY = (int)a_V2.y;
+   float t_DYResp = deltaPos.y == 0 ? 0 : 1.f / deltaPos.y;
+   int startY = (int)vertex1.y, endY = (int)vertex2.y;
 
-   float x = a_V1.x;
-   float z = a_V1.z;
+   float x = vertex1.x;
+   float z = vertex1.z;
 
-   float t_DeltaX = t_DeltaPos.x * t_DYResp;
-   float t_DeltaZ = t_DeltaPos.z * t_DYResp;
+   float deltaX = deltaPos.x * t_DYResp;
+   float deltaZ = deltaPos.z * t_DYResp;
 
-   float t_Inc = 1.f - FRACPOS(a_V1.y);
+   float t_Inc = 1.f - FRACPOS(vertex1.y);
 
    // subpixel correction
-   t_StartY++;
-   x += t_DeltaX * t_Inc;
-   z += t_DeltaZ * t_Inc;
+   startY++;
+   x += deltaX * t_Inc;
+   z += deltaZ * t_Inc;
 
-   if (t_StartY < 0)
+   if (startY < 0)
    {
-      x -= t_DeltaX * t_StartY;
-      z -= t_DeltaZ * t_StartY;
-      t_StartY = 0;
+      x -= deltaX * startY;
+      z -= deltaZ * startY;
+      startY = 0;
    }
 
    // Small fix
-   if (t_EndY >= 1024) t_EndY = 1024 - 1;
+   if (endY >= 1024) endY = 1024 - 1;
 
    // For each scanline that this triangle uses
-   for (int y = t_StartY; y <= t_EndY; y++)
+   for (int y = startY; y <= endY; y++)
    {
-      if (x<m_Lowest[y].x) // If the x is lower than our lowest x
+      if (x<scanlineLowest[y].x) // If the x is lower than our lowest x
       {
-         m_Lowest[y].x = (x); // Fill the scanline struct with our info
-         m_Lowest[y].y = (float)y;
-         m_Lowest[y].z = z;
+         scanlineLowest[y].x = (x); // Fill the scanline struct with our info
+         scanlineLowest[y].y = (float)y;
+         scanlineLowest[y].z = z;
       }
-      if (x>m_Highest[y].x) // If the x is higher than our highest x
+      if (x>scanlineHighest[y].x) // If the x is higher than our highest x
       {
-         m_Highest[y].x = (x); // Fill the scanline struct with our info
-         m_Highest[y].y = (float)y;
-         m_Highest[y].z = z;
+         scanlineHighest[y].x = (x); // Fill the scanline struct with our info
+         scanlineHighest[y].y = (float)y;
+         scanlineHighest[y].z = z;
       }
 
       // Interpolate
       // Or going to the part of the triangle on the next scanline
-      x += t_DeltaX;
-      z += t_DeltaZ;
+      x += deltaX;
+      z += deltaZ;
    }
 }

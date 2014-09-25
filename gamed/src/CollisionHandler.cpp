@@ -7,65 +7,65 @@
 
 CollisionHandler::CollisionHandler()
 {
-	m_Width = ceil((float)MAP_WIDTH / (0.5f*COLLISION_BOX_SIZE)); //  * 2 / 50
-	m_Height = ceil((float)MAP_HEIGHT / (0.5f*COLLISION_BOX_SIZE));  // Because for some reason the map width/h is half the width/h of the map?
+	width = ceil((float)MAP_WIDTH / (0.5f*COLLISION_BOX_SIZE)); //  * 2 / 50
+	height = ceil((float)MAP_HEIGHT / (0.5f*COLLISION_BOX_SIZE));  // Because for some reason the map width/h is half the width/h of the map?
 
-	printf("Spawned collision map (%d, %d)\n", m_Width, m_Height);
-	m_CollisionData = new Object*[m_Width*m_Height];
+	printf("Spawned collision map (%d, %d)\n", width, height);
+	collisionData = new Object*[width*height];
 }
 
 CollisionHandler::~CollisionHandler()
 {
-	delete[] m_CollisionData;
+	delete[] collisionData;
 }
 
 void CollisionHandler::update(float a_DT)
 {
-	for (int i = 0; i < m_Height*m_Width; i++)
-		m_CollisionData[i] = NULL; // Clear the collision data
+	for (int i = 0; i < height*width; i++)
+		collisionData[i] = NULL; // Clear the collision data
 
-	const std::map<uint32, Object*>& t_Objects = m_Map->getObjects();
+	const std::map<uint32, Object*>& objects = m_Map->getObjects();
 
-	for (auto i = t_Objects.begin(); i != t_Objects.end(); i++)
+	for (auto i = objects.begin(); i != objects.end(); i++)
 	{
-		Object* t_Object = i->second;
+		Object* tempObject = i->second;
 
-		float x = t_Object->getX();
-		float y = t_Object->getY();
-		Object* t_Target = getCollisionData(t_Object->getPosition());
+		float x = tempObject->getX();
+		float y = tempObject->getY();
+		Object* target = getCollisionData(tempObject->getPosition());
 
-		//printf("Object at (%f,%f) (%f,%f)\n", t_Object->getX(), t_Object->getY());
+		//printf("Object at (%f,%f) (%f,%f)\n", tempObject->getX(), tempObject->getY());
 
-		if(t_Target!=NULL) // Is collision occupied
+		if(target!=NULL) // Is collision occupied
 		{
-			t_Object->onCollision(t_Target);
-         t_Target->onCollision(t_Object);
+			tempObject->onCollision(target);
+         target->onCollision(tempObject);
 		}
 		else
 		{
-			setCollisionData(t_Object);
+			setCollisionData(tempObject);
 		}
 	}
 }
 
 void CollisionHandler::setCollisionData(Object* a_Object)
 {
-	int32 t_X = a_Object->getX() / COLLISION_BOX_SIZE;
-	int32 t_Y = a_Object->getY() / COLLISION_BOX_SIZE;
+	int32 x = a_Object->getX() / COLLISION_BOX_SIZE;
+	int32 y = a_Object->getY() / COLLISION_BOX_SIZE;
 
-	if (t_X >= 0 && t_Y >= 0 && t_X < m_Width && t_Y < m_Height)
-		m_CollisionData[t_Y + t_X*m_Height] = a_Object;
-	//else printf("Set out of bounds location: x=%d y=%d, x=%f y=%f\n", t_X, t_Y, a_Object->getX(), a_Object->getY());
+	if (x >= 0 && y >= 0 && x < width && y < height)
+		collisionData[y + x*height] = a_Object;
+	//else printf("Set out of bounds location: x=%d y=%d, x=%f y=%f\n", x, y, a_Object->getX(), a_Object->getY());
 }
 
 Object* CollisionHandler::getCollisionData(Vector2 a_Target)
 {
-   int32 t_X = a_Target.X / COLLISION_BOX_SIZE;
-   int32 t_Y = a_Target.Y / COLLISION_BOX_SIZE;
+   int32 x = a_Target.X / COLLISION_BOX_SIZE;
+   int32 y = a_Target.Y / COLLISION_BOX_SIZE;
 
-   if (t_X >= 0 && t_Y >= 0 && t_X < m_Width && t_Y < m_Height)
-      return m_CollisionData[t_Y + t_X*m_Height];
+   if (x >= 0 && y >= 0 && x < width && y < height)
+      return collisionData[y + x*height];
 	
-   //printf("Get out of bounds location: x=%d y=%d\n", t_X, t_Y);
+   //printf("Get out of bounds location: x=%d y=%d\n", x, y);
    return 0;
 }

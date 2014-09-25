@@ -47,23 +47,27 @@ public:
 	AIMesh();
 	~AIMesh();
 
-   bool load(std::string a_File);
-   float getY(float a_X, float a_Y);
+   bool load(std::string inputFile);
+   float getY(float argX, float argY);
+
+   float getWidth() { return mapWidth; }
+   float getHeight() { return mapHeight; }
 	
 private:
-   void Line(float x1, float y1, float x2, float y2, char *a_Info, unsigned m_Width, unsigned m_Height);
-   void DrawTriangle(Triangle a_Triangle, float *a_Info, unsigned a_Width, unsigned a_Height);
-   void FillScanLine(Vertex a_V1, Vertex a_V2);
-	bool OutputMesh(unsigned a_Width, unsigned a_Height);
-	bool WriteToFile(float *a_PixelInfo, unsigned a_Width, unsigned a_Height);
+   void drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height);
+   void drawTriangle(Triangle triangle, float *heightInfo, unsigned width, unsigned height);
+   void fillScanLine(Vertex vertex1, Vertex vertex2);
+	bool outputMesh(unsigned width, unsigned height);
+	bool writeFile(float *pixelInfo, unsigned width, unsigned height);
 
 
-	std::vector<unsigned char> m_Buffer;
-   __AIMESHFILE *m_File;
+	std::vector<unsigned char> buffer;
+   __AIMESHFILE *fileStream;
 
-   double m_LowX, m_LowY, m_HighX, m_HighY;
-   ScanLine m_Lowest[1024], m_Highest[1024];
-   float *m_Heightmap;
+   double lowX, lowY, highX, highY;
+   ScanLine scanlineLowest[1024], scanlineHighest[1024];
+   float *heightMap;
+   float mapWidth, mapHeight;
 };
 
 #endif
