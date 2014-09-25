@@ -73,7 +73,7 @@ const static vector<vector<MovementVector> > ConstWaypoints =
    },
 };
 
-SummonersRift::SummonersRift(Game* game) : Map(game, 90*1000000, 30*1000000, 90*1000000) {
+SummonersRift::SummonersRift(Game* game) : Map(game, 15*1000000, 30*1000000, 90*1000000) {
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_R_03_A", 10097.62f, 808.73f, 2550, 156, 0));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_R_02_A", 6512.53f, 1262.62f, 2550, 170, 0));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_C_07_A", 3747.26f, 1041.04f, 2550, 190, 0));
@@ -131,7 +131,6 @@ bool SummonersRift::spawn() {
       for(uint32 i = 0; i < positions.size(); ++i) {
          Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_MELEE, positions[i], ConstWaypoints[i]);
          addObject(m);
-         game->notifyMinionSpawned(m);
       }
       return false;
    }
@@ -140,7 +139,6 @@ bool SummonersRift::spawn() {
       for(uint32 i = 0; i < positions.size(); ++i) {
          Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CASTER, positions[i], ConstWaypoints[i]);
          addObject(m);
-         game->notifyMinionSpawned(m);
       }
       return false;
    }
@@ -149,7 +147,6 @@ bool SummonersRift::spawn() {
       for(uint32 i = 0; i < positions.size(); ++i) {
          Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CANNON, positions[i], ConstWaypoints[i]);
          addObject(m);
-         game->notifyMinionSpawned(m);
       }
       return true;
    }

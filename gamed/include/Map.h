@@ -14,6 +14,7 @@ class Map {
 
 protected:
    std::map<uint32, Object*> objects;
+   std::map<uint32, Unit*> visionUnits[2];
    std::vector<uint32> expToLevelUp;
    int waveNumber;
    const uint64 firstSpawnTime;
@@ -55,6 +56,8 @@ public:
    
    bool getKillReduction() { return killReduction; }
    bool setKillReduction(bool state) { killReduction = state; }
+   
+   bool teamHasVisionOn(int side, Object* o);
 };
 
 #endif

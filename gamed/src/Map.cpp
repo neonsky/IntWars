@@ -2,6 +2,18 @@
 #include "Game.h"
 
 void Map::update(int64 diff) {
+   for(int i = 0; i < 2; ++i) {
+      for(auto kv = visionUnits[i].begin(); kv != visionUnits[i].end();) {
+         if(teamHasVisionOn(1-i, kv->second)) {
+            game->notifySpawn(kv->second);
+            kv = visionUnits[i].erase(kv);
+            continue;
+         }
+         
+         ++kv;
+      }
+   }
+
    for(auto kv = objects.begin(); kv != objects.end();) {
       if(kv->second->isToRemove() && kv->second->getAttackerCount() == 0) {
          delete kv->second;
@@ -83,10 +95,24 @@ Object* Map::getObjectById(uint32 id) {
 
 void Map::addObject(Object* o) {
    objects[o->getNetId()] = o;
+   
+   Unit* u = dynamic_cast<Unit*>(o);
+   if(!u) {
+      return;
+   }
+   
+   visionUnits[o->getSide()][o->getNetId()] = u;
+   
+   Minion* m = dynamic_cast<Minion*>(u);
+   
+   if(m) {
+      game->notifyMinionSpawned(m, m->getSide());
+   }
 }
 
 void Map::removeObject(Object* o) {
    objects.erase(o->getNetId());
+   visionUnits[o->getSide()].erase(o->getNetId());
 }
 
 void Map::stopTargeting(Unit* target) {
@@ -117,4 +143,18 @@ std::vector<Champion*> Map::getChampionsInRange(Target* t, float range) {
 		}
 	}
 	return champs;
+}
+
+bool Map::teamHasVisionOn(int side, Object* o) {
+   if(o->getSide() == side) {
+      return true;
+   }
+
+   for(auto kv : objects) {
+      if(kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius()) {
+         return true;
+      }
+   }
+   
+   return false;
 }

@@ -1,7 +1,7 @@
 #ifndef _MINION_H
 #define _MINION_H
 
-#include "AI/MinionAI.h"
+#include "Unit.h"
 
 enum MinionSpawnPosition : uint32 {
    SPAWN_BLUE_TOP = 0xeb364c40,

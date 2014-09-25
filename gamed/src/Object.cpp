@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0) {
+Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius), visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0) {
 }
 
 Object::~Object() {

@@ -6,20 +6,43 @@
 
 using namespace std;
 
-void Game::notifyMinionSpawned(Minion* m) {
+void Game::notifyMinionSpawned(Minion* m, int side) {
    MinionSpawn ms(m);
-   broadcastPacket(ms, CHL_S2C);
+   
+   if(side == 2) {
+      broadcastPacket(ms, CHL_S2C);
+   } else {
+      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
+      if(side != m->getSide()) {
+         printPacket((uint8*)&ms.getBuffer().getBytes()[0], ms.getBuffer().getBytes().size());
+         notifyUpdatedStats(m, false);
+      }
+   }
+   
    notifySetHealth(m);
 }
 
 void Game::notifySetHealth(Unit* u) {
    SetHealth sh(u);
-   broadcastPacket(sh, CHL_S2C);
+   broadcastPacketVision(u, sh, CHL_S2C);
 }
 
-void Game::notifyUpdatedStats(Unit* u) {
-   UpdateStats us(u);
-   broadcastPacket(us, CHL_LOW_PRIORITY, 2);
+void Game::notifyUpdatedStats(Unit* u, bool partial) {
+   UpdateStats us(u, partial);
+   
+   Turret* t = dynamic_cast<Turret*>(u);
+   if(t) {
+      broadcastPacket(us, CHL_LOW_PRIORITY, 2);
+      return;
+   }
+   
+   if(!partial) {
+      broadcastPacketTeam((1-u->getSide()) == 0 ? TEAM_BLUE : TEAM_PURPLE, us, CHL_LOW_PRIORITY, 2);
+      printf("Broadcasting stats to team %d\n", 1-u->getSide());
+      printPacket((uint8*)&us.getBuffer().getBytes()[0], us.getBuffer().getBytes().size());
+   } else {
+      broadcastPacketVision(u, us, CHL_LOW_PRIORITY, 2);
+   }
 }
 
 void Game::notifyAddBuff(Unit* u, Unit* source, std::string buffName) {
@@ -67,7 +90,7 @@ void Game::notifyMovement(Object* o) {
       answer->getVector(i)->y = waypoints[i].y;
    }
    
-   broadcastPacket(reinterpret_cast<uint8 *>(answer), answer->size(), 4);
+   broadcastPacketVision(o, reinterpret_cast<uint8 *>(answer), answer->size(), 4);
    MovementAns::destroy(answer);
 }
 
@@ -169,4 +192,12 @@ void Game::notifyStopAutoAttack(Unit* attacker) {
 void Game::notifyDebugMessage(std::string htmlDebugMessage) {
    DebugMessage dm(htmlDebugMessage);
    broadcastPacket(dm, CHL_S2C);
+}
+
+void Game::notifySpawn(Unit* u) {
+   Minion* m = dynamic_cast<Minion*>(u);
+   
+   if(m) {
+      notifyMinionSpawned(m, 1-m->getSide());
+   }
 }

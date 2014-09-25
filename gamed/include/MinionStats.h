@@ -93,6 +93,10 @@ public:
    
    void setAttackSpeedMultiplier(float multiplier) override {
    }
+   
+   uint8 getSize(uint8 blockId, uint32 stat) override {
+      return 4;
+   }
 
 };
 

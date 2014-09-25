@@ -282,6 +282,21 @@ struct Unk {
    uint32 targetNetId;
 };
 
+/*
+0000-0015 ba 23 00 00 40 17 00 15 00 03 23 00 00 40 23 00 .#..@.....#..@#.
+0016-0031 00 40 40 e8 00 ba ff 01 00 00 00 0a 00 01 00 00 .@@.............
+0032-0047 00 00 00 00 00 00 00 00 00 00 00 80 3f 00 00 00 ............?...
+0048-0063 00 00 00 00 00 00 00 00 00 00 02 f7 b0 14 00 04 ................
+0064-0076 23 00 00 40 00 28 05 93 04 b4 02 3b 02          #..@.(.....;.
+*/
+
+/*
+0000-0015 ba a8 00 00 40 17 00 15 00 03 a8 00 00 40 a8 00 ....@........@..
+0016-0031 00 40 40 e8 00 ba ff 01 00 00 00 0a 00 01 00 00 .@@.............
+0032-0047 00 00 00 00 00 00 00 00 00 00 00 80 3f 00 00 00 ............?...
+0048-0063 00 00 00 00 00 00 00 00 00 00 02 5e 31 00 00 04 ...........^1...
+0064-0076 a8 00 00 40 00 d9 02 a3 02 54 01 21 01          ...@.....T.!.*/
+
 class MinionSpawn : public BasePacket {
 public:
    MinionSpawn(const Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
@@ -290,16 +305,32 @@ public:
       buffer << m->getNetId() << m->getNetId();
       buffer << (uint32)m->getPosition();
       buffer << (uint8)0xFF; // unk
-      buffer << (uint8)1; // unk
+      buffer << (uint8)1; // wave number ?
+      buffer << (uint8)0; // unk
       buffer << (uint8)m->getType();
       buffer << (uint8)0; // unk
-      buffer << (uint8)1; // unk
-      buffer << "\x0a\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x3f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x2c\x27";
-      buffer << (uint8)2; // coordCount
+      buffer << (uint32)0x0001000A; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint16)0x0000; // unk
+      buffer << 1.0f; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint16)0x0200; // unk
+      buffer << (uint32)clock(); // unk
+      
+      const std::vector<MovementVector>& waypoints = m->getWaypoints();
+      
+      buffer << (uint8)((waypoints.size()-m->getCurWaypoint()+1)*2); // coordCount
       buffer << m->getNetId();
       buffer << (uint8)0; // movement mask
       buffer << MovementVector::targetXToNormalFormat(m->getX());
       buffer << MovementVector::targetYToNormalFormat(m->getY());
+      for(int i = m->getCurWaypoint(); i < waypoints.size(); ++i) {
+         buffer << waypoints[i].x;
+         buffer << waypoints[i].y;
+      }
    }
    
    MinionSpawn(uint32 itemHash) : BasePacket(PKT_S2C_MinionSpawn, itemHash) {
@@ -1096,8 +1127,14 @@ public:
 
 class UpdateStats : public GamePacket {
 public:
-   UpdateStats(Unit* u) : GamePacket(PKT_S2C_CharStats, 0) {
-      const std::map<uint8, std::set<uint32> >& stats = u->getStats().getUpdatedStats();
+   UpdateStats(Unit* u, bool partial = true) : GamePacket(PKT_S2C_CharStats, 0) {
+      std::map<uint8, std::set<uint32> > stats;
+   
+      if(partial) {
+         stats = u->getStats().getUpdatedStats();
+      } else {
+         stats = u->getStats().getAllStats();
+      }
       
       std::set<uint8> masks;
       uint8 masterMask = 0;

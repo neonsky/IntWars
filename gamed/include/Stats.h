@@ -97,6 +97,18 @@ public:
     const std::map<uint8, std::set<uint32> >& getUpdatedStats() const {
         return updatedStats;
     }
+    
+    const std::map<uint8, std::set<uint32> > getAllStats() const {
+      std::map<uint8, std::set<uint32> > toReturn;
+      
+      for(uint8 i = 0; i < 5; ++i) {
+         for(auto kv : stats[i]) {
+            toReturn[(1 << i)].insert(kv.first);
+         }
+      }
+      
+      return toReturn;
+    }
 
     void clearUpdatedStats() {
         updatedStats.clear();

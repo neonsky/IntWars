@@ -6,7 +6,7 @@
 #include "LuaScript.h"
 #include <sstream>
 
-Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats()), type(type), skillPoints(0), respawnTimer(0), playerId(playerId)  {
+Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats(), 30, 0, 0, 1200), type(type), skillPoints(0), respawnTimer(0), playerId(playerId)  {
    stats->setGold(475.0f);
    stats->setAttackSpeedMultiplier(1.0f);
    stats->setGoldPerSecond(map->getGoldPerSecond());

@@ -1,5 +1,4 @@
 #include "Unit.h"
-#include "AI.h"
 #include "Map.h"
 #include "Game.h"
 
@@ -13,9 +12,6 @@ using namespace std;
 
 Unit::~Unit() {
     delete stats;
-    if (ai) {
-        delete ai;
-    }
 }
 
 void Unit::update(int64 diff) {
@@ -46,7 +42,7 @@ void Unit::update(int64 diff) {
 
    if (isAttacking) {
       autoAttackCurrentDelay += diff / 1000000.f;
-      if (autoAttackCurrentDelay >= autoAttackDelay) {
+      if (autoAttackCurrentDelay >= autoAttackDelay/stats->getAttackSpeedMultiplier()) {
          if(!isMelee()) {
             Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, unitTarget, 0, autoAttackProjectileSpeed, 0);
             map->addObject(p);
@@ -98,10 +94,6 @@ void Unit::update(int64 diff) {
 
    if (autoAttackCurrentCooldown > 0) {
       autoAttackCurrentCooldown -= diff / 1000000.f;
-   }
-
-   if (ai) {
-      ai->update(diff);
    }
 
    statUpdateTimer += diff;
