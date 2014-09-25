@@ -7,7 +7,6 @@ Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGo
    collisionHandler->setMap(this);
 }
 
-
 void Map::update(int64 diff) {
    collisionHandler->update(diff);
    for(auto kv = objects.begin(); kv != objects.end();) {

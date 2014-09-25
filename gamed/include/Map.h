@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Object.h"
+#include "AIMesh.h"
 #include "Champion.h"
 #include "CollisionHandler.h"
 
@@ -54,6 +55,8 @@ public:
    
    bool getFirstBlood() { return firstBlood; }
    bool setFirstBlood(bool state) { firstBlood = state; }
+
+   AIMesh mesh;
    
    bool getKillReduction() { return killReduction; }
    bool setKillReduction(bool state) { killReduction = state; }

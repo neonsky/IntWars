@@ -28,22 +28,22 @@ void CollisionHandler::update(float a_DT)
 
 	for (auto i = t_Objects.begin(); i != t_Objects.end(); i++)
 	{
-		Object* t_Object1 = i->second;
+		Object* t_Object = i->second;
 
-		float x = t_Object1->getX();
-		float y = t_Object1->getY();
-		Object* t_Target = getCollisionData(t_Object1->getPosition());
+		float x = t_Object->getX();
+		float y = t_Object->getY();
+		Object* t_Target = getCollisionData(t_Object->getPosition());
 
-		//printf("Object at (%f,%f) (%f,%f)\n", t_Object1->getX(), t_Object1->getY());
+		//printf("Object at (%f,%f) (%f,%f)\n", t_Object->getX(), t_Object->getY());
 
 		if(t_Target!=NULL) // Is collision occupied
 		{
-			t_Object1->onCollision(t_Target);
-         t_Target->onCollision(t_Object1);
+			t_Object->onCollision(t_Target);
+         t_Target->onCollision(t_Object);
 		}
 		else
 		{
-			setCollisionData(t_Object1);
+			setCollisionData(t_Object);
 		}
 	}
 }
