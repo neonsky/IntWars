@@ -18,6 +18,5 @@ function applyEffects()
    local damage = getEffectValue(0)+getOwner():getStats():getBonusAdFlat()+(0.9*getOwner():getStats():getTotalAp())
 	dealMagicalDamage(damage * (1-reduc/10.0))
    -- TODO this can be fetched from projectile inibin "HitEffectName"
-   -- TODO find what particle this uses
-   addParticleTarget("Ezreal_mysticshot_tar.troy", getTarget())
+   addParticleTarget("Ezreal_TrueShot_tar.troy", getTarget())
 end

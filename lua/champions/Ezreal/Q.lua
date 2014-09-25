@@ -20,6 +20,5 @@ function applyEffects()
    addParticleTarget("Ezreal_mysticshot_tar.troy", getTarget())
    
    destroyProjectile()
-   
-   print("Ezreal Q hit something!")
+
 end
