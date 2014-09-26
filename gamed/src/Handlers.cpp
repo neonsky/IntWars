@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -297,13 +298,14 @@ bool Game::handleCastSpell(HANDLE_ARGS) {
    printf("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    uint32 futureProjNetId = GetNewNetID();
-   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId);
+   uint32 spellNetId = GetNewNetID();
+   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId, spellNetId);
 
    if(!s) {
       return false;
    }
    
-   CastSpellAns response(s, spell->x, spell->y, futureProjNetId);
+   CastSpellAns response(s, spell->x, spell->y, futureProjNetId, spellNetId);
    broadcastPacket(response, CHL_S2C);
 
    return true;
@@ -314,6 +316,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    //Lets do commands
    if(message->msg == '.') {
       const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".tp", ".coords", ".ch"};
+      std::ostringstream debugMsg;
       
       // help command
       if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0) {
@@ -478,6 +481,8 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
        // coords
       if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
          printf("At %f;%f\n", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
+         debugMsg << "At Coords: " << peerInfo(peer)->getChampion()->getX() << ";" << peerInfo(peer)->getChampion()->getY();
+         notifyDebugMessage(debugMsg.str());
          return true;
       }
       

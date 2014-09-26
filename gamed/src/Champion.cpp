@@ -87,7 +87,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
    }
 }
 
-Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target, uint32 futureProjNetId) {
+Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target, uint32 futureProjNetId, uint32 spellNetId) {
    if(slot >= spells.size()) {
       return 0;
    }
@@ -100,7 +100,7 @@ Spell* Champion::castSpell(uint8 slot, float x, float y, Unit* target, uint32 fu
       return 0;
    }
    
-   s->cast(x, y, target, futureProjNetId);
+   s->cast(x, y, target, futureProjNetId, spellNetId);
    stats->setCurrentMana(stats->getCurrentMana() - (s->getCost() * (1 - stats->getSpellCostReduction())));
    return s;
 }

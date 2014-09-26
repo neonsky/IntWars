@@ -823,9 +823,9 @@ public:
    }
 };
 
-class AutoAttack : public BasePacket {
+class BeginAutoAttack : public BasePacket {
 public:
-   AutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_AutoAttack, attacker->getNetId()) {
+   BeginAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_BeginAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
@@ -837,12 +837,16 @@ public:
    }
 };
 
-class AutoAttackMelee : public BasePacket {
+class NextAutoAttack : public BasePacket {
 public:
-   AutoAttackMelee(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_Melee_AutoAttack, attacker->getNetId()) {
+   NextAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical, bool initial) : BasePacket(PKT_S2C_NextAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
-      buffer << (uint8)0; // unk
-      buffer << futureProjNetId; // this might not be "melee" auto attack after all..
+      if (initial)
+         buffer << (uint8)0x80; // These flags appear to change only to 0x80 and 0x7F after the first autoattack.
+      else
+         buffer << (uint8)0x7F;
+         
+      buffer << futureProjNetId;
       if (isCritical)
         buffer << (uint8)0x49;
       else
@@ -949,10 +953,10 @@ struct CastSpell {
 
 class CastSpellAns : public GamePacket {
 public:
-   CastSpellAns(Spell* s, float x, float y, uint32 futureProjNetId) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
+   CastSpellAns(Spell* s, float x, float y, uint32 futureProjNetId, uint32 spellNetId) : GamePacket(PKT_S2C_CastSpellAns, s->getOwner()->getNetId()) {
       buffer << (uint8)0 << (uint8)0x66 << (uint8)0x00; // unk
       buffer << s->getId(); // Spell hash, for example hash("EzrealMysticShot")
-      buffer << (uint32)0x400001f6; // a net ID, but what for..
+      buffer << (uint32)spellNetId; // Spell net ID
       buffer << (uint8)0; // unk
       buffer << 1.0f; // unk
       buffer << s->getOwner()->getNetId() << s->getOwner()->getNetId();
@@ -1141,7 +1145,15 @@ class LevelPropSpawn : public BasePacket {
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
             buffer << lp->getX() << lp->getZ() << lp->getY();
-            buffer.fill(0, 41); // unk
+            buffer << 0.f; // Rotation Y
+            
+            buffer << lp->getDirectionX() << lp->getDirectionZ() << lp->getDirectionY();
+            buffer << lp->getUnk1() << lp->getUnk2();
+
+            buffer << 1.0f << 1.0f << 1.0f; // Scaling
+            buffer << (uint32)300; // unk
+            buffer << (uint8)1; // bIsProp -- if is a prop, become unselectable and use direction params
+            
             buffer << lp->getName();
             buffer.fill(0, 64-lp->getName().length());
             buffer << lp->getType();
@@ -1149,12 +1161,17 @@ class LevelPropSpawn : public BasePacket {
         }
         
         // TODO : remove this once we find a better solution for jungle camp spawning command
-        LevelPropSpawn(uint32 netId, const std::string& name, const std::string& type, float x, float y, float z) : BasePacket(PKT_S2C_LevelPropSpawn) {
+        LevelPropSpawn(uint32 netId, const std::string& name, const std::string& type, float x, float y, float z, float dirX, float dirY, float dirZ, float unk1, float unk2) : BasePacket(PKT_S2C_LevelPropSpawn) {
             buffer << netId;
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
             buffer << x << z << y;
-            buffer.fill(0, 41); // unk
+            buffer << 0.f; // Rotation Y
+            buffer << dirX << dirZ << dirY; // Direction
+            buffer << unk1 << unk2;
+            buffer << 1.0f << 1.0f << 1.0f; // Scaling
+            buffer << (uint32)300; // unk
+            buffer << (uint8)1; // bIsProp -- if is a prop, become unselectable and use direction params
             buffer << name;
             buffer.fill(0, 64-name.length());
             buffer << type;
@@ -1191,6 +1208,15 @@ public:
    }
    void setRequestNo(uint8 requestNo){
       buffer << requestNo;
+   }
+};
+
+class DebugMessage : public BasePacket {
+public:
+   DebugMessage(const std::string& message) : BasePacket(PKT_S2C_DebugMessage) {
+      buffer << (uint32)0;
+      buffer << message;
+      buffer.fill(0, 512-message.length());
    }
 };
 /* End New Packets */

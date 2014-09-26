@@ -76,13 +76,13 @@ void Game::notifyDamageDone(Unit* source, Unit* target, float amount, DamageType
    broadcastPacket(dd, CHL_S2C);
 }
 
-void Game::notifyAutoAttack(Unit* attacker, Unit* victim, uint32 futureProjNetId, bool isCritical) {
-   AutoAttack aa(attacker, victim, futureProjNetId, isCritical);
+void Game::notifyBeginAutoAttack(Unit* attacker, Unit* victim, uint32 futureProjNetId, bool isCritical) {
+   BeginAutoAttack aa(attacker, victim, futureProjNetId, isCritical);
    broadcastPacket(aa, CHL_S2C);
 }
 
-void Game::notifyAutoAttackMelee(Unit* attacker, Unit* target, uint32 futureProjNetId, bool isCritical) {
-   AutoAttackMelee aa(attacker, target, futureProjNetId, isCritical);
+void Game::notifyNextAutoAttack(Unit* attacker, Unit* target, uint32 futureProjNetId, bool isCritical, bool nextAttackFlag) {
+   NextAutoAttack aa(attacker, target, futureProjNetId, isCritical, nextAttackFlag);
    broadcastPacket(aa, CHL_S2C);
 }
 
@@ -164,4 +164,9 @@ void Game::notifyAddGold(Champion* c, Unit* died, float gold) {
 void Game::notifyStopAutoAttack(Unit* attacker) {
    StopAutoAttack saa(attacker);
    broadcastPacket(saa, CHL_S2C);
+}
+
+void Game::notifyDebugMessage(std::string htmlDebugMessage) {
+   DebugMessage dm(htmlDebugMessage);
+   broadcastPacket(dm, CHL_S2C);
 }
