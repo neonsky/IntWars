@@ -40,7 +40,7 @@ void Turret::update(int64 diff)
          } else {
             Champion* currentTarget = dynamic_cast<Champion*>(unitTarget);
             
-            // Is the current target a champion? If it isn't, don't do anything
+            // Is the current target a champion? If it is, don't do anything
             if (!currentTarget) {
                // Find the next champion in range targeting an enemy champion who is also in range
                Champion* c = dynamic_cast<Champion*>(u);

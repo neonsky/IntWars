@@ -99,10 +99,10 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 90*1000000, 30*1000000, 90*
    addObject(new Turret(this, GetNewNetID(), "@Turret_T2_L_02_A", 7536.f, 13190.f, 2550, 170, 1));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T2_L_01_A", 10261.f, 13465.f, 2550, 190, 1));
    
-   addObject(new LevelProp(this, GetNewNetID(), 12465, 14422.257f, 101, "LevelProp_Yonkey", "Yonkey"));
-   addObject(new LevelProp(this, GetNewNetID(), -76, 1769.1589f, 94, "LevelProp_Yonkey1", "Yonkey"));
-   addObject(new LevelProp(this, GetNewNetID(), 13374, 14245.673f, 194, "LevelProp_ShopMale", "ShopMale"));
-   addObject(new LevelProp(this, GetNewNetID(), -99, 855.6632f, 191, "LevelProp_ShopMale1", "ShopMale"));
+   addObject(new LevelProp(this, GetNewNetID(), 12465.f, 14422.257f, 101.f, 0.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_Yonkey", "Yonkey"));
+   addObject(new LevelProp(this, GetNewNetID(), -76.f, 1769.1589f, 94.f, 0.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_Yonkey1", "Yonkey"));
+   addObject(new LevelProp(this, GetNewNetID(), 13374.17f, 14245.673f, 194.9741f, 224.f, 33.33f, 0.f, 0.f, -44.44f, "LevelProp_ShopMale", "ShopMale"));
+   addObject(new LevelProp(this, GetNewNetID(), -99.5613f, 855.6632f, 191.4039f, 158.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_ShopMale1", "ShopMale"));
    
    // Start at xp to reach level 1
    expToLevelUp = { 0, 280, 660, 1140, 1720, 2400, 3180, 4060, 5040, 6120, 7300, 8580, 9960, 11440, 13020, 14700, 16480, 18360 };

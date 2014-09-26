@@ -30,14 +30,14 @@ enum PacketCmd : uint8
 {                                            
    PKT_KeyCheck = 0x00, 
    PKT_S2C_RemoveItem = 0x0B,
-   PKT_S2C_Melee_AutoAttack = 0x0C,
+   PKT_S2C_NextAutoAttack = 0x0C,
 
    PKT_S2C_EndSpawn = 0x11,
    PKT_C2S_QueryStatusReq = 0x14,
    PKT_S2C_SkillUp = 0x15,
    PKT_C2S_Ping_Load_Info = 0x16,
-   PKT_S2C_AutoAttack = 0x1A,
-   PKT_S2C_EditBuff = 0x1C,//unsure
+   PKT_S2C_BeginAutoAttack = 0x1A,
+   PKT_S2C_EditBuff = 0x1C,
    PKT_C2S_SwapItems = 0x20,
    PKT_S2C_AddGold = 0x22,
    
@@ -114,6 +114,7 @@ enum PacketCmd : uint8
    PKT_S2C_FogUpdate2 = 0x23,
    PKT_S2C_LevelPropSpawn = 0xD0,
 
+   PKT_S2C_DebugMessage = 0xF7,
    PKT_S2C_UNK          = 0xFE, // Change target ??
 
    PKT_Batch = 0xFF

@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -76,7 +77,7 @@ bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
    sol::table config = script.getTable("game");
    int mapId = config.get<int>("map");
    printf("Current map: %i\n", mapId);
-   SynchVersionAns answer(players, "Version 4.13.0.262 [PUBLIC]", "CLASSIC", (uint32)mapId);
+   SynchVersionAns answer(players, "Version 4.17.0.233 [PUBLIC]", "CLASSIC", (uint32)mapId);
    printPacket(reinterpret_cast<uint8 *>(&answer), sizeof(answer));
    return sendPacket(peer, answer, 3);
 }
@@ -101,8 +102,13 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
    printf("Spawning map\r\n");
 
    int playerId = 0;
+   ClientInfo* playerInfo = 0;
 
    for(auto p : players) {
+      if (p->getPeer() == peer) {
+         playerInfo = p;
+      }
+      
       HeroSpawn spawn(p, playerId++);
       sendPacket(peer, spawn, CHL_S2C);
       
@@ -128,6 +134,45 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
          LevelPropSpawn lpsPacket(lp);
          sendPacket(peer, lpsPacket, CHL_S2C);
       }
+   }
+
+   // Level props are just models, we need button-object minions to allow the client to interact with it
+   if (playerInfo != 0 && playerInfo->getTeam() == TEAM_BLUE) {
+      MinionSpawn ms1(0xff10c6db); // Shop (blue side)
+      sendPacket(peer, ms1, CHL_S2C);
+      
+      SetHealth sh1(0xff10c6db); // Shop (blue side)
+      sendPacket(peer, sh1, CHL_S2C);
+      
+      MinionSpawn ms2(0xffd23c3e); // unk
+      sendPacket(peer, ms2, CHL_S2C);
+      
+      SetHealth sh2(0xffd23c3e); // unk
+      sendPacket(peer, sh2, CHL_S2C);
+      
+      MinionSpawn ms3(0xfff97db5); // unk
+      sendPacket(peer, ms3, CHL_S2C);
+      
+      SetHealth sh3(0xfff97db5); // unk
+      sendPacket(peer, sh3, CHL_S2C);
+   } else if (playerInfo != 0 && playerInfo->getTeam() == TEAM_PURPLE) {
+      MinionSpawn ms1(0xffa6170e); // Shop (purple side)
+      sendPacket(peer, ms1, CHL_S2C);
+      
+      SetHealth sh1(0xffa6170e); // Shop (purple side)
+      sendPacket(peer, sh1, CHL_S2C);
+      
+      MinionSpawn ms2(0xff26ac0f); // unk
+      sendPacket(peer, ms2, CHL_S2C);
+      
+      SetHealth sh2(0xff26ac0f); // unk
+      sendPacket(peer, sh2, CHL_S2C);
+      
+      MinionSpawn ms3(0xfff02c0f); // unk
+      sendPacket(peer, ms3, CHL_S2C);
+      
+      SetHealth sh3(0xfff02c0f); // unk
+      sendPacket(peer, sh3, CHL_S2C);
    }
 
    StatePacket end(PKT_S2C_EndSpawn);
@@ -297,13 +342,14 @@ bool Game::handleCastSpell(HANDLE_ARGS) {
    printf("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    uint32 futureProjNetId = GetNewNetID();
-   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId);
+   uint32 spellNetId = GetNewNetID();
+   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId, spellNetId);
 
    if(!s) {
       return false;
    }
    
-   CastSpellAns response(s, spell->x, spell->y, futureProjNetId);
+   CastSpellAns response(s, spell->x, spell->y, futureProjNetId, spellNetId);
    broadcastPacket(response, CHL_S2C);
 
    return true;
@@ -314,6 +360,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    //Lets do commands
    if(message->msg == '.') {
       const char *cmd[] = { ".set", ".gold", ".speed", ".health", ".xp", ".ap", ".ad", ".mana", ".model", ".help", ".spawn", ".size", ".junglespawn", ".skillpoints", ".level", ".tp", ".coords", ".ch"};
+      std::ostringstream debugMsg;
       
       // help command
       if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0) {
@@ -478,6 +525,8 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
        // coords
       if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
          printf("At %f;%f\n", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
+         debugMsg << "At Coords: " << peerInfo(peer)->getChampion()->getX() << ";" << peerInfo(peer)->getChampion()->getY();
+         notifyDebugMessage(debugMsg.str());
          return true;
       }
       

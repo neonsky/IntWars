@@ -27,7 +27,7 @@ public:
    uint32 playerHitId;
    int getTeamSize();
    std::pair<float, float> getRespawnPosition();
-   Spell* castSpell(uint8 slot, float x, float y, Unit* target, uint32 futureProjNetId);
+   Spell* castSpell(uint8 slot, float x, float y, Unit* target, uint32 futureProjNetId, uint32 spellNetId);
    Spell* levelUpSpell(uint8 slot);
    
    virtual void update(int64 diff);

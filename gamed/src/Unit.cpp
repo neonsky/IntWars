@@ -36,10 +36,12 @@ void Unit::update(int64 diff) {
       setUnitTarget(0);
       isAttacking = false;
       map->getGame()->notifySetTarget(this, 0);
+      initialAttackDone = false;
    }
    
    if(!unitTarget && isAttacking) {
       isAttacking = false;
+      initialAttackDone = false;
    }
 
    if (isAttacking) {
@@ -63,10 +65,13 @@ void Unit::update(int64 diff) {
          autoAttackCurrentDelay = 0;
          autoAttackProjId = GetNewNetID();
          autoAttackFlag = true;
-         if(!isMelee()) {
-            map->getGame()->notifyAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit);
+         
+         if (!initialAttackDone) {
+            initialAttackDone = true;
+            map->getGame()->notifyBeginAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit);
          } else {
-            map->getGame()->notifyAutoAttackMelee(this, unitTarget, autoAttackProjId, nextAutoIsCrit);
+            nextAttackFlag = !nextAttackFlag; // The first auto attack frame has occurred
+            map->getGame()->notifyNextAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
          }
       }
    } else {
