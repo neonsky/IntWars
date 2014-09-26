@@ -77,7 +77,7 @@ bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
    sol::table config = script.getTable("game");
    int mapId = config.get<int>("map");
    printf("Current map: %i\n", mapId);
-   SynchVersionAns answer(players, "Version 4.13.0.262 [PUBLIC]", "CLASSIC", (uint32)mapId);
+   SynchVersionAns answer(players, "Version 4.17.0.233 [PUBLIC]", "CLASSIC", (uint32)mapId);
    printPacket(reinterpret_cast<uint8 *>(&answer), sizeof(answer));
    return sendPacket(peer, answer, 3);
 }
@@ -102,8 +102,13 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
    printf("Spawning map\r\n");
 
    int playerId = 0;
+   ClientInfo* playerInfo = 0;
 
    for(auto p : players) {
+      if (p->getPeer() == peer) {
+         playerInfo = p;
+      }
+      
       HeroSpawn spawn(p, playerId++);
       sendPacket(peer, spawn, CHL_S2C);
       
@@ -129,6 +134,45 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
          LevelPropSpawn lpsPacket(lp);
          sendPacket(peer, lpsPacket, CHL_S2C);
       }
+   }
+
+   // Level props are just models, we need button-object minions to allow the client to interact with it
+   if (playerInfo != 0 && playerInfo->getTeam() == TEAM_BLUE) {
+      MinionSpawn ms1(0xff10c6db); // Shop (blue side)
+      sendPacket(peer, ms1, CHL_S2C);
+      
+      SetHealth sh1(0xff10c6db); // Shop (blue side)
+      sendPacket(peer, sh1, CHL_S2C);
+      
+      MinionSpawn ms2(0xffd23c3e); // unk
+      sendPacket(peer, ms2, CHL_S2C);
+      
+      SetHealth sh2(0xffd23c3e); // unk
+      sendPacket(peer, sh2, CHL_S2C);
+      
+      MinionSpawn ms3(0xfff97db5); // unk
+      sendPacket(peer, ms3, CHL_S2C);
+      
+      SetHealth sh3(0xfff97db5); // unk
+      sendPacket(peer, sh3, CHL_S2C);
+   } else if (playerInfo != 0 && playerInfo->getTeam() == TEAM_PURPLE) {
+      MinionSpawn ms1(0xffa6170e); // Shop (purple side)
+      sendPacket(peer, ms1, CHL_S2C);
+      
+      SetHealth sh1(0xffa6170e); // Shop (purple side)
+      sendPacket(peer, sh1, CHL_S2C);
+      
+      MinionSpawn ms2(0xff26ac0f); // unk
+      sendPacket(peer, ms2, CHL_S2C);
+      
+      SetHealth sh2(0xff26ac0f); // unk
+      sendPacket(peer, sh2, CHL_S2C);
+      
+      MinionSpawn ms3(0xfff02c0f); // unk
+      sendPacket(peer, ms3, CHL_S2C);
+      
+      SetHealth sh3(0xfff02c0f); // unk
+      sendPacket(peer, sh3, CHL_S2C);
    }
 
    StatePacket end(PKT_S2C_EndSpawn);

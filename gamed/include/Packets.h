@@ -301,6 +301,10 @@ public:
       buffer << MovementVector::targetXToNormalFormat(m->getX());
       buffer << MovementVector::targetYToNormalFormat(m->getY());
    }
+   
+   MinionSpawn(uint32 itemHash) : BasePacket(PKT_S2C_MinionSpawn, itemHash) {
+      buffer.fill(0, 3);
+   }
 };
 
 class AddGold : public BasePacket {
@@ -827,6 +831,7 @@ class BeginAutoAttack : public BasePacket {
 public:
    BeginAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_BeginAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
+      buffer << attacked->getX() << 44.3f << attacked->getY(); // New change as of 4.17. For now, Z is constant (no implementation to find Z)
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
       if (isCritical)
@@ -841,6 +846,7 @@ class NextAutoAttack : public BasePacket {
 public:
    NextAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical, bool initial) : BasePacket(PKT_S2C_NextAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
+      buffer << attacked->getX() << 44.3f << attacked->getY(); // New change as of 4.17. For now, Z is constant (no implementation to find Z)
       if (initial)
          buffer << (uint8)0x80; // These flags appear to change only to 0x80 and 0x7F after the first autoattack.
       else
@@ -905,6 +911,10 @@ public:
       buffer << (uint16)0x0000; // unk,maybe flags for physical/magical/true dmg
       buffer << u->getStats().getMaxHealth();
       buffer << u->getStats().getCurrentHealth();
+   }
+   
+   SetHealth(uint32 itemHash) : BasePacket(PKT_S2C_SetHealth, itemHash) {
+      buffer << (uint16)0;
    }
 };
 
