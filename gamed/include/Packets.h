@@ -404,8 +404,11 @@ typedef struct _QueryStatus {
 typedef struct _SynchVersion {
     PacketHeader header;
     uint32 unk1;
-    uint32 unk2;
-    uint8 version[50]; //Dunno how big and when usefull data begins
+    int8 version[256]; // version string might be shorter?
+    
+    const int8 *getVersion() {
+        return version;
+    }
 } SynchVersion;
 
 typedef struct _WorldSendGameNumber {

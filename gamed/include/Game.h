@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PEER_MTU 996
 #define RELIABLE ENET_PACKET_FLAG_RELIABLE
 #define UNRELIABLE 0
+#define GAME_VERSION "Version 4.17.0.233 [PUBLIC]"
 
 #define peerInfo(p) ((ClientInfo*)p->data)
 

@@ -77,7 +77,24 @@ bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
    sol::table config = script.getTable("game");
    int mapId = config.get<int>("map");
    printf("Current map: %i\n", mapId);
-   SynchVersionAns answer(players, "Version 4.17.0.233 [PUBLIC]", "CLASSIC", (uint32)mapId);
+   
+   bool versionMatch = true;
+   // Version might be an invalid value, currently it trusts the client
+   if (strncmp(version->getVersion(), GAME_VERSION, 256) != 0) {
+      versionMatch = false;
+      printf("Client %s does not match Server %s\n", version->getVersion(), GAME_VERSION);
+   } else {
+      printf("Accepted client version (%s)\n", version->getVersion());
+   }
+   
+   for(ClientInfo* player : players) {
+      if(player->getPeer() == peer) {
+         player->setVersionMatch(versionMatch);
+         break;
+      }
+   }
+   
+   SynchVersionAns answer(players, GAME_VERSION, "CLASSIC", (uint32)mapId);
    printPacket(reinterpret_cast<uint8 *>(&answer), sizeof(answer));
    return sendPacket(peer, answer, 3);
 }
@@ -138,41 +155,68 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
 
    // Level props are just models, we need button-object minions to allow the client to interact with it
    if (playerInfo != 0 && playerInfo->getTeam() == TEAM_BLUE) {
-      MinionSpawn ms1(0xff10c6db); // Shop (blue side)
+      // Shop (blue side)
+      MinionSpawn ms1(0xff10c6db);
       sendPacket(peer, ms1, CHL_S2C);
-      
-      SetHealth sh1(0xff10c6db); // Shop (blue side)
+      SetHealth sh1(0xff10c6db);
       sendPacket(peer, sh1, CHL_S2C);
       
-      MinionSpawn ms2(0xffd23c3e); // unk
+      // Vision for hardcoded objects
+      // Top inhib
+      MinionSpawn ms2(0xffd23c3e);
       sendPacket(peer, ms2, CHL_S2C);
-      
-      SetHealth sh2(0xffd23c3e); // unk
+      SetHealth sh2(0xffd23c3e);
       sendPacket(peer, sh2, CHL_S2C);
       
-      MinionSpawn ms3(0xfff97db5); // unk
+      // Mid inhib
+      MinionSpawn ms3(0xff4a20f1);
       sendPacket(peer, ms3, CHL_S2C);
-      
-      SetHealth sh3(0xfff97db5); // unk
+      SetHealth sh3(0xff4a20f1);
       sendPacket(peer, sh3, CHL_S2C);
+      
+      // Bottom inhib
+      MinionSpawn ms4(0xff9303e1);
+      sendPacket(peer, ms4, CHL_S2C);
+      SetHealth sh4(0xff9303e1);
+      sendPacket(peer, sh4, CHL_S2C);
+      
+      // Nexus
+      MinionSpawn ms5(0xfff97db5);
+      sendPacket(peer, ms5, CHL_S2C);
+      SetHealth sh5(0xfff97db5);
+      sendPacket(peer, sh5, CHL_S2C);
+      
    } else if (playerInfo != 0 && playerInfo->getTeam() == TEAM_PURPLE) {
-      MinionSpawn ms1(0xffa6170e); // Shop (purple side)
+      // Shop (purple side)
+      MinionSpawn ms1(0xffa6170e); 
       sendPacket(peer, ms1, CHL_S2C);
-      
-      SetHealth sh1(0xffa6170e); // Shop (purple side)
+      SetHealth sh1(0xffa6170e);
       sendPacket(peer, sh1, CHL_S2C);
       
-      MinionSpawn ms2(0xff26ac0f); // unk
+      // Vision for hardcoded objects
+      // Top inhib
+      MinionSpawn ms2(0xff6793d0);
       sendPacket(peer, ms2, CHL_S2C);
-      
-      SetHealth sh2(0xff26ac0f); // unk
+      SetHealth sh2(0xff6793d0);
       sendPacket(peer, sh2, CHL_S2C);
       
-      MinionSpawn ms3(0xfff02c0f); // unk
+      // Mid inhib
+      MinionSpawn ms3(0xffff8f1f);
       sendPacket(peer, ms3, CHL_S2C);
-      
-      SetHealth sh3(0xfff02c0f); // unk
+      SetHealth sh3(0xffff8f1f);
       sendPacket(peer, sh3, CHL_S2C);
+      
+      // Bottom inhib
+      MinionSpawn ms4(0xff26ac0f); 
+      sendPacket(peer, ms4, CHL_S2C);
+      SetHealth sh4(0xff26ac0f);
+      sendPacket(peer, sh4, CHL_S2C);
+      
+      // Nexus
+      MinionSpawn ms5(0xfff02c0f);
+      sendPacket(peer, ms5, CHL_S2C);
+      SetHealth sh5(0xfff02c0f);
+      sendPacket(peer, sh5, CHL_S2C);
    }
 
    StatePacket end(PKT_S2C_EndSpawn);
@@ -199,15 +243,16 @@ bool Game::handleStartGame(HANDLE_ARGS) {
    if(++playersReady == players.size()) {
       StatePacket start(PKT_S2C_StartGame);
       broadcastPacket(reinterpret_cast<uint8 *>(&start), sizeof(StatePacket), CHL_S2C);
+      
+      for(ClientInfo* player : players) {
+         if(player->getPeer() == peer && !player->isVersionMatch()) {
+            DebugMessage dm("Your client version does not match the server. Check the server log for more information.");
+            sendPacket(peer, dm, CHL_S2C);
+         }
+      }
    
       _started = true;
    }
-   
-   FogUpdate2 test;
-   test.x = 0;
-   test.y = 0;
-   test.radius = 1;
-   test.unk1 = 2;
 
    return true;
 }
@@ -331,7 +376,7 @@ bool Game::handleQueryStatus(HANDLE_ARGS) {
 
 bool Game::handleClick(HANDLE_ARGS) {
    Click *click = reinterpret_cast<Click *>(packet->data);
-   printf("Object %u clicked on %u\n", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
+   printf("Object %X clicked on %X\n", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
 
    return true;
 }
