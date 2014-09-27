@@ -306,10 +306,21 @@ public:
       buffer << (uint32)m->getPosition();
       buffer << (uint8)0xFF; // unk
       buffer << (uint8)1; // wave number ?
-      buffer << (uint8)0; // unk
+      
+      if(m->getType() == MINION_TYPE_CASTER) {
+         buffer << (uint8)3; // unk
+      } else {
+         buffer << (uint8)0; // unk
+      }
+      
       buffer << (uint8)m->getType();
       buffer << (uint8)0; // unk
-      buffer << (uint32)0x0001000A; // unk
+      
+      if(m->getType() == MINION_TYPE_CASTER) {
+         buffer << (uint32)0x00010007; // unk
+      } else {
+         buffer << (uint32)0x0001000A; // unk
+      }
       buffer << (uint32)0x00000000; // unk
       buffer << (uint32)0x00000000; // unk
       buffer << (uint16)0x0000; // unk
