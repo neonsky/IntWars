@@ -172,10 +172,11 @@ bool Game::broadcastPacketVision(Object* o, const Packet& packet, uint8 channelN
 }
 
 bool Game::broadcastPacketVision(Object* o, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag) {
-   broadcastPacketTeam(o->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, data, length, channelNo, flag);
    
-   if(map->teamHasVisionOn(1-o->getSide(), o)) {
-      broadcastPacketTeam((1-o->getSide() == 0) ? TEAM_BLUE : TEAM_PURPLE, data, length, channelNo, flag);
+   for(int i = 0; i < 2; ++i) {
+      if(o->isVisibleByTeam(i)) {
+         broadcastPacketTeam((i == 0) ? TEAM_BLUE : TEAM_PURPLE, data, length, channelNo, flag);
+      }
    }
 }
 

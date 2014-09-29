@@ -63,6 +63,7 @@ enum PacketCmd : uint8
    PKT_S2C_GameTimer = 0xC0,
    PKT_S2C_GameTimerUpdate = 0xC1,
 
+   PKT_S2C_LeaveVision = 0x51,
    PKT_C2S_StartGame = 0x52,
    PKT_S2C_SynchVersion = 0x54,
    PKT_C2S_ScoreBord = 0x56,

@@ -98,6 +98,8 @@ class Game
       void notifyStopAutoAttack(Unit* attacker);
       void notifyDebugMessage(std::string htmlDebugMessage);
       void notifySpawn(Unit* u);
+      void notifyLeaveVision(Object* o, uint32 side);
+      void notifyEnterVision(Object* o, uint32 side);
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);

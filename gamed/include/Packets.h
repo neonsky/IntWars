@@ -282,21 +282,6 @@ struct Unk {
    uint32 targetNetId;
 };
 
-/*
-0000-0015 ba 23 00 00 40 17 00 15 00 03 23 00 00 40 23 00 .#..@.....#..@#.
-0016-0031 00 40 40 e8 00 ba ff 01 00 00 00 0a 00 01 00 00 .@@.............
-0032-0047 00 00 00 00 00 00 00 00 00 00 00 80 3f 00 00 00 ............?...
-0048-0063 00 00 00 00 00 00 00 00 00 00 02 f7 b0 14 00 04 ................
-0064-0076 23 00 00 40 00 28 05 93 04 b4 02 3b 02          #..@.(.....;.
-*/
-
-/*
-0000-0015 ba a8 00 00 40 17 00 15 00 03 a8 00 00 40 a8 00 ....@........@..
-0016-0031 00 40 40 e8 00 ba ff 01 00 00 00 0a 00 01 00 00 .@@.............
-0032-0047 00 00 00 00 00 00 00 00 00 00 00 80 3f 00 00 00 ............?...
-0048-0063 00 00 00 00 00 00 00 00 00 00 02 5e 31 00 00 04 ...........^1...
-0064-0076 a8 00 00 40 00 d9 02 a3 02 54 01 21 01          ...@.....T.!.*/
-
 class MinionSpawn : public BasePacket {
 public:
    MinionSpawn(const Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
@@ -347,6 +332,39 @@ public:
    MinionSpawn(uint32 itemHash) : BasePacket(PKT_S2C_MinionSpawn, itemHash) {
       buffer.fill(0, 3);
    }
+};
+
+class LeaveVision : public BasePacket {
+public:
+   LeaveVision(Object* o) : BasePacket(PKT_S2C_LeaveVision, o->getNetId()) { }
+
+};
+
+/**
+ * This is basically a "Unit Spawn" packet with only the net ID and the additionnal data
+ */
+class EnterVisionAgain : public BasePacket {
+public:
+   EnterVisionAgain(Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
+      buffer.fill(0, 13);
+      buffer << 1.0f;
+      buffer.fill(0, 13);
+      buffer << (uint8)0x02;
+      buffer << (uint32)clock(); // unk
+      
+      const std::vector<MovementVector>& waypoints = m->getWaypoints();
+      
+      buffer << (uint8)((waypoints.size()-m->getCurWaypoint()+1)*2); // coordCount
+      buffer << m->getNetId();
+      buffer << (uint8)0; // movement mask
+      buffer << MovementVector::targetXToNormalFormat(m->getX());
+      buffer << MovementVector::targetYToNormalFormat(m->getY());
+      for(int i = m->getCurWaypoint(); i < waypoints.size(); ++i) {
+         buffer << waypoints[i].x;
+         buffer << waypoints[i].y;
+      }
+   }
+
 };
 
 class AddGold : public BasePacket {

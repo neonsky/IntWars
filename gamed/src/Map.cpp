@@ -2,18 +2,6 @@
 #include "Game.h"
 
 void Map::update(int64 diff) {
-   for(int i = 0; i < 2; ++i) {
-      for(auto kv = visionUnits[i].begin(); kv != visionUnits[i].end();) {
-         if(teamHasVisionOn(1-i, kv->second)) {
-            game->notifySpawn(kv->second);
-            kv = visionUnits[i].erase(kv);
-            continue;
-         }
-         
-         ++kv;
-      }
-   }
-
    for(auto kv = objects.begin(); kv != objects.end();) {
       if(kv->second->isToRemove() && kv->second->getAttackerCount() == 0) {
          delete kv->second;
@@ -32,6 +20,27 @@ void Map::update(int64 diff) {
          kv->second->update(diff);
          ++kv;
          continue;
+      }
+      
+      for(uint32 i = 0; i < 2; ++i) {
+         if(u->getSide() == i) {
+            continue;
+         }
+         
+         if(visionUnits[u->getSide()].find(u->getNetId()) != visionUnits[u->getSide()].end() && teamHasVisionOn(i, u)) {
+            u->setVisibleByTeam(i, true);
+            game->notifySpawn(u);
+            visionUnits[u->getSide()].erase(u->getNetId());
+            continue;
+         }
+
+         if(!u->isVisibleByTeam(i) && teamHasVisionOn(i, u)) {
+            game->notifyEnterVision(u, i);
+            u->setVisibleByTeam(i, true);
+         } else if(u->isVisibleByTeam(i) && !teamHasVisionOn(i, u)) {
+            game->notifyLeaveVision(u, i);
+            u->setVisibleByTeam(i, false);
+         }
       }
       
       if(u->buffs.size() != 0){

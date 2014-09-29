@@ -62,6 +62,8 @@ protected:
    
    uint32 collisionRadius;
    uint32 visionRadius;
+   
+   bool visibleByTeam[2];
       
 public:
 	
@@ -111,6 +113,9 @@ public:
    uint32 getAttackerCount() const { return attackerCount; }
    void incrementAttackerCount() { ++attackerCount; }
    void decrementAttackerCount() { --attackerCount; }
+
+   bool isVisibleByTeam(uint32 side);
+   void setVisibleByTeam(uint32 side, bool visible);
 };
 
 #endif /* OBJECT_H_ */

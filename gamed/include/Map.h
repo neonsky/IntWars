@@ -14,7 +14,7 @@ class Map {
 
 protected:
    std::map<uint32, Object*> objects;
-   std::map<uint32, Unit*> visionUnits[2];
+   std::map<uint32, Unit*> visionUnits[3];
    std::vector<uint32> expToLevelUp;
    int waveNumber;
    const uint64 firstSpawnTime;

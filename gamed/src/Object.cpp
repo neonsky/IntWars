@@ -5,7 +5,9 @@
 
 using namespace std;
 
-Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius), visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0) {
+Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius),
+                                                                                                     visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0),
+                                                                                                     visibleByTeam{false, false} {
 }
 
 Object::~Object() {
@@ -93,4 +95,16 @@ void Object::setPosition(float x, float y) {
 
 bool Object::collide(Object* o) {
    return distanceWith(o) < getCollisionRadius()+o->getCollisionRadius();
+}
+
+bool Object::isVisibleByTeam(uint32 side) {
+	if(side > 1) {
+		return false;
+	}
+
+	return (side == getSide() || visibleByTeam[side]);
+}
+
+void Object::setVisibleByTeam(uint32 side, bool visible) {
+	visibleByTeam[side] = visible;
 }

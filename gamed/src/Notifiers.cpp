@@ -14,7 +14,6 @@ void Game::notifyMinionSpawned(Minion* m, int side) {
    } else {
       broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
       if(side != m->getSide()) {
-         printPacket((uint8*)&ms.getBuffer().getBytes()[0], ms.getBuffer().getBytes().size());
          notifyUpdatedStats(m, false);
       }
    }
@@ -38,8 +37,6 @@ void Game::notifyUpdatedStats(Unit* u, bool partial) {
    
    if(!partial) {
       broadcastPacketTeam((1-u->getSide()) == 0 ? TEAM_BLUE : TEAM_PURPLE, us, CHL_LOW_PRIORITY, 2);
-      printf("Broadcasting stats to team %d\n", 1-u->getSide());
-      printPacket((uint8*)&us.getBuffer().getBytes()[0], us.getBuffer().getBytes().size());
    } else {
       broadcastPacketVision(u, us, CHL_LOW_PRIORITY, 2);
    }
@@ -78,10 +75,6 @@ void Game::notifyTeleport(Unit* u, float _x, float _y){
 void Game::notifyMovement(Object* o) {
    const std::vector<MovementVector>& waypoints = o->getWaypoints();
    MovementAns *answer = MovementAns::create(waypoints.size()*2);
-   
-   /*for(size_t i = 0; i < waypoints.size(); i++) {
-      printf("     Vector %lu, x: %f, y: %f\n", i, 2.0 * waypoints[i].x + MAP_WIDTH, 2.0 * waypoints[i].y + MAP_HEIGHT);
-   }*/
    
    answer->nbUpdates = 1;
    answer->netId = o->getNetId();
@@ -199,5 +192,19 @@ void Game::notifySpawn(Unit* u) {
    
    if(m) {
       notifyMinionSpawned(m, 1-m->getSide());
+   }
+}
+
+void Game::notifyLeaveVision(Object* o, uint32 side) {
+   LeaveVision lv(o);
+   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, lv, CHL_S2C);
+}
+
+void Game::notifyEnterVision(Object* o, uint32 side) {
+   Minion* m = dynamic_cast<Minion*>(o);
+   
+   if(m) {
+      EnterVisionAgain eva(m);
+      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
    }
 }
