@@ -292,19 +292,24 @@ public:
       buffer << (uint8)0xFF; // unk
       buffer << (uint8)1; // wave number ?
       
-      if(m->getType() == MINION_TYPE_CASTER) {
-         buffer << (uint8)3; // unk
-      } else {
+      buffer << (uint8)m->getType();
+      
+      if(m->getType() == MINION_TYPE_MELEE) {
          buffer << (uint8)0; // unk
+      } else {
+         buffer << (uint8)1; // unk
       }
       
-      buffer << (uint8)m->getType();
       buffer << (uint8)0; // unk
       
       if(m->getType() == MINION_TYPE_CASTER) {
          buffer << (uint32)0x00010007; // unk
-      } else {
+      } else if(m->getType() == MINION_TYPE_MELEE) {
          buffer << (uint32)0x0001000A; // unk
+      } else if(m->getType() == MINION_TYPE_CANNON) {
+         buffer << (uint32)0x0001000D;
+      } else {
+         buffer << (uint32)0x00010007; // unk
       }
       buffer << (uint32)0x00000000; // unk
       buffer << (uint32)0x00000000; // unk

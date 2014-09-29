@@ -9,13 +9,9 @@ using namespace std;
 void Game::notifyMinionSpawned(Minion* m, int side) {
    MinionSpawn ms(m);
    
-   if(side == 2) {
-      broadcastPacket(ms, CHL_S2C);
-   } else {
-      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
-      if(side != m->getSide()) {
-         notifyUpdatedStats(m, false);
-      }
+   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
+   if(side != m->getSide()) {
+      notifyUpdatedStats(m, false);
    }
    
    notifySetHealth(m);

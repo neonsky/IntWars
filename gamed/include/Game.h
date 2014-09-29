@@ -71,7 +71,7 @@ class Game
       bool handleSwapItems(HANDLE_ARGS);
       
       // Notifiers
-      void notifyMinionSpawned(Minion* m, int side = 2);
+      void notifyMinionSpawned(Minion* m, int side);
       void notifySetHealth(Unit* u);
       void notifyUpdatedStats(Unit* u, bool partial = true);
       void notifyMovement(Object* o);
