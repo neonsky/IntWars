@@ -131,28 +131,28 @@ bool SummonersRift::spawn() {
       for(uint32 i = 0; i < positions.size(); ++i) {
          Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_MELEE, positions[i], ConstWaypoints[i]);
          addObject(m);
-         game->notifyMinionSpawned(m);
       }
       return false;
    }
    
-   if(waveNumber < 6) {
-      for(uint32 i = 0; i < positions.size(); ++i) {
-         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CASTER, positions[i], ConstWaypoints[i]);
-         addObject(m);
-         game->notifyMinionSpawned(m);
-      }
-      return false;
-   }
-   
-   if(waveNumber == 6) {
+   if(waveNumber == 3) {
       for(uint32 i = 0; i < positions.size(); ++i) {
          Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CANNON, positions[i], ConstWaypoints[i]);
          addObject(m);
-         game->notifyMinionSpawned(m);
       }
-      return true;
+      return false;
    }
+   
+   if(waveNumber < 7) {
+      for(uint32 i = 0; i < positions.size(); ++i) {
+         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CASTER, positions[i], ConstWaypoints[i]);
+         addObject(m);
+      }
+      
+      return false;
+   }
+   
+   return true;
 }
 
 const Target SummonersRift::getRespawnLoc(int side) const {

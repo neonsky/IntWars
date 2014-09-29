@@ -6,20 +6,36 @@
 
 using namespace std;
 
-void Game::notifyMinionSpawned(Minion* m) {
+void Game::notifyMinionSpawned(Minion* m, int side) {
    MinionSpawn ms(m);
-   broadcastPacket(ms, CHL_S2C);
+   
+   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
+   if(side != m->getSide()) {
+      notifyUpdatedStats(m, false);
+   }
+   
    notifySetHealth(m);
 }
 
 void Game::notifySetHealth(Unit* u) {
    SetHealth sh(u);
-   broadcastPacket(sh, CHL_S2C);
+   broadcastPacketVision(u, sh, CHL_S2C);
 }
 
-void Game::notifyUpdatedStats(Unit* u) {
-   UpdateStats us(u);
-   broadcastPacket(us, CHL_LOW_PRIORITY, 2);
+void Game::notifyUpdatedStats(Unit* u, bool partial) {
+   UpdateStats us(u, partial);
+   
+   Turret* t = dynamic_cast<Turret*>(u);
+   if(t) {
+      broadcastPacket(us, CHL_LOW_PRIORITY, 2);
+      return;
+   }
+   
+   if(!partial) {
+      broadcastPacketTeam((1-u->getSide()) == 0 ? TEAM_BLUE : TEAM_PURPLE, us, CHL_LOW_PRIORITY, 2);
+   } else {
+      broadcastPacketVision(u, us, CHL_LOW_PRIORITY, 2);
+   }
 }
 
 void Game::notifyAddBuff(Unit* u, Unit* source, std::string buffName) {
@@ -56,10 +72,6 @@ void Game::notifyMovement(Object* o) {
    const std::vector<MovementVector>& waypoints = o->getWaypoints();
    MovementAns *answer = MovementAns::create(waypoints.size()*2);
    
-   /*for(size_t i = 0; i < waypoints.size(); i++) {
-      printf("     Vector %lu, x: %f, y: %f\n", i, 2.0 * waypoints[i].x + MAP_WIDTH, 2.0 * waypoints[i].y + MAP_HEIGHT);
-   }*/
-   
    answer->nbUpdates = 1;
    answer->netId = o->getNetId();
    for(size_t i = 0; i < waypoints.size(); i++) {
@@ -67,7 +79,7 @@ void Game::notifyMovement(Object* o) {
       answer->getVector(i)->y = waypoints[i].y;
    }
    
-   broadcastPacket(reinterpret_cast<uint8 *>(answer), answer->size(), 4);
+   broadcastPacketVision(o, reinterpret_cast<uint8 *>(answer), answer->size(), 4);
    MovementAns::destroy(answer);
 }
 
@@ -169,4 +181,26 @@ void Game::notifyStopAutoAttack(Unit* attacker) {
 void Game::notifyDebugMessage(std::string htmlDebugMessage) {
    DebugMessage dm(htmlDebugMessage);
    broadcastPacket(dm, CHL_S2C);
+}
+
+void Game::notifySpawn(Unit* u) {
+   Minion* m = dynamic_cast<Minion*>(u);
+   
+   if(m) {
+      notifyMinionSpawned(m, 1-m->getSide());
+   }
+}
+
+void Game::notifyLeaveVision(Object* o, uint32 side) {
+   LeaveVision lv(o);
+   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, lv, CHL_S2C);
+}
+
+void Game::notifyEnterVision(Object* o, uint32 side) {
+   Minion* m = dynamic_cast<Minion*>(o);
+   
+   if(m) {
+      EnterVisionAgain eva(m);
+      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
+   }
 }

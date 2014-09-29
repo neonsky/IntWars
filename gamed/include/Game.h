@@ -72,9 +72,9 @@ class Game
       bool handleSwapItems(HANDLE_ARGS);
       
       // Notifiers
-      void notifyMinionSpawned(Minion* m);
+      void notifyMinionSpawned(Minion* m, int side);
       void notifySetHealth(Unit* u);
-      void notifyUpdatedStats(Unit* u);
+      void notifyUpdatedStats(Unit* u, bool partial = true);
       void notifyMovement(Object* o);
       void notifyDamageDone(Unit* source, Unit* target, float amount, DamageType type = DAMAGE_TYPE_PHYSICAL);
       void notifyBeginAutoAttack(Unit* attacker, Unit* victim, uint32 futureProjNetId, bool isCritical);
@@ -98,6 +98,9 @@ class Game
       void notifyAddGold(Champion* c, Unit* died, float gold);
       void notifyStopAutoAttack(Unit* attacker);
       void notifyDebugMessage(std::string htmlDebugMessage);
+      void notifySpawn(Unit* u);
+      void notifyLeaveVision(Object* o, uint32 side);
+      void notifyEnterVision(Object* o, uint32 side);
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);
@@ -110,6 +113,8 @@ class Game
       bool broadcastPacket(const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
       bool broadcastPacketTeam(uint8 team, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
       bool broadcastPacketTeam(uint8 team, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
+      bool broadcastPacketVision(Object* o, const Packet& packet, uint8 channelNo, uint32 flag = RELIABLE);
+      bool broadcastPacketVision(Object* o, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag = RELIABLE);
 
 	private:
 		bool _isAlive, _started;

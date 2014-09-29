@@ -42,7 +42,7 @@ void LuaScript::addUnit() {
 
     //Basic documentation in 3... 2... 1...
     //constructor types here ------------\ are needed, even though we won't use it in lua
-    sol::constructors <sol::types < Map*, uint32, std::string, Stats*, uint32, float, float, AI*>> unitCtr;
+    sol::constructors <sol::types < Map*, uint32, std::string, Stats*, uint32, float, float, uint32>> unitCtr;
     sol::userdata <Unit> unitUserData(// this is the actual user data.
             "Unit", unitCtr, //Unit's constructor, not really useful, but necessary.
             "getStats", &Unit::getStats, //"methodName", &Class::method

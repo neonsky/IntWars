@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<MovementVector>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, new MinionAI(this)), type(type), position(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
+Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<MovementVector>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, 1100), type(type), position(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
    switch(position) {
    case SPAWN_BLUE_TOP:
       setSide(0);

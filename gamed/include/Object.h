@@ -18,8 +18,8 @@ class Map;
 #define MAP_HEIGHT (14446 / 2)
 
 struct MovementVector {
-    short x;
-    short y;
+    int16 x;
+    int16 y;
     
     MovementVector() : x(0), y(0){ }
     MovementVector(int16 x, int16 y) : x(x), y(y) { }
@@ -61,11 +61,14 @@ protected:
    uint32 attackerCount;
    
    uint32 collisionRadius;
+   uint32 visionRadius;
+   
+   bool visibleByTeam[2];
       
 public:
 	
    virtual ~Object();
-   Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius);
+   Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius = 0);
 
    /**
    * Moves the object depending on its target, updating its coordinate.
@@ -91,7 +94,8 @@ public:
    void setTarget(Target* target);
    void setWaypoints(const std::vector<MovementVector>& waypoints);
 
-   const std::vector<MovementVector>& getWaypoints() { return waypoints; }
+   const std::vector<MovementVector>& getWaypoints() const { return waypoints; }
+   uint32 getCurWaypoint() const { return curWaypoint; }
    bool isMovementUpdated() { return movementUpdated; }
    void clearMovementUpdated() { movementUpdated = false; }
    bool isToRemove() { return toRemove; }
@@ -103,11 +107,15 @@ public:
    void setPosition(float x, float y);
 
    uint32 getCollisionRadius() const { return collisionRadius; }
+   uint32 getVisionRadius() const { return visionRadius; }
    bool collide(Object* o);
    
    uint32 getAttackerCount() const { return attackerCount; }
    void incrementAttackerCount() { ++attackerCount; }
    void decrementAttackerCount() { --attackerCount; }
+
+   bool isVisibleByTeam(uint32 side);
+   void setVisibleByTeam(uint32 side, bool visible);
 };
 
 #endif /* OBJECT_H_ */

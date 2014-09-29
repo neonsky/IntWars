@@ -167,6 +167,19 @@ bool Game::broadcastPacketTeam(uint8 team, const Packet& packet, uint8 channelNo
 	return broadcastPacketTeam(team, (const uint8*)&packet.getBuffer().getBytes()[0], packet.getBuffer().size(), channelNo, flag);
 }
 
+bool Game::broadcastPacketVision(Object* o, const Packet& packet, uint8 channelNo, uint32 flag) {
+   return broadcastPacketVision(o, (const uint8*)&packet.getBuffer().getBytes()[0], packet.getBuffer().size(), channelNo, flag);
+}
+
+bool Game::broadcastPacketVision(Object* o, const uint8 *data, uint32 length, uint8 channelNo, uint32 flag) {
+   
+   for(int i = 0; i < 2; ++i) {
+      if(o->isVisibleByTeam(i)) {
+         broadcastPacketTeam((i == 0) ? TEAM_BLUE : TEAM_PURPLE, data, length, channelNo, flag);
+      }
+   }
+}
+
 bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 {
 	if(packet->dataLength >= 8)

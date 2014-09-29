@@ -253,6 +253,12 @@ bool Game::handleStartGame(HANDLE_ARGS) {
    
       _started = true;
    }
+   
+   FogUpdate2 test;
+   test.x = 0;
+   test.y = 0;
+   test.radius = 1;
+   test.unk1 = 2;
 
    return true;
 }
@@ -438,25 +444,6 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
          printf("Setting speed to %f\n", data);
 
          peerInfo(peer)->getChampion()->getStats().setMovementSpeed(data);
-         return true;
-      }
-
-      // spawn
-      if(strncmp(message->getMessage(), cmd[10], strlen(cmd[10])) == 0)
-      {
-         static const MinionSpawnPosition positions[] = {   SPAWN_BLUE_TOP,
-                                                            SPAWN_BLUE_BOT,
-                                                            SPAWN_BLUE_MID,
-                                                            SPAWN_RED_TOP,
-                                                            SPAWN_RED_BOT,
-                                                            SPAWN_RED_MID, 
-                                                         };
-           
-         for(int i = 0; i < 6; ++i) {                                     
-            Minion* m = new Minion(map, GetNewNetID(), MINION_TYPE_MELEE, positions[i]);
-            map->addObject(m);
-            notifyMinionSpawned(m);
-         }
          return true;
       }
 
