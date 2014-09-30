@@ -11,7 +11,7 @@ players = {
 		["icon"] = 0 -- Summoner Icon ID
 	},
    
-	-- uncomment this for more players! you can also add more, up to 12!
+	--[[-- uncomment this for more players! you can also add more, up to 12!
 
 	["player2"] = {
 		["rank"] = "DIAMOND",
