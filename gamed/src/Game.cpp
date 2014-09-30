@@ -67,6 +67,7 @@ uint32 Game::strToId(std::string str){
         return SPL_Teleport;
     }
     
+    return 0;
 }
 
 template<typename T>

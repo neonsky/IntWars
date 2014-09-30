@@ -48,9 +48,9 @@ public:
    int64 getRespawnTimer() const { return respawnTimer; }
    
    float getChampionGoldFromMinions() { return championGoldFromMinions; }
-   float setChampionGoldFromMinions(float gold) { this->championGoldFromMinions = gold; }
+   void setChampionGoldFromMinions(float gold) { this->championGoldFromMinions = gold; }
    
-   bool setChampionHitFlagTimer(int64 time) { this->championHitFlagTimer = time; }
+   void setChampionHitFlagTimer(int64 time) { this->championHitFlagTimer = time; }
 
    virtual void dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source) override;
 };

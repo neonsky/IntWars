@@ -253,12 +253,6 @@ bool Game::handleStartGame(HANDLE_ARGS) {
    
       _started = true;
    }
-   
-   FogUpdate2 test;
-   test.x = 0;
-   test.y = 0;
-   test.radius = 1;
-   test.unk1 = 2;
 
    return true;
 }
@@ -670,6 +664,8 @@ bool Game::handleSwapItems(HANDLE_ARGS) {
    
    peerInfo(peer)->getChampion()->getInventory().swapItems(request->slotFrom, request->slotTo);
    notifyItemsSwapped(peerInfo(peer)->getChampion(), request->slotFrom, request->slotTo);
+   
+   return true;
 }
 
 bool Game::handleEmotion(HANDLE_ARGS) {

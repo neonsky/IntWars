@@ -52,10 +52,10 @@ public:
    std::vector<Champion*> getChampionsInRange(Target* t, float range);
    
    bool getFirstBlood() { return firstBlood; }
-   bool setFirstBlood(bool state) { firstBlood = state; }
+   void setFirstBlood(bool state) { firstBlood = state; }
    
    bool getKillReduction() { return killReduction; }
-   bool setKillReduction(bool state) { killReduction = state; }
+   void setKillReduction(bool state) { killReduction = state; }
    
    bool teamHasVisionOn(int side, Object* o);
 };
