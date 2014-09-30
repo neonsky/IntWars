@@ -10,9 +10,6 @@ void Game::notifyMinionSpawned(Minion* m, int side) {
    MinionSpawn ms(m);
    
    broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
-   if(side != m->getSide()) {
-      notifyUpdatedStats(m, false);
-   }
    
    notifySetHealth(m);
 }
@@ -184,11 +181,20 @@ void Game::notifyDebugMessage(std::string htmlDebugMessage) {
 }
 
 void Game::notifySpawn(Unit* u) {
+
    Minion* m = dynamic_cast<Minion*>(u);
    
    if(m) {
       notifyMinionSpawned(m, 1-m->getSide());
    }
+   
+   Champion* c = dynamic_cast<Champion*>(u);
+   
+   if(c) {
+      notifyChampionSpawned(c, 1-c->getSide());
+   }
+   
+   notifySetHealth(u);
 }
 
 void Game::notifyLeaveVision(Object* o, uint32 side) {
@@ -202,5 +208,20 @@ void Game::notifyEnterVision(Object* o, uint32 side) {
    if(m) {
       EnterVisionAgain eva(m);
       broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
+      notifySetHealth(m);
+      return;
    }
+   
+   Champion* c = dynamic_cast<Champion*>(o);
+   
+   if(c) {
+      notifyChampionSpawned(c, side);
+      notifySetHealth(c);
+      return;
+   }
+}
+
+void Game::notifyChampionSpawned(Champion* c, uint32 side) {
+   HeroSpawn2 hs(c);
+   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, hs, CHL_S2C);
 }

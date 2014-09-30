@@ -101,6 +101,7 @@ class Game
       void notifySpawn(Unit* u);
       void notifyLeaveVision(Object* o, uint32 side);
       void notifyEnterVision(Object* o, uint32 side);
+      void notifyChampionSpawned(Champion* c, uint32 side);
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);

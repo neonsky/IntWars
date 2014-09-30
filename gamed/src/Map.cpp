@@ -31,12 +31,14 @@ void Map::update(int64 diff) {
             u->setVisibleByTeam(i, true);
             game->notifySpawn(u);
             visionUnits[u->getSide()].erase(u->getNetId());
+            game->notifyUpdatedStats(u, false);
             continue;
          }
 
          if(!u->isVisibleByTeam(i) && teamHasVisionOn(i, u)) {
             game->notifyEnterVision(u, i);
             u->setVisibleByTeam(i, true);
+            game->notifyUpdatedStats(u, false);
          } else if(u->isVisibleByTeam(i) && !teamHasVisionOn(i, u)) {
             game->notifyLeaveVision(u, i);
             u->setVisibleByTeam(i, false);
@@ -116,6 +118,12 @@ void Map::addObject(Object* o) {
    
    if(m) {
       game->notifyMinionSpawned(m, m->getSide());
+   }
+   
+   Champion* c = dynamic_cast<Champion*>(o);
+   
+   if(c) {
+      game->notifyChampionSpawned(c, c->getSide());
    }
 }
 

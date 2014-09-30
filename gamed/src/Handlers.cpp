@@ -128,10 +128,7 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
       
       HeroSpawn spawn(p, playerId++);
       sendPacket(peer, spawn, CHL_S2C);
-      
-      HeroSpawn2 h2(p->getChampion());
-      sendPacket(peer, h2, CHL_S2C);
-      
+            
       PlayerInfo info(p);
       sendPacket(peer, info, CHL_S2C); 
    }
@@ -252,6 +249,12 @@ bool Game::handleStartGame(HANDLE_ARGS) {
       }
    
       _started = true;
+   }
+   
+   if(_started) {
+      for(auto p : players) {
+         map->addObject(p->getChampion());
+      }
    }
 
    return true;

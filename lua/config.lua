@@ -11,19 +11,21 @@ players = {
 		["icon"] = 0 -- Summoner Icon ID
 	},
    
-	--[[, -- uncomment this for more players! you can also add more, up to 12!
+	-- uncomment this for more players! you can also add more, up to 12!
 
 	["player2"] = {
 		["rank"] = "DIAMOND",
 		["name"] = "Test2",
-		["champion"] = "Urgot",
-		["team"] = "BLUE",
+		["champion"] = "Ezreal",
+		["team"] = "PURPLE",
 		["skin"] = 1,
 		["summoner1"] = "FLASH",
 		["summoner2"] = "IGNITE",
-		["ribbon"] = 2
+		["ribbon"] = 2,
+      ["icon"] = 0 -- Summoner Icon ID
 	},
 
+   --[[
 	["player3"] = {
 		["rank"] = "DIAMOND",
 		["name"] = "Test3",

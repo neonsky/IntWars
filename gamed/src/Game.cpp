@@ -140,8 +140,6 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
            c->setSide((team == "BLUE") ? 0 : 1);
            c->levelUp();
 
-           map->addObject(c);
-
 
            player->setChampion(c);
 
