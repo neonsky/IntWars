@@ -242,7 +242,7 @@ void Pathfinder::cleanLists()
 {
    unsigned int missing = PathNode::missingNodes();
 
-   if (openList.size() + closedList.size() != missing) __debugbreak();
+   if (openList.size() + closedList.size() != missing) 0;// __debugbreak();
 
    for (auto i = openList.begin(); i != openList.end(); i++) 
       delete (*i);
