@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include <stdarg.h>
+
 Logger::Logger()
 {
     m_pLogFile = stdout;
@@ -21,14 +23,21 @@ void Logger::setLogFile(const char *filename)
     m_pLogFile = loadFileStream(m_pLogFile, filename);
 }
 
-void Logger::log(const std::string &tag, const std::string &msg, const char *funcName,
-                 const char *sourceFile, unsigned int lineNum)
+void Logger::log(const std::string &tag, const char *funcName,
+                 const char *sourceFile, unsigned int lineNum, 
+                 const std::string& fmt, ...)
 {
     std::string outputBuffer;
 
-    fillOutputBuffer(outputBuffer, tag, msg, funcName, sourceFile, lineNum);
+    fillOutputBuffer(outputBuffer, tag, fmt, funcName, sourceFile, lineNum);
 
-    fprintf(m_pLogFile, "%s", outputBuffer.c_str());
+    const char* bufferCStr = outputBuffer.c_str();
+
+    // gather va arguments
+    va_list args;
+    va_start(args, bufferCStr);
+    vfprintf(m_pLogFile, bufferCStr, args);
+    va_end(args);
 }
 
 void Logger::flush()
@@ -47,7 +56,8 @@ void Logger::fillOutputBuffer(std::string &outputBuffer, const std::string &tag,
 
     if(funcName != NULL)
     {
-        outputBuffer += "\nFunction: ";
+        // outputBuffer += "\nFunction: ";
+        outputBuffer += "Function: ";
         outputBuffer += funcName;
     }
     if(sourceFile != NULL)
@@ -62,7 +72,7 @@ void Logger::fillOutputBuffer(std::string &outputBuffer, const std::string &tag,
         outputBuffer += std::to_string(lineNum);
     }
 
-    outputBuffer += '\n';
+    // outputBuffer += '\n';
 }
 
 FILE *Logger::loadFileStream(FILE *stream, const char *filename)

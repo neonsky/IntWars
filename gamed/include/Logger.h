@@ -17,8 +17,8 @@ public:
 
     void setLogFile(const char* filename);
 
-    void log(const std::string& tag, const std::string& msg,
-         const char* funcName, const char* sourceFile, unsigned int lineNum);
+    void log(const std::string& tag, const char* funcName, const char* sourceFile, 
+        unsigned int lineNum, const std::string& fmt, ...);
 
     /**
      * @brief Flushes output buffer. Called for critical events
@@ -75,107 +75,107 @@ private:
 	{ \
 		if(!(expr)) \
 		{ \
-			Logger::instance().log("ASSERT", #expr, __FUNCTION__, __FILE__, __LINE__); \
+			Logger::instance().log("ASSERT", __FUNCTION__, __FILE__, __LINE__, #expr); \
 			Logger::instance().flush(); \
             DEBUG_BREAK; \
 		} \
 	} \
 	while(0)\
 
-#define CORE_FATAL(str) \
+#define CORE_FATAL(fmt, ...) \
     do \
     { \
-        Logger::instance().log("FATAL", str, __FUNCTION__, __FILE__, __LINE__);\
+        Logger::instance().log("FATAL", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__);\
         Logger::instance().flush(); \
         DEBUG_BREAK; \
         std::terminate(); \
     } \
     while(0)\
 
-#define CORE_ERROR(str) \
+#define CORE_ERROR(fmt, ...) \
     do \
     { \
-        Logger::instance().log("ERROR",str, __FUNCTION__, __FILE__, __LINE__); \
+        Logger::instance().log("ERROR", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_WARNING(str) \
+#define CORE_WARNING(fmt, ...) \
     do \
     { \
-        Logger::instance().log("WARNING", str, __FUNCTION__, __FILE__, __LINE__);\
+        Logger::instance().log("WARNING", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__);\
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_DEBUG(str) \
+#define CORE_DEBUG(fmt, ...) \
     do \
     { \
-        Logger::instance().log("DEBUG", str, NULL, NULL, 0); \
+        Logger::instance().log("DEBUG", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
 
-#define CORE_LOG(tag, str) \
+#define CORE_LOG(tag, fmt, ...) \
     do \
     { \
-        Logger::instance().log(tag, str, NULL, NULL, 0); \
+        Logger::instance().log(tag, NULL, NULL, 0, fmt, ##__VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
 
 
-#define CORE_VERBOSE(str) \
+#define CORE_VERBOSE(fmt, ...) \
     do \
     { \
-        Logger::instance().log("VERBOSE", str, __FUNCTION__, __FILE__, __LINE__); \
+        Logger::instance().log("VERBOSE", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
     } \
     while(0) \
 
 #else // Not in debug mode
 
 // Keep errors and warnings, just exclude func, file and line info
-#define CORE_FATAL(str) \
+#define CORE_FATAL(fmt, ...) \
     do \
     { \
-        Logger::instance().log("FATAL", str, NULL, NULL, 0); \
+        Logger::instance().log("FATAL", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
         Logger::instance().flush(); \
         std::terminate(); \
     } \
     while(0)\
 
 
-#define CORE_ERROR(str) \
+#define CORE_ERROR(fmt, ...) \
     do \
     { \
-        Logger::instance().log("ERROR",str, NULL, NULL, 0); \
+        Logger::instance().log("ERROR", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_WARNING(str) \
+#define CORE_WARNING(fmt, ...) \
     do \
     { \
-        Logger::instance().log("WARNING", str, NULL, NULL, 0);\
+        Logger::instance().log("WARNING", NULL, NULL, 0, fmt, ##__VA_ARGS__);\
     } \
     while(0)\
 
 // Release mode definitions of macros. Defined in such a way as to be
 // ignored completelly by the compiler
-#define CORE_DEBUG(str) do { (void)sizeof(str); } while(0)
-#define CORE_VERBOSE(str) do { (void)sizeof(str); } while(0)
-#define CORE_LOG(tag, str) do { (void)sizeof(str); } while(0)
+#define CORE_DEBUG(fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
+#define CORE_VERBOSE(fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
+#define CORE_LOG(tag, fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
 #define CORE_ASSERT(expr) do { (void)sizeof(expr); } while(0)
 
 #endif
 
-#define CORE_INFO(str) \
+#define CORE_INFO(fmt, ...) \
     do \
     { \
-        Logger::instance().log("INFO", str, NULL, NULL, 0); \
+        Logger::instance().log("INFO", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
     } \
     while(0) \
 
