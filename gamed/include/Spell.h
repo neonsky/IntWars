@@ -7,6 +7,8 @@
 #include <vector>
 #include "LuaScript.h"
 
+#include <array>
+
 
 class Unit;
 class Champion;
@@ -76,8 +78,8 @@ protected:
    float castTime;
    float castRange;
    float projectileSpeed;
-   float cooldown[5];
-   float cost[5];
+   std::array<float, 5> cooldown;
+   std::array<float, 5> cost;
    
    // Warning : this value usually contains one of the "ad/ap" bonus coefficient, as seen in "deals 50 (+{coefficient}%) damage"
    // However, it may not be accurate and there's no way to tell whether it's the ad or ap bonus for hybrid spells
@@ -98,8 +100,6 @@ protected:
    
 public:
    Spell(Champion* owner, const std::string& spellName, uint8 slot);
-   
-   
    
    /**
     * Called when the character casts the spell
@@ -148,7 +148,7 @@ public:
     * TODO : Add in CDR % from champion's stat
     */
    float getCooldown() const { 
-      return 0; // TODO : remove this 
+      return 0; // TODO: Remove this
       if(!level) {
          return 0;
       }
@@ -159,7 +159,7 @@ public:
     * @return the mana/energy/health cost
     */
    float getCost() const {
-      return 0; // TODO : remove this 
+      return 0; // TODO: Remove this
       if(!level) {
          return 0;
       }
