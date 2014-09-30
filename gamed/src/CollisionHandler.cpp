@@ -8,6 +8,7 @@ void CollisionHandler::update(float a_DT)
 	const std::map<uint32, Object*>& objects = chart->getObjects();
 
 	for (auto i = objects.begin(); i != objects.end(); i++)
+   //auto i = objects.begin();
 	{
 		Object* o1 = i->second;
       for (auto j = objects.begin(); j != objects.end(); j++) if (j != i) // Object-Object collision
@@ -23,12 +24,15 @@ void CollisionHandler::update(float a_DT)
          }
 		}
 
-      Vector2 direction = (o1->getTarget()->getPosition() - o1->getPosition()).Normalize(); // Get the direction where I am walking into
-      direction = direction * o1->getCollisionRadius(); // Multiply it with how fat I am
-      
-      direction = o1->getPosition() + direction;
-      if (mesh->getY(direction.X, direction.Y) == 0.0f)
-         o1->onCollision(0);
+      Target *target = o1->getTarget();
+      if (target)
+      {
+         Vector2 direction = (target->getPosition() - o1->getPosition()).Normalize(); // Get the direction where I am walking into
+         direction = direction * o1->getCollisionRadius(); // Multiply it with how fat I am
 
+         direction = o1->getPosition() + direction;
+         if (mesh->getY(direction.X, direction.Y) == 0.0f)
+            o1->onCollision(0);
+      }
 	}
 }
