@@ -26,6 +26,7 @@ protected:
    Game* game;
    bool firstBlood;
    bool killReduction;
+   AIMesh mesh;
 
    CollisionHandler *collisionHandler;
    
@@ -47,6 +48,8 @@ public:
    virtual float getExpFor(Unit* u) const = 0 ;
    
    Game* getGame() const { return game; }
+
+   CollisionHandler* getPathFinder() { return collisionHandler; }
    
    const std::map<uint32, Object*>& getObjects() { return objects; }
    void stopTargeting(Unit* target);
@@ -56,7 +59,7 @@ public:
    bool getFirstBlood() { return firstBlood; }
    bool setFirstBlood(bool state) { firstBlood = state; }
 
-   AIMesh mesh;
+   AIMesh *getAIMesh() { return &mesh; }
    
    bool getKillReduction() { return killReduction; }
    bool setKillReduction(bool state) { killReduction = state; }

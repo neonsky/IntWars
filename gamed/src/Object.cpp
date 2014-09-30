@@ -92,5 +92,5 @@ void Object::setPosition(float x, float y) {
 }
 
 bool Object::collide(Object* o) {
-   return distanceWith(o) < getCollisionRadius()+o->getCollisionRadius();
+   return distanceWithSqr(o) < (getCollisionRadius() + o->getCollisionRadius())*(getCollisionRadius() + o->getCollisionRadius());
 }

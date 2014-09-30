@@ -53,6 +53,7 @@ public:
    float getWidth() { return mapWidth; }
    float getHeight() { return mapHeight; }
 	
+   bool isLoaded() { return loaded; }
 private:
    void drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height);
    void drawTriangle(Triangle triangle, float *heightInfo, unsigned width, unsigned height);
@@ -68,6 +69,7 @@ private:
    ScanLine scanlineLowest[1024], scanlineHighest[1024];
    float *heightMap;
    float mapWidth, mapHeight;
+   bool loaded;
 };
 
 #endif

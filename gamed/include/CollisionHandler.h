@@ -3,24 +3,16 @@
 
 #include "stdafx.h"
 #include "Vector2.h"
+#include "Pathfinder.h"
 
-class Map;
 class Object;
-class CollisionHandler 
+class CollisionHandler : public Pathfinder
 {
 public:
-	CollisionHandler();
-	~CollisionHandler();
-	void setMap(Map * a_Map) { m_Map = a_Map; }
-
-	void setCollisionData(Object* a_Pos);
-	Object* getCollisionData(Vector2 a_Pos);
+   CollisionHandler() {}
+   ~CollisionHandler() {}
 
 	void update(float a_DT);
-protected:
-	Map * m_Map;
-	Object **collisionData;
-	uint32 width, height;
 };
 
 #endif

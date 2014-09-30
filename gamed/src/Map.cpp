@@ -1,5 +1,7 @@
 #include "Map.h"
 #include "Game.h"
+#include "Pathfinder.h"
+#include "CollisionHandler.h"
 
 Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true)
 {

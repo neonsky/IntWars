@@ -13,6 +13,9 @@ public:
    float distanceWith(Target* target);
    float distanceWith(float xtarget, float ytarget);
 
+   float distanceWithSqr(Target* target);
+   float distanceWithSqr(float xtarget, float ytarget);
+
    float getX() const { return x; }
    float getY() const { return y; }
 

@@ -10,7 +10,7 @@
 
 // TODO: Clean this junk up
 
-AIMesh::AIMesh() :fileStream(0), heightMap(0)
+AIMesh::AIMesh() :fileStream(0), heightMap(0), loaded(false)
 {
 }
 
@@ -39,12 +39,10 @@ bool AIMesh::load(std::string inputFile)
 	}*/
 
    // LEVELS/Map1/AIPath.aimesh
-
+   loaded = false;
    buffer.clear();
-   std::cout << "Before reading" << std::endl;
    if (RAFManager::getInstance()->readFile(inputFile, buffer)) // Our file exists. Load it.
    {
-      std::cout << "After reading" << std::endl;
       for (int i = 0; i < 1024; i++) // For every scanline for the triangle rendering
       {
          scanlineLowest[i].u = scanlineLowest[i].v = scanlineLowest[i].x = scanlineLowest[i].y = scanlineLowest[i].z = 1e10f; // Init to zero
@@ -56,8 +54,10 @@ bool AIMesh::load(std::string inputFile)
       outputMesh(1024, 1024);
 
       std::cout << "Opened AIMesh file for this map." << std::endl;
+      loaded = true;
       return true;
    }
+   std::cout << "Failed opening AIMesh file for this map." << std::endl;
    return false;
 }
 

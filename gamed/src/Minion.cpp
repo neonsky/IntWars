@@ -153,3 +153,9 @@ void Minion::update(int64 diff) {
       setWaypoints(newWaypoints);
    }
 }
+
+void Minion::onCollision(Object * a_Collider)
+{
+   //printf("Minion %d collided with %d\n", this, a_Collider);
+   // auto new_path = map->getPathFinder()->getPath(getPosition(), getTarget());
+}
