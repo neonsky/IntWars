@@ -117,9 +117,6 @@ void Spell::finishCasting() {
    
    state = STATE_COOLDOWN;
    currentCooldown = getCooldown();
-
-   Stats& stats = owner->getStats();
-   stats.setCurrentMana(stats.getCurrentMana() - getCost());
 }
 
 std::string Spell::getStringForSlot(){
