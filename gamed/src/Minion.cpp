@@ -36,27 +36,27 @@ Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition po
    // TODO : make these data dynamic with the game elapsed time
    switch(type) {
    case MINION_TYPE_MELEE:
-      stats->setCurrentHealth(475.0f);
-      stats->setMaxHealth(475.0f);
-      stats->setBaseAd(12.0f);
+      stats->setCurrentHealth(475.0f + ((20.f)*(int)(map->getGameTime() / (180 * 1000000))));
+      stats->setMaxHealth(475.0f + ((20.f)*(int)(map->getGameTime() / (180 * 1000000))));
+      stats->setBaseAd(12.0f + ((1.f)*(int)(map->getGameTime() / (180 * 1000000))));
       stats->setRange(180.f);
       stats->setBaseAttackSpeed(1.250f);
       autoAttackDelay = 11.8f/30.f;
       setMelee(true);
       break;
    case MINION_TYPE_CASTER:
-      stats->setCurrentHealth(279.0f);
-      stats->setMaxHealth(279.0f);
-      stats->setBaseAd(23.0f);
+      stats->setCurrentHealth(279.0f + ((7.5f)*(int)(map->getGameTime() / (90 * 1000000))));
+      stats->setMaxHealth(279.0f + ((7.5f)*(int)(map->getGameTime() / (90 * 1000000))));
+      stats->setBaseAd(23.0f + ((1.f)*(int)(map->getGameTime() / (90 * 1000000))));
       stats->setRange(600.f);
       stats->setBaseAttackSpeed(0.670f);
       autoAttackDelay = 14.1f/30.f;
       autoAttackProjectileSpeed = 650.f;
       break;
    case MINION_TYPE_CANNON:
-      stats->setCurrentHealth(600.0f);
-      stats->setMaxHealth(600.0f);
-      stats->setBaseAd(40.0f);
+      stats->setCurrentHealth(700.0f + ((27.f)*(int)(map->getGameTime() / (180 * 1000000))));
+      stats->setMaxHealth(700.0f + ((27.f)*(int)(map->getGameTime() / (180 * 1000000))));
+      stats->setBaseAd(40.0f + ((3.f)*(int)(map->getGameTime() / (180 * 1000000))));
       stats->setRange(450.f);
       stats->setBaseAttackSpeed(1.0f);
       autoAttackDelay = 9.f/30.f;

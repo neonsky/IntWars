@@ -217,11 +217,11 @@ float SummonersRift::getGoldFor(Unit* u) const {
    
    switch(m->getType()) {
       case MINION_TYPE_MELEE:
-		  return 19.f + (0.5f / 180.f)*(gameTime / 1000000.f);
+         return 19.f + ((0.5f)*(int)(gameTime / (180 * 1000000)));
       case MINION_TYPE_CASTER:
-         return 14.f + (0.2f/90.f)*(gameTime/1000000.f);
+         return 14.f + ((0.2f)*(int)(gameTime / (90 * 1000000)));
       case MINION_TYPE_CANNON:
-         return 40.f + (1.f/180.f)*(gameTime/1000000.f);
+         return 40.f + ((1.f)*(int)(gameTime / (180 * 1000000)));
    }
    
    return 0.f;
