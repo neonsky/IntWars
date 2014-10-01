@@ -37,6 +37,7 @@ public:
 
    static bool isTableEmpty() { InitTable(); return nodeTable.size() == TABLE_SIZE; }
    static unsigned int missingNodes() { InitTable(); return TABLE_SIZE - nodeTable.size(); }
+   static void DestroyTable() { tableInitialised = 2; for (int i = 0; i < TABLE_SIZE; i = 0) delete nodeTable[i]; nodeTable.clear(); tableInitialised = -1; }
 private:
    static void InitTable();
    static std::vector<PathNode*> nodeTable;

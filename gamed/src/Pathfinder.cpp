@@ -3,6 +3,8 @@
 #include "AIMesh.h"
 #include <algorithm>
 #include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 std::vector<Vector2> Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize = PATH_DEFAULT_BOX_SIZE)
 {
@@ -225,7 +227,7 @@ void* PathNode::operator new(size_t size) // catch news
       break;
 
    case 0: // creating cache
-      ret = (PathNode*)malloc(size);
+      ret = (PathNode*)std::malloc(size);
       //if (ret == 0) 0;//__debugbreak(); // No memory?
    }
    return ret;
@@ -233,8 +235,8 @@ void* PathNode::operator new(size_t size) // catch news
 
 void PathNode::operator delete(void * object)
 {
-   //((PathNode*)object)->Init(0, 0, 0, 0, 0);
-   nodeTable.push_back((PathNode*)object);
+   if (tableInitialised == 2) std::free(object);
+   else nodeTable.push_back((PathNode*)object);
 }
 
 
