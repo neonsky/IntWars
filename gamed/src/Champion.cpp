@@ -6,11 +6,13 @@
 #include "LuaScript.h"
 #include <sstream>
 
-Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats()), type(type), skillPoints(0), respawnTimer(0), playerId(playerId)  {
+Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats()), type(type), skillPoints(0), respawnTimer(0), playerId(playerId) {
    stats->setGold(475.0f);
    stats->setAttackSpeedMultiplier(1.0f);
    stats->setGoldPerSecond(map->getGoldPerSecond());
    stats->setGeneratingGold(false);
+
+   collisionRadius = 35;
 
    std::vector<unsigned char> iniFile;
    if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/"+type+".inibin", iniFile)) {
@@ -328,4 +330,16 @@ int Champion::getTeamSize(){
       return blueTeamSize;
    }
    else { return purpTeamSize; }
+}
+
+void Champion::onCollision(Object *collider)
+{
+   if (collider == 0)
+   {
+      //std::cout << "I bumped into a wall!\n";
+   }
+   else
+   {
+      //std::cout << "I bumped into someone else!\n";
+   }
 }

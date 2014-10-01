@@ -1,7 +1,6 @@
 #include "CollisionHandler.h"
 #include "Map.h"
-#include <chrono>
-#include <math.h>
+#include "AIMesh.h"
 
 void CollisionHandler::update(float a_DT)
 {
@@ -27,11 +26,11 @@ void CollisionHandler::update(float a_DT)
       Target *target = o1->getTarget();
       if (target)
       {
-         Vector2 direction = (target->getPosition() - o1->getPosition()).Normalize(); // Get the direction where I am walking into
-         direction = direction * o1->getCollisionRadius(); // Multiply it with how fat I am
+         Vector2 test = o1->getPosition() + (o1->getDirection()*((float)o1->getCollisionRadius()*2.0f)); // Get the outer bound of your character in the direction I am walking.
+                                                                                                         // Have to multiply this radius by 2 for some reason.. Idk why.
+                                                                                                         // TODO: Figure out why.
 
-         direction = o1->getPosition() + direction;
-         if (mesh->getY(direction.X, direction.Y) == 0.0f)
+         if (!mesh->isWalkable(test.X, test.Y)) // If we cant walk here according to the mesh.
             o1->onCollision(0);
       }
 	}

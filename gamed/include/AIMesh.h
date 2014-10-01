@@ -2,6 +2,7 @@
 #define _AIMESH_H
 #include <vector>
 #include <string>
+#include "Vector2.h"
 
 #define MAX_TRIANGLE_COUNT (2<<15) 
 #define AIMESH_TEXTURE_SIZE 1024
@@ -54,9 +55,12 @@ public:
 
    bool load(std::string inputFile);
    float getY(float argX, float argY);
+   bool isWalkable(float argX, float argY) { return getY(argX, argY) > -254.0f; }
 
    float getWidth() { return mapWidth; }
    float getHeight() { return mapHeight; }
+
+   Vector2 TranslateToTextureCoordinate(Vector2 vector);
 	
    bool isLoaded() { return loaded; }
 private:

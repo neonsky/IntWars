@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0) {
+Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius) : Target(x, y), direction(Vector2(0, 1)), map(map), id(id), target(0), collisionRadius(collisionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0) {
 }
 
 Object::~Object() {
@@ -48,16 +48,16 @@ void Object::Move(int64 diff) {
    Vector2 cur(x, y);
    
    Vector2 goingTo (to - cur);
-	Vector2 norm (goingTo.Normalize());
+	direction = goingTo.Normalize();
 
 	double deltaMovement = (double)(getMoveSpeed()) * 0.000001f*diff;
 
-	float xx = norm.X * deltaMovement;
-	float yy = norm.Y * deltaMovement;
+   float xx = direction.X * deltaMovement;
+   float yy = direction.Y * deltaMovement;
 
       
    x+= xx;
-   y+=yy;
+   y+= yy;
 
 	/* If the target was a simple point, stop when it is reached */
 	if(target->isSimpleTarget() && distanceWith(target) < deltaMovement*3) {
