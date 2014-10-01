@@ -34,7 +34,7 @@ bool AIMesh::load(std::string inputFile)
 	if (t_FileStream.read(buffer.data(), size))
 	{
 		fileStream = (__AIMESHFILE*)buffer.data();
-		outputMesh(1024, 1024);
+		outputMesh(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
 		return true;
 	}*/
 
@@ -43,15 +43,19 @@ bool AIMesh::load(std::string inputFile)
    buffer.clear();
    if (RAFManager::getInstance()->readFile(inputFile, buffer)) // Our file exists. Load it.
    {
-      for (int i = 0; i < 1024; i++) // For every scanline for the triangle rendering
+      for (int i = 0; i < AIMESH_TEXTURE_SIZE; i++) // For every scanline for the triangle rendering
       {
          scanlineLowest[i].u = scanlineLowest[i].v = scanlineLowest[i].x = scanlineLowest[i].y = scanlineLowest[i].z = 1e10f; // Init to zero
          scanlineHighest[i].u = scanlineHighest[i].v = scanlineHighest[i].x = scanlineHighest[i].y = scanlineHighest[i].z = -1e10f;
       }
 
-      heightMap = new float[1024 * 1024]; // Shows occupied or not
+      heightMap = new float[AIMESH_TEXTURE_SIZE * AIMESH_TEXTURE_SIZE]; // Shows occupied or not
+      xMap = new float[AIMESH_TEXTURE_SIZE * AIMESH_TEXTURE_SIZE]; // Shows x
+      yMap = new float[AIMESH_TEXTURE_SIZE * AIMESH_TEXTURE_SIZE]; // Shows y
       fileStream = (__AIMESHFILE*)buffer.data();
-      outputMesh(1024, 1024);
+      outputMesh(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
+
+      //writeFile(heightMap, AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
 
       std::cout << "Opened AIMesh file for this map." << std::endl;
       loaded = true;
@@ -64,12 +68,12 @@ bool AIMesh::load(std::string inputFile)
 bool AIMesh::outputMesh(unsigned width, unsigned height)
 {
    mapHeight = mapWidth = 0;
-	for (unsigned i = 0; i < width*height; i++) heightMap[i] = 0.0f; // Clear the map
+	for (unsigned i = 0; i < width*height; i++) heightMap[i] = -255.0f; // Clear the map
 
-   lowX = 9e9, lowY = 9e9, highX = 0, highY = 0; // Init triangle
+   lowX = 9e9, lowY = 9e9, highX = 0, highY = 0, lowestZ = 9e9; // Init triangle
 
 	for (unsigned i = 0; i < fileStream->triangle_count; i++) 
-   // Need to find the absolute values.. So we can map it to 1024x1024 instead of 13000x15000
+   // Need to find the absolute values.. So we can map it to AIMESH_TEXTURE_SIZExAIMESH_TEXTURE_SIZE instead of 13000x15000
 	{
       // Triangle low X check
 		if (fileStream->triangles[i].Face.v1[0] < lowX)
@@ -152,11 +156,18 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 }
 
 float AIMesh::getY(float argX, float argY)
-{
-   unsigned pos = (unsigned)((argX - lowX)*highX * 1024.0f) + (argY - lowY)*highY;
-   return heightMap[pos];
+{   
+   if (loaded)
+   {
+      argX = (int)((argX - lowX)*highX); argY = (int)((argY - lowY)*highY);
+
+      if ((argX >= 0.0f && argX < AIMESH_TEXTURE_SIZE) && (argY >= 0.0f && argY < AIMESH_TEXTURE_SIZE))
+         return heightMap[(int)((AIMESH_TEXTURE_SIZE - argX) + (AIMESH_TEXTURE_SIZE - argY)*AIMESH_TEXTURE_SIZE)];
+   }
+   return -99999.99f;
 }
 
+// Line function from Jacco Bikker's SDL Tmpl8 3.0c
 void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height)
 {
    if ((x1 < 0) || (y1 < 0) || (x1 >= width) || (y1 >= height) ||
@@ -180,6 +191,8 @@ void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, 
 
 bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
 {
+#define MIN(a,b) (((a)>(b))?(b):(a))
+#define MAX(a,b) (((a)>(b))?(a):(b))
    std::ofstream imageFile("maps/test.tga", std::ios::binary);
    if (!imageFile) return false;
 
@@ -190,24 +203,23 @@ bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
    header[13] = (width >> 8) & 0xFF;
    header[14] = height & 0xFF;
    header[15] = (height >> 8) & 0xFF;
-   header[16] = 24;  // bits per pit_Xel
+   header[16] = 24;  // bits per pixel
 
    imageFile.write((const char*)header, 18);
 
-   // The image data is stored bottom-to-top, left-to-right
+   //for (int y = 0; y < height; y++)
    for (int y = height - 1; y >= 0; y--)
-      //for (int y = 0; y<height; y++)
-   for (int x = 0; x < width; x++)
-   {
-      imageFile.put((char)(pixelInfo[(y * width) + x]));
-      imageFile.put((char)(pixelInfo[(y * width) + x]));
-      imageFile.put((char)(pixelInfo[(y * width) + x]));
-   }
+      for (int x = 0; x < width; x++)
+      {
+         /* blue */  imageFile.put((char)MAX(MIN(pixelInfo[(y * height) + x]+(255-190),255.0f), 0.0f));
+         /* green */ imageFile.put(((float)(y) / 1024.0f)*256.0f);
+         /* red */   imageFile.put(((float)(x) / 1024.0f)*256.0f);
+      }
 
    // The file footer. This part is totally optional.
    static const char footer[26] =
-      "\0\0\0\0"  // no et_XTension area
-      "\0\0\0\0"  // no developer directort_Y
+      "\0\0\0\0"  // no extension area
+      "\0\0\0\0"  // no developer directory
       "TRUEVISION-XFILE"  // Yep, this is a TGA file
       ".";
    imageFile.write(footer, 26);
@@ -283,7 +295,7 @@ void AIMesh::drawTriangle(Triangle triangle, float *heightInfo, unsigned width, 
          }
 
          if (!(scanlineHighest[y].x<0 || x >= height))
-         for (; x<(int)scanlineHighest[y].x; x++) // for each piece of the scanline
+         for (int i = 0; x<(int)scanlineHighest[y].x; i++, x++) // for each piece of the scanline
          {
             if (x >= height) break; // If we're out of screen, break out this loop
 
@@ -301,7 +313,10 @@ void AIMesh::drawTriangle(Triangle triangle, float *heightInfo, unsigned width, 
                // Get the point on the texture that we need to draw. It basically picks a pixel based on the uv.
 
                //a_Target->GetRenderTarget()->Plot(x, tempHeight - y, 255);
-               heightInfo[height-x + y * height] = z;
+               heightInfo[(height - x) + (height-y)* height] = z;
+               xMap[height - x + (height - y)* height] = scanlineLowest[y].x + deltaX*i;
+               yMap[height - x + (height - y)* height] = scanlineLowest[y].y;
+               if (z < lowestZ) lowestZ = z;
             }
 
             z += deltaZ;
@@ -324,7 +339,7 @@ void AIMesh::fillScanLine(Vertex vertex1, Vertex vertex2)
       return fillScanLine(vertex2, vertex1);
    // We need to go from low to high so switch if the other one is higher
 
-   if (vertex2.y < 0 || vertex1.y >= 1024)
+   if (vertex2.y < 0 || vertex1.y >= AIMESH_TEXTURE_SIZE)
       return;
    // There's nothing on this line
 
@@ -334,8 +349,8 @@ void AIMesh::fillScanLine(Vertex vertex1, Vertex vertex2)
    deltaPos.y = vertex2.y - vertex1.y;
    deltaPos.z = vertex2.z - vertex1.z;
 
-   float tempWidth = 1024;
-   float tempHeight = 1024;
+   float tempWidth = AIMESH_TEXTURE_SIZE;
+   float tempHeight = AIMESH_TEXTURE_SIZE;
 
    float t_DYResp = deltaPos.y == 0 ? 0 : 1.f / deltaPos.y;
    int startY = (int)vertex1.y, endY = (int)vertex2.y;
@@ -361,7 +376,7 @@ void AIMesh::fillScanLine(Vertex vertex1, Vertex vertex2)
    }
 
    // Small fix
-   if (endY >= 1024) endY = 1024 - 1;
+   if (endY >= AIMESH_TEXTURE_SIZE) endY = AIMESH_TEXTURE_SIZE - 1;
 
    // For each scanline that this triangle uses
    for (int y = startY; y <= endY; y++)

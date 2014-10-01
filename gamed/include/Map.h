@@ -60,6 +60,7 @@ public:
    bool setFirstBlood(bool state) { firstBlood = state; }
 
    AIMesh *getAIMesh() { return &mesh; }
+   float getHeightAtLocation(float x, float y) { return mesh.getY(x, y); }
    
    bool getKillReduction() { return killReduction; }
    bool setKillReduction(bool state) { killReduction = state; }

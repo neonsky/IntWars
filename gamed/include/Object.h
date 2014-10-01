@@ -61,9 +61,10 @@ protected:
    uint32 attackerCount;
    
    uint32 collisionRadius;
-      
+   float currentUpwardDisplacement;
 public:
-	
+   float getUpDisplacement() { return currentUpwardDisplacement; }
+
    virtual ~Object();
    Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius);
 

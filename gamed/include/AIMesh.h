@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 
-#define MAX_TRIANGLE_COUNT 2500
+#define MAX_TRIANGLE_COUNT (2<<15) 
+#define AIMESH_TEXTURE_SIZE 1024
 
 struct ScanLine
 {
@@ -37,7 +38,11 @@ struct __AIMESHFILE
 	int triangle_count;
 	int zero[2];
 
-	Triangle triangles[MAX_TRIANGLE_COUNT];
+   Triangle triangles[MAX_TRIANGLE_COUNT];
+   // TODO: I have to find a better way to do this. :/
+   // Basically, it's a set of triangles that go on for triangle_count. 
+   // Dynamic allocation is stupid, and this way is potentially well, unsafe.
+   // pointers will make the app think that the first 4 bytes are a pointer.. Sigh.
 }; 
 #pragma pack(pop)
 
@@ -65,9 +70,9 @@ private:
 	std::vector<unsigned char> buffer;
    __AIMESHFILE *fileStream;
 
-   double lowX, lowY, highX, highY;
-   ScanLine scanlineLowest[1024], scanlineHighest[1024];
-   float *heightMap;
+   double lowX, lowY, highX, highY, lowestZ;
+   ScanLine scanlineLowest[AIMESH_TEXTURE_SIZE], scanlineHighest[AIMESH_TEXTURE_SIZE];
+   float *heightMap; float *xMap; float *yMap;
    float mapWidth, mapHeight;
    bool loaded;
 };
