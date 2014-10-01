@@ -82,100 +82,100 @@ private:
 	} \
 	while(0)\
 
-#define CORE_FATAL(fmt, ...) \
+#define CORE_FATAL(...) \
     do \
     { \
-        Logger::instance().log("FATAL", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__);\
+        Logger::instance().log("FATAL", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);\
         Logger::instance().flush(); \
         DEBUG_BREAK; \
         std::terminate(); \
     } \
     while(0)\
 
-#define CORE_ERROR(fmt, ...) \
+#define CORE_ERROR(...) \
     do \
     { \
-        Logger::instance().log("ERROR", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("ERROR", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_WARNING(fmt, ...) \
+#define CORE_WARNING(...) \
     do \
     { \
-        Logger::instance().log("WARNING", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__);\
+        Logger::instance().log("WARNING", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);\
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_DEBUG(fmt, ...) \
+#define CORE_DEBUG(...) \
     do \
     { \
-        Logger::instance().log("DEBUG", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("DEBUG", NULL, NULL, 0, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
 
-#define CORE_LOG(tag, fmt, ...) \
+#define CORE_LOG(tag, ...) \
     do \
     { \
-        Logger::instance().log(tag, NULL, NULL, 0, fmt, ##__VA_ARGS__); \
+        Logger::instance().log(tag, NULL, NULL, 0, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
 
 
-#define CORE_VERBOSE(fmt, ...) \
+#define CORE_VERBOSE(...) \
     do \
     { \
-        Logger::instance().log("VERBOSE", __FUNCTION__, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("VERBOSE", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); \
     } \
     while(0) \
 
 #else // Not in debug mode
 
 // Keep errors and warnings, just exclude func, file and line info
-#define CORE_FATAL(fmt, ...) \
+#define CORE_FATAL(...) \
     do \
     { \
-        Logger::instance().log("FATAL", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("FATAL", NULL, NULL, 0, __VA_ARGS__); \
         Logger::instance().flush(); \
         std::terminate(); \
     } \
     while(0)\
 
 
-#define CORE_ERROR(fmt, ...) \
+#define CORE_ERROR(...) \
     do \
     { \
-        Logger::instance().log("ERROR", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("ERROR", NULL, NULL, 0, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0)\
 
 
-#define CORE_WARNING(fmt, ...) \
+#define CORE_WARNING(...) \
     do \
     { \
-        Logger::instance().log("WARNING", NULL, NULL, 0, fmt, ##__VA_ARGS__);\
+        Logger::instance().log("WARNING", NULL, NULL, 0, __VA_ARGS__);\
     } \
     while(0)\
 
 // Release mode definitions of macros. Defined in such a way as to be
 // ignored completelly by the compiler
-#define CORE_DEBUG(fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
-#define CORE_VERBOSE(fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
-#define CORE_LOG(tag, fmt, ...) do { (void)sizeof(fmt##__VA_ARGS__); } while(0)
+#define CORE_DEBUG(...) do { (void)sizeof(__VA_ARGS__); } while(0)
+#define CORE_VERBOSE(...) do { (void)sizeof(__VA_ARGS__); } while(0)
+#define CORE_LOG(tag, ...) do { (void)sizeof(__VA_ARGS__); } while(0)
 #define CORE_ASSERT(expr) do { (void)sizeof(expr); } while(0)
 
 #endif
 
-#define CORE_INFO(fmt, ...) \
+#define CORE_INFO(...) \
     do \
     { \
-        Logger::instance().log("INFO", NULL, NULL, 0, fmt, ##__VA_ARGS__); \
+        Logger::instance().log("INFO", NULL, NULL, 0, __VA_ARGS__); \
     } \
     while(0) \
 
