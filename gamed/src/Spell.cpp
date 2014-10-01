@@ -6,14 +6,14 @@
 #include "Inibin.h"
 #include "LuaScript.h"
 
+
 using namespace std;
 
 Spell::Spell(Champion* owner, const std::string& spellName, uint8 slot) : owner(owner), spellName(spellName), level(0), slot(slot), state(STATE_READY), currentCooldown(0), currentCastTime(0), castTime(0.f), castRange(1000.f), projectileSpeed(2000.f), flags(0), projectileFlags(0) {
    
-   for(int i = 0; i < 5; ++i) {
-      cooldown[i] = 1.0f;
-   }
-   
+   cooldown.fill(1.f);
+   cost.fill(1.f);
+
    std::vector<unsigned char> iniFile;
    if(!RAFManager::getInstance()->readFile("DATA/Spells/"+spellName+".inibin", iniFile)) {
       if(!RAFManager::getInstance()->readFile("DATA/Characters/"+owner->getType()+"/Spells/"+spellName+".inibin", iniFile)) {
@@ -26,11 +26,12 @@ Spell::Spell(Champion* owner, const std::string& spellName, uint8 slot) : owner(
    
    Inibin inibin(iniFile);
       
-   for(int i = 0; i < 5; ++i) {
+   // Generate cooldown values for each level of the spell
+   for(int i = 0; i < cooldown.size(); ++i) {
       char c = '0'+i+1;
       cooldown[i] = inibin.getFloatValue("SpellData", string("Cooldown")+c);
    }
-   
+
    castTime = ((1.f+inibin.getFloatValue("SpellData", "DelayCastOffsetPercent")))/2.f;
    
    flags = inibin.getIntValue("SpellData", "Flags");
