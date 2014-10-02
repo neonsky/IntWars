@@ -2,7 +2,6 @@
 #include <cmath>
 #include <algorithm>
 #include "Vector2.h"
-#include "Unit.h"
 
 using namespace std;
 
@@ -99,11 +98,8 @@ bool Object::collide(Object* o) {
 }
 
 bool Object::isVisibleByTeam(uint32 side) {
-   Unit * unit = dynamic_cast<Unit*>(this);
-   if (unit) if(unit->isDead())
-      return false;
-
-	if(side > 1 || toRemove) {
+	if(side > 1) 
+   {
 		return false;
 	}
 
