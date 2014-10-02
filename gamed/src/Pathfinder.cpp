@@ -6,53 +6,65 @@
 #include <cstdio>
 #include <cstdlib>
 
-std::vector<Vector2> Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize = PATH_DEFAULT_BOX_SIZE)
+Map * Pathfinder::chart = 0;
+AIMesh *Pathfinder::mesh = 0;
+
+Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize = PATH_DEFAULT_BOX_SIZE)
 {
-   cleanLists();
-   gridNodeSize = boxSize;
+   Path path;
+   //path.cleanLists();
+   path.gridNodeSize = boxSize;
    Vector2 distance = (to - from) / boxSize;
 
    if ((256 - abs(distance.X)) > 0 && (256 - abs(distance.Y)) > 0) // difference in path is size on both width and height is less than the distance/boxsize
    {
-      mapTranslation.X = ((to.X < from.X) ? (to.X) : (from.X)) - (256 - abs(distance.X))*0.5f;
-      mapTranslation.Y = ((to.Y < from.Y) ? (to.Y) : (from.Y)) - (256 - abs(distance.Y))*0.5f;
+      path.mapTranslation.X = ((to.X < from.X) ? (to.X) : (from.X)) - (256 - abs(distance.X))*0.5f;
+      path.mapTranslation.Y = ((to.Y < from.Y) ? (to.Y) : (from.Y)) - (256 - abs(distance.Y))*0.5f;
 
-      if (mapTranslation.X < 0) mapTranslation.X = 0;
-      if (mapTranslation.Y < 0) mapTranslation.Y = 0;
+      if (path.mapTranslation.X < 0) path.mapTranslation.X = 0;
+      if (path.mapTranslation.Y < 0) path.mapTranslation.Y = 0;
    }
    else return getPath(from, to, boxSize*2.0f); // Otherwise increase the boxsize until we're at something we can work with.
 
-   start = fromPositionToGrid(from); // Save start in grid info
-   destination = fromPositionToGrid(to); // Save destination in grid info
+   path.start = path.fromPositionToGrid(from); // Save start in grid info
+   path.destination = path.fromPositionToGrid(to); // Save destination in grid info
 
-   insertObstructions(); // Ready the map.
+   path.insertObstructions(chart, mesh); // Ready the map.
 
-   addToOpenList(start, 0); // Let's start at the start.
+   path.addToOpenList(path.start, 0); // Let's start at the start.
 
-   for (int tries = 0; openList.size() != 0; tries++) // Go through the open list while it's not empty
+   for (int tries = 0; path.openList.size() != 0; tries++) // Go through the open list while it's not empty
+   {
       if (tries == MAX_PATHFIND_TRIES)
-         return reconstructUnfinishedPath();
-      else if(traverseOpenList())
-         return reconstructPath();
+      {
+         path.error = PATH_ERROR_OUT_OF_TRIES;
+         path.waypoints = reconstructUnfinishedPath(path);
+      }
+      else if (traverseOpenList(path))
+      {
+         path.error = PATH_ERROR_NONE;
+         path.waypoints = reconstructPath(path);
+      }
+   }
 
-   std::vector<Vector2> path;
-   path.push_back(from);
+   path.error = PATH_ERROR_OPENLIST_EMPTY;
+   path.waypoints.push_back(from);
    return path;
 }
 
-bool Pathfinder::traverseOpenList()
+bool Pathfinder::traverseOpenList(Path path)
 {
-   if (openList.size() == 0) return true;
+   if (path.openList.size() == 0) return true;
    
    // This sorts every iteration, which means that everything but the last couple of elements are sorted.
    // TODO: That means, this can probably be optimised. Sort only the last elements and add them into the vector where they belong.
    // But honestly, it's running pretty fast so why bother
-   std::sort(openList.begin(), openList.end(), SortByF);
+   std::sort(path.openList.begin(), path.openList.end(), SortByF);
 
-   PathNode * currentNode = openList.back();
-   openList.pop_back();
+   PathNode * currentNode = path.openList.back();
+   path.openList.pop_back();
 
-   bool atDestination = (currentNode->x == (int)destination.X && currentNode->y == (int)destination.Y);
+   bool atDestination = (currentNode->x == (int)path.destination.X && currentNode->y == (int)path.destination.Y);
 
    if (!atDestination) // While we're not there
    {
@@ -60,46 +72,46 @@ bool Pathfinder::traverseOpenList()
       {
          for (int dy = -1; dy <= 1; dy++) if (!(dx == 0 && dy == 0)) // in y 8 directions, ignore the x==y==0 where we dont move
          {
-            if (!isGridNodeOccupied(currentNode->x + dx, currentNode->y + dy)) // Is something here?
+            if (!path.isGridNodeOccupied(currentNode->x + dx, currentNode->y + dy)) // Is something here?
             {
-               PathNode* conflictingNode = isNodeOpen(currentNode->x + dx, currentNode->y + dy); // Nothing is here, did we already add this to the open list?
+               PathNode* conflictingNode = path.isNodeOpen(currentNode->x + dx, currentNode->y + dy); // Nothing is here, did we already add this to the open list?
                if (!conflictingNode) // We did not, add it
-                  addToOpenList(Vector2((float)(currentNode->x + dx), (float)(currentNode->y + dy)), currentNode);
+                  path.addToOpenList(Vector2((float)(currentNode->x + dx), (float)(currentNode->y + dy)), currentNode);
                else if (conflictingNode->g > CALC_G(currentNode->g)) // I found a shorter route to this node.
                {
                   conflictingNode->setParent(currentNode); // Give it a new parent
-                  conflictingNode->setScore((int)CALC_H(conflictingNode->x, conflictingNode->y, destination.X, destination.Y), CALC_G(currentNode->g)); // set the new score.
+                  conflictingNode->setScore((int)CALC_H(conflictingNode->x, conflictingNode->y, path.destination.X, path.destination.Y), CALC_G(currentNode->g)); // set the new score.
                }
             }
          }
       }
    }
 
-   closedList.push_back(currentNode);
+   path.closedList.push_back(currentNode);
    return atDestination;
 }
 
-std::vector<Vector2> Pathfinder::reconstructPath() // Make a std::vector of the waypoints
+std::vector<Vector2> Pathfinder::reconstructPath(Path path) // Make a std::vector of the waypoints
 {
    std::vector<Vector2> ret;
-   auto i = (closedList.back());
+   auto i = (path.closedList.back());
 
    while (i)
    {
-      ret.push_back(fromGridToPosition(Vector2((float)i->x, (float)i->y)));
+      ret.push_back(path.fromGridToPosition(Vector2((float)i->x, (float)i->y)));
       i = i->parent;
    }
 
    return ret;
 }
 
-std::vector<Vector2> Pathfinder::reconstructUnfinishedPath() // Let's go over the closed list and go back to the start, create a path from the best choice.
+std::vector<Vector2> Pathfinder::reconstructUnfinishedPath(Path path) // Let's go over the closed list and go back to the start, create a path from the best choice.
 {
    std::vector<Vector2> ret;
    
-   auto a = closedList.back();
+   auto a = path.closedList.back();
    int lowestG = 9e7;
-   for (auto i = closedList.begin(); i != closedList.end(); i++)
+   for (auto i = path.closedList.begin(); i != path.closedList.end(); i++)
       if ((*i)->g < lowestG)
       {
          lowestG = (*i)->g;
@@ -108,14 +120,14 @@ std::vector<Vector2> Pathfinder::reconstructUnfinishedPath() // Let's go over th
 
    while (a)
    {
-      ret.push_back(fromGridToPosition(Vector2((float)a->x, (float)a->y)));
+      ret.push_back(path.fromGridToPosition(Vector2((float)a->x, (float)a->y)));
       a = a->parent;
    }
 
    return ret;
 }
 
-PathNode* Pathfinder::isNodeOpen(int x, int y)
+PathNode* Path::isNodeOpen(int x, int y)
 {
    // TODO: Optimise? This is where the application is residing in 96% of the time during pathfinding.
 
@@ -134,12 +146,12 @@ bool SortByF(const PathNode* first, const PathNode* second) // Sort function for
    return (first->g + first->h > second->g + second->h); // Greater than because we want the lower scores in the back (first)
 }
 
-Vector2 Pathfinder::fromGridToPosition(Vector2 position)
+Vector2 Path::fromGridToPosition(Vector2 position)
 {
    return (position+mapTranslation)*gridNodeSize;
 }
 
-Vector2 Pathfinder::fromPositionToGrid(Vector2 position)
+Vector2 Path::fromPositionToGrid(Vector2 position)
 {
    auto pos = (position / gridNodeSize) - mapTranslation;
    pos.X = floorf(pos.X);
@@ -147,7 +159,7 @@ Vector2 Pathfinder::fromPositionToGrid(Vector2 position)
    return pos;
 }
 
-bool Pathfinder::isGridNodeOccupied(int x, int y)
+bool Path::isGridNodeOccupied(int x, int y)
 {
    if ((x >= 0 && x < GRID_SIZE) &&
        (y >= 0 && y < GRID_SIZE))
@@ -158,10 +170,9 @@ bool Pathfinder::isGridNodeOccupied(int x, int y)
 }
 
 
-void Pathfinder::insertObstructions() // insert all objects into the map
+void Path::insertObstructions(Map * chart, AIMesh *mesh) // insert all objects into the map
 {
    std::memset(map, false, sizeof(Grid)*GRID_WIDTH*GRID_HEIGHT); // Empty map
-   //std::memset(map, 0, sizeof(Grid)*GRID_WIDTH*GRID_HEIGHT); // Empty map
 
    if (chart == NULL) return;
 
@@ -193,6 +204,7 @@ void Pathfinder::insertObstructions() // insert all objects into the map
 
 }
 
+#ifdef USE_OPTIMISATION
 char PathNode::tableInitialised = -1;
 std::vector<PathNode*> PathNode::nodeTable;
 
@@ -238,22 +250,17 @@ void PathNode::operator delete(void * object)
    if (tableInitialised == 2) std::free(object);
    else nodeTable.push_back((PathNode*)object);
 }
+#endif
 
 
-void Pathfinder::cleanLists()
+void Path::cleanLists()
 {
-   unsigned int missing = PathNode::missingNodes();
-
-   if (openList.size() + closedList.size() != missing) 0;// __debugbreak();
-
    for (auto i = openList.begin(); i != openList.end(); i++) 
       delete (*i);
    openList.clear();
    for (auto i = closedList.begin(); i != closedList.end(); i++) 
       delete (*i);
    closedList.clear();
-
-   if (!PathNode::isTableEmpty()) 0;// __debugbreak(); // we fucked up.
 }
 
 void Pathfinder::setMap(Map * map)
