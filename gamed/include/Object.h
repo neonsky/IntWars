@@ -111,6 +111,7 @@ public:
    void setPosition(float x, float y);
    float getZ();
 
+   void setCollisionRadius(uint32 collisionRadius) { this->collisionRadius = collisionRadius; }
    uint32 getCollisionRadius() const { return collisionRadius; }
    uint32 getVisionRadius() const { return visionRadius; }
    bool collide(Object* o);

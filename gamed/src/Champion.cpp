@@ -47,6 +47,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
    spells.push_back(new Spell(this, inibin.getStringValue("Data", "Spell4"), 3));
    
    setMelee(inibin.getBoolValue("DATA", "IsMelee"));
+   setCollisionRadius(inibin.getIntValue("DATA", "PathfindingCollisionRadius"));
    
    iniFile.clear();
    if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/Spells/"+type+"BasicAttack.inibin", iniFile)) {

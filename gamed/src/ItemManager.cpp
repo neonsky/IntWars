@@ -20,10 +20,6 @@ void ItemManager::init() {
 
       Inibin inibin(iniFile);
       
-      if(i == 3146) {
-         inibin.printValues();
-      }
-      
       uint32 maxStack = inibin.getIntValue("DATA", "MaxStack");
       uint32 price = inibin.getIntValue("DATA", "Price");
       bool trinket = inibin.getIntValue(0x32E2CBC9);
