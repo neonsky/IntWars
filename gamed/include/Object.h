@@ -61,14 +61,18 @@ protected:
    uint32 attackerCount;
    
    uint32 collisionRadius;
+   float currentUpwardDisplacement;
    uint32 visionRadius;
    
    bool visibleByTeam[2];
       
 public:
-	
+   float getUpDisplacement() { return currentUpwardDisplacement; }
+
    virtual ~Object();
    Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius = 0);
+
+   virtual void onCollision(Object *collider) {}
 
    /**
    * Moves the object depending on its target, updating its coordinate.
@@ -105,6 +109,7 @@ public:
    Map* getMap() const { return map; }
 
    void setPosition(float x, float y);
+   float getZ();
 
    uint32 getCollisionRadius() const { return collisionRadius; }
    uint32 getVisionRadius() const { return visionRadius; }

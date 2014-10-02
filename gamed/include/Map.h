@@ -6,7 +6,9 @@
 
 #include "stdafx.h"
 #include "Object.h"
+#include "AIMesh.h"
 #include "Champion.h"
+#include "CollisionHandler.h"
 
 class Game;
 
@@ -25,11 +27,13 @@ protected:
    Game* game;
    bool firstBlood;
    bool killReduction;
+   AIMesh mesh;
+
+   CollisionHandler *collisionHandler;
    
 public:
-   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), firstBlood(true), killReduction(true){ }
-   
-   virtual ~Map() { }
+   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime);
+   virtual ~Map() { delete collisionHandler; }
    virtual void update(long long diff);
    virtual float getGoldPerSecond() = 0;
    virtual bool spawn() = 0;
@@ -45,6 +49,8 @@ public:
    virtual float getExpFor(Unit* u) const = 0 ;
    
    Game* getGame() const { return game; }
+
+   CollisionHandler* getPathFinder() { return collisionHandler; }
    
    const std::map<uint32, Object*>& getObjects() { return objects; }
    void stopTargeting(Unit* target);
@@ -53,6 +59,9 @@ public:
    
    bool getFirstBlood() { return firstBlood; }
    void setFirstBlood(bool state) { firstBlood = state; }
+
+   AIMesh *getAIMesh() { return &mesh; }
+   float getHeightAtLocation(float x, float y) { return mesh.getY(x, y); }
    
    bool getKillReduction() { return killReduction; }
    void setKillReduction(bool state) { killReduction = state; }

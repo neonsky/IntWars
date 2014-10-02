@@ -2,6 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include "Vector2.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -41,7 +42,10 @@ void Object::setTarget(Target* target) {
 void Object::Move(int64 diff) {
 
 	if(!target)
-	  return;
+      return;
+
+   currentUpwardDisplacement = map->getHeightAtLocation(getPosition().X, getPosition().Y);
+
    Vector2 to(target->getX(), target->getY());
    Vector2 cur(x, y);
    
@@ -94,7 +98,7 @@ void Object::setPosition(float x, float y) {
 }
 
 bool Object::collide(Object* o) {
-   return distanceWith(o) < getCollisionRadius()+o->getCollisionRadius();
+   return distanceWithSqr(o) < (getCollisionRadius() + o->getCollisionRadius())*(getCollisionRadius() + o->getCollisionRadius());
 }
 
 bool Object::isVisibleByTeam(uint32 side) {
@@ -108,4 +112,8 @@ bool Object::isVisibleByTeam(uint32 side) {
 
 void Object::setVisibleByTeam(uint32 side, bool visible) {
 	visibleByTeam[side] = visible;
+}
+
+float Object::getZ() {
+   return map->getHeightAtLocation(x, y);
 }
