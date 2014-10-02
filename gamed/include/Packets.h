@@ -1303,6 +1303,18 @@ public:
       buffer.fill(0, 512-message.length());
    }
 };
+
+
+class SetCooldown : public BasePacket {
+public:
+   SetCooldown(uint32 netId, uint8 slotId, float currentCd, float totalCd = 0.0f)
+         : BasePacket(PKT_S2C_SetCooldown, netId) {
+      buffer << slotId;
+      buffer << totalCd;
+      buffer << currentCd;
+   }
+};
+
 /* End New Packets */
 
 #if defined( __GNUC__ )
