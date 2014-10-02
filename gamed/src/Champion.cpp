@@ -198,7 +198,7 @@ std::pair<float, float> Champion::getRespawnPosition() {
    std::string playerTeam;
    std::ostringstream playerTableName;
    playerTableName << "player" << playerId;
-   printf(playerTableName.str().c_str());
+   puts(playerTableName.str().c_str());
    sol::table playerTable = playersTable.get<sol::table>(playerTableName.str());
    playerTeam = playerTable.get<std::string>("team");
    int spawnNumber = 0;
@@ -351,11 +351,23 @@ int Champion::getTeamSize(){
    std::string playerTeam;
    std::ostringstream playerTableName;
    playerTableName << "player" << playerId;
-   printf(playerTableName.str().c_str());
+   puts(playerTableName.str().c_str());
    sol::table playerTable = playerList.get<sol::table>(playerTableName.str());
    std::string team = playerTable.get<std::string>("team");
    if (team == "BLUE") {
       return blueTeamSize;
    }
    else { return purpTeamSize; }
+}
+
+void Champion::onCollision(Object *collider)
+{
+   if (collider == 0)
+   {
+      //std::cout << "I bumped into a wall!\n";
+   }
+   else
+   {
+      //std::cout << "I bumped into someone else!\n";
+   }
 }

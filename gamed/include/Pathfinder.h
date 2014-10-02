@@ -19,6 +19,9 @@
 
 #define PATH_DEFAULT_BOX_SIZE 50.0f
 
+// Use to increase speed on pathfinding, could cause trouble when used on multiple threads
+//#define USE_OPTIMISATION
+
 class PathNode
 {  
 public:
@@ -28,20 +31,23 @@ public:
    void Init(int ax, int ay, int ag, int ah, PathNode *p) { InitTable(); x = ax; y = ay; h = ah; g = ag; parent = p; }
    void setScore(int ah, int ag) { g = ag, h = ah; }
    void setParent(PathNode* p) { parent = p; }
-   
-   void* operator new(size_t size);
-   void operator delete(void * objects);
-//private:
    int x, y, h, g;
    PathNode* parent;
-
+#ifdef USE_OPTIMISATION
+public:
+   void* operator new(size_t size);
+   void operator delete(void * objects);
+private:
    static bool isTableEmpty() { InitTable(); return nodeTable.size() == TABLE_SIZE; }
    static unsigned int missingNodes() { InitTable(); return TABLE_SIZE - nodeTable.size(); }
    static void DestroyTable() { tableInitialised = 2; for (int i = 0; i < TABLE_SIZE; i = 0) delete nodeTable[i]; nodeTable.clear(); tableInitialised = -1; }
-private:
    static void InitTable();
    static std::vector<PathNode*> nodeTable;
    static char tableInitialised;
+#else
+   static void InitTable(){}
+   static void DestroyTable(){}
+#endif
 };
 
 struct Grid
@@ -54,35 +60,38 @@ struct Grid
 class Map;
 class AIMesh;
 
-// TODO: Make Pathfinder threadsafe. Currently it's made to only accept 1 instance, yet we will probably use it for multiple cases
-class Pathfinder
+enum PathError
+{
+   PATH_ERROR_NONE = 0,
+   PATH_ERROR_OUT_OF_TRIES,
+   PATH_ERROR_OPENLIST_EMPTY
+};
+
+class Path
 {
 public:
-   Pathfinder():mesh(0),chart(0) {}
-   ~Pathfinder() {}
+   friend class Pathfinder;
+   std::vector<Vector2> waypoints;
 
-   std::vector<Vector2> getPath(Vector2 from, Vector2 to, float boxSize);
+protected:
+   bool isPathed() { return error == 0; }
 
    Vector2 fromGridToPosition(Vector2 position);
    Vector2 fromPositionToGrid(Vector2 position);
-   void setMap(Map * map);// { chart = map; mesh = chart->getAIMesh(); }
-protected:
-   Map * chart;
-   AIMesh *mesh;
-private:
-   void addRealPosToOpenList(Vector2 position, PathNode* parent) 
-   { 
-      addGridPosToOpenList(fromPositionToGrid(position), parent); 
+
+   void addRealPosToOpenList(Vector2 position, PathNode* parent)
+   {
+      addGridPosToOpenList(fromPositionToGrid(position), parent);
    }
 
-   void addGridPosToOpenList(Vector2 position, PathNode* parent) 
-   { 
-      openList.push_back(new PathNode(position, (int)CALC_G((parent)?(parent->g):(0)), (int)CALC_H(position.X, position.Y, destination.X, destination.Y), parent));
+   void addGridPosToOpenList(Vector2 position, PathNode* parent)
+   {
+      openList.push_back(new PathNode(position, (int)CALC_G((parent) ? (parent->g) : (0)), (int)CALC_H(position.X, position.Y, destination.X, destination.Y), parent));
    }
 
-   void addToOpenList(Vector2 position, PathNode* parent) 
-   { 
-      addGridPosToOpenList(position, parent); 
+   void addToOpenList(Vector2 position, PathNode* parent)
+   {
+      addGridPosToOpenList(position, parent);
    }
 
    bool isGridNodeOccupied(Vector2 pos) { isGridNodeOccupied((int)pos.X, (int)pos.Y); }
@@ -90,17 +99,32 @@ private:
    PathNode* isNodeOpen(int x, int y);
 
    void cleanLists();
-   void insertObstructions();
-private:
+   void insertObstructions(Map * chart, AIMesh *mesh);
+
+   std::vector<PathNode*> openList, closedList;
    Grid map[GRID_SIZE][GRID_SIZE];
    Vector2 mapTranslation, start, destination;
    float gridNodeSize;
+   PathError error;
+};
 
-   std::vector<PathNode*> openList, closedList;
+class Pathfinder
+{
+public:
+   Pathfinder()/*:mesh(0),chart(0)*/ {}
+   ~Pathfinder() {}
 
-   bool traverseOpenList();
-   std::vector<Vector2> reconstructPath();
-   std::vector<Vector2> reconstructUnfinishedPath();
+   static Path getPath(Vector2 from, Vector2 to, float boxSize);
+   void setMap(Map * map);// { chart = map; mesh = chart->getAIMesh(); }
+protected:
+   static Map * chart;
+   static AIMesh *mesh;
+private:
+private:
+
+   static bool traverseOpenList(Path path);
+   static std::vector<Vector2> reconstructPath(Path path);
+   static std::vector<Vector2> reconstructUnfinishedPath(Path path);
 };
 
 bool SortByF(const PathNode* first, const PathNode* second);

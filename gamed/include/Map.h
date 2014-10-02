@@ -62,6 +62,7 @@ public:
 
    AIMesh *getAIMesh() { return &mesh; }
    float getHeightAtLocation(float x, float y) { return mesh.getY(x, y); }
+   bool isWalkable(float x, float y) { return mesh.isWalkable(x, y); }
    
    bool getKillReduction() { return killReduction; }
    void setKillReduction(bool state) { killReduction = state; }

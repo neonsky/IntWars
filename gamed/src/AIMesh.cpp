@@ -167,6 +167,15 @@ float AIMesh::getY(float argX, float argY)
    return -99999.99f;
 }
 
+Vector2 AIMesh::TranslateToTextureCoordinate(Vector2 vector)
+{
+   if (loaded)
+   {
+      vector.X = (int)((vector.X - lowX)*highX); vector.Y = (int)((vector.Y - lowY)*highY);
+   }
+   return vector;
+}
+
 // Line function from Jacco Bikker's SDL Tmpl8 3.0c
 void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height)
 {

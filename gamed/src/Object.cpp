@@ -50,16 +50,16 @@ void Object::Move(int64 diff) {
    Vector2 cur(x, y);
    
    Vector2 goingTo (to - cur);
-	Vector2 norm (goingTo.Normalize());
+	direction = goingTo.Normalize();
 
 	double deltaMovement = (double)(getMoveSpeed()) * 0.000001f*diff;
 
-	float xx = norm.X * deltaMovement;
-	float yy = norm.Y * deltaMovement;
+   float xx = direction.X * deltaMovement;
+   float yy = direction.Y * deltaMovement;
 
       
    x+= xx;
-   y+=yy;
+   y+= yy;
 
 	/* If the target was a simple point, stop when it is reached */
 	if(target->isSimpleTarget() && distanceWith(target) < deltaMovement*3) {

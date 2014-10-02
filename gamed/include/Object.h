@@ -62,6 +62,7 @@ protected:
    
    uint32 collisionRadius;
    float currentUpwardDisplacement;
+   Vector2 direction;
    uint32 visionRadius;
    
    bool visibleByTeam[2];
@@ -79,6 +80,8 @@ public:
    * @param diff the amount of milliseconds the object is supposed to move
    */
    void Move(int64 diff);
+   
+   Vector2 getDirection() { return direction; }
 
    void calculateVector(float xtarget, float ytarget);
 
