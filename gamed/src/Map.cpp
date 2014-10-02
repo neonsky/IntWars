@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Game.h"
+#include "Unit.h"
 
 void Map::update(int64 diff) {
    for(auto kv = objects.begin(); kv != objects.end();) {
@@ -163,12 +164,18 @@ std::vector<Champion*> Map::getChampionsInRange(Target* t, float range) {
 }
 
 bool Map::teamHasVisionOn(int side, Object* o) {
+   
+
    if(o->getSide() == side) {
       return true;
    }
 
-   for(auto kv : objects) {
-      if(kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius()) {
+   for(auto kv : objects) 
+   {
+      if(kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius()) 
+      {
+         Unit * unit = dynamic_cast<Unit*>(kv.second);
+         if ((unit) && unit->isDead()) continue;
          return true;
       }
    }

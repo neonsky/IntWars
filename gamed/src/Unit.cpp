@@ -184,6 +184,9 @@ const std::string& Unit::getModel() {
 }
 
 void Unit::die(Unit* killer) {
+   setToRemove();
+   map->stopTargeting(this);
+
    map->getGame()->notifyNpcDie(this, killer);
 
 	float exp = map->getExpFor(this);
@@ -200,34 +203,33 @@ void Unit::die(Unit* killer) {
 		}
 	}
 
+   if (killer)
+   {
+      Champion* cKiller = dynamic_cast<Champion*>(killer);
 
-   Champion* cKiller = dynamic_cast<Champion*>(killer);
-    
-	if (!cKiller) {
-      return;
-    }
-    
-    float gold = map->getGoldFor(this);
-    
-    if(!gold) {
-      return;
-    }
-    
-	cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
-	map->getGame()->notifyAddGold(cKiller, this, gold);
+      if (!cKiller) {
+         return;
+      }
 
-   if(cKiller->killDeathCounter < 0){
-      cKiller->setChampionGoldFromMinions(cKiller->getChampionGoldFromMinions()+gold);
-      printf("Adding gold form minions to reduce death spree: %f\n", cKiller->getChampionGoldFromMinions());
+      float gold = map->getGoldFor(this);
+
+      if (!gold) {
+         return;
+      }
+
+      cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
+      map->getGame()->notifyAddGold(cKiller, this, gold);
+
+      if (cKiller->killDeathCounter < 0){
+         cKiller->setChampionGoldFromMinions(cKiller->getChampionGoldFromMinions() + gold);
+         printf("Adding gold form minions to reduce death spree: %f\n", cKiller->getChampionGoldFromMinions());
+      }
+
+      if (cKiller->getChampionGoldFromMinions() >= 50 && cKiller->killDeathCounter < 0){
+         cKiller->setChampionGoldFromMinions(0);
+         cKiller->killDeathCounter += 1;
+      }
    }
-   
-   if(cKiller->getChampionGoldFromMinions() >= 50 && cKiller->killDeathCounter < 0){
-      cKiller->setChampionGoldFromMinions(0);
-      cKiller->killDeathCounter += 1;
-   }
-   
-   setToRemove();
-   map->stopTargeting(this);
 }
 
 void Unit::setUnitTarget(Unit* target) {

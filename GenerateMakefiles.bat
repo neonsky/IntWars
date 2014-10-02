@@ -1,5 +1,5 @@
 @echo off
-echo Generatw IntWars Makefiles
+echo Generate IntWars Makefiles
 echo ------------------------------
 IF EXIST build GOTO BUILDDIR
 ELSE GOTO MAIN 
