@@ -1,6 +1,7 @@
 #include "CollisionHandler.h"
 #include "Map.h"
 #include "AIMesh.h"
+#include "Unit.h"
 
 void CollisionHandler::update(float a_DT)
 {
@@ -10,9 +11,16 @@ void CollisionHandler::update(float a_DT)
    //auto i = objects.begin();
 	{
 		Object* o1 = i->second;
+
+      Unit * unit = dynamic_cast<Unit*>(o1);
+      if (unit && unit->isDead()) continue; // Don't collide with anything if we're dead.
+
       for (auto j = objects.begin(); j != objects.end(); j++) if (j != i) // Object-Object collision
       {
          Object* o2 = j->second;
+
+         unit = dynamic_cast<Unit*>(o2);
+         if (unit && unit->isDead()) continue; // Can't collide with dead things.
 
          if ((o1->getPosition() - o2->getPosition()).SqrLength() < (o1->getCollisionRadius() + o2->getCollisionRadius())*(o1->getCollisionRadius() + o2->getCollisionRadius())) //distance check
          {
