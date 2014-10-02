@@ -198,6 +198,43 @@ void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, 
    }
 }
 
+// Blatantly copy the line function
+float AIMesh::castRaySqr(Vector2 origin, Vector2 direction)
+{
+   float x1 = origin.X;
+   float y1 = origin.Y;
+   float x2 = direction.X * 10000.0f;
+   float y2 = direction.Y * 10000.0f;
+
+   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE))
+   {
+      return 0.0f; // Outside of map, collide immediately
+   }
+   
+   float b = x2 - x1;
+   float h = y2 - y1;
+   float l = fabsf(b);
+   if (fabsf(h) > l) l = fabsf(h);
+   int il = (int)l;
+   float dx = b / (float)l;
+   float dy = h / (float)l;
+   //for (int i = 0; i <= il; i++)
+   while (true)
+   {
+      if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE))
+      {
+         if (heightMap[(int)((AIMESH_TEXTURE_SIZE - (int)floor(x1 + 0.5f)) + (AIMESH_TEXTURE_SIZE - (int)floor(y1 + 0.5f))*AIMESH_TEXTURE_SIZE)]<=-254.0f)// is it walkable
+         {
+            return (Vector2(x1, y1) - origin).SqrLength() + 0.00005f;
+         }
+         x1 += dx, y1 += dy;
+      }
+      else break; // Because we're outside the screen
+   }
+
+   return (Vector2(x1, y1) - origin).SqrLength(); // Outside of map, collide immediately
+}
+
 bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
 {
 #define MIN(a,b) (((a)>(b))?(b):(a))

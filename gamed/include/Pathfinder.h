@@ -73,9 +73,10 @@ public:
    friend class Pathfinder;
    std::vector<Vector2> waypoints;
 
-protected:
    bool isPathed() { return error == 0; }
-
+   PathError getError() { return error; }
+   std::vector<Vector2> getWaypoints() { return waypoints; }
+protected:
    Vector2 fromGridToPosition(Vector2 position);
    Vector2 fromPositionToGrid(Vector2 position);
 
