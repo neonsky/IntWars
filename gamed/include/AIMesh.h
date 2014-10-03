@@ -57,8 +57,8 @@ public:
 
    float getY(float argX, float argY);
    bool isWalkable(float argX, float argY) { return getY(argX, argY) > -254.0f; }
-   float castRay(Vector2 origin, Vector2 direction) { return sqrt(castRaySquared(origin, direction)); }
-   float castRaySquared(Vector2 origin, Vector2 direction);
+   float castRay(Vector2 origin, Vector2 direction) { return sqrt(castRaySqr(origin, direction)); }
+   float castRaySqr(Vector2 origin, Vector2 direction);
 
    float getWidth() { return mapWidth; }
    float getHeight() { return mapHeight; }
