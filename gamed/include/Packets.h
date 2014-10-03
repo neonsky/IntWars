@@ -1210,8 +1210,8 @@ public:
                if(u->getStats().getSize(m, tmpMask) == 4) {
                   float f = u->getStats().getStat(m, tmpMask);
                   unsigned char *c = reinterpret_cast<unsigned char *>(&f);
-                  if(c[0] == 0xFF) {
-                     c[0] = 0xFE;
+                  if(c[0] >= 0xFE) {
+                     c[0] = 0xFD;
                   }
                   buffer << f;
                } else if(u->getStats().getSize(m, tmpMask) == 2) {
