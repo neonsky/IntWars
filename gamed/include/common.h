@@ -25,7 +25,7 @@ enum GameCmd : uint8
 	PKT_S2C_MoveAns                 = 0x61,
 };
 
-//Currently attuned to Live 4.12.0.356
+//Currently attuned to GAME_VERSION [Game.h]
 enum PacketCmd : uint8
 {                                            
    PKT_KeyCheck = 0x00, 
@@ -60,8 +60,9 @@ enum PacketCmd : uint8
    PKT_S2C_HeroSpawn = 0x4C,
    PKT_S2C_Announce = 0x4D,
 
-   PKT_S2C_GameTimer = 0xC0,
-   PKT_S2C_GameTimerUpdate = 0xC1,
+   // Packet 0xC0 format is [Net ID 1] [Net ID 2], purpose still unknown
+   PKT_S2C_GameTimer = 0xC1,
+   PKT_S2C_GameTimerUpdate = 0xC2,
 
    PKT_S2C_LeaveVision = 0x51,
    PKT_C2S_StartGame = 0x52,

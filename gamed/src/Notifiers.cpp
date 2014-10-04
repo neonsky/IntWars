@@ -230,3 +230,10 @@ void Game::notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float t
    SetCooldown cd(c->getNetId(), slotId, currentCd, totalCd);
    broadcastPacket(cd, CHL_S2C);
 }
+
+void Game::notifyGameTimer() {
+   float gameTime = map->getGameTime() / 1000000.f;
+
+   GameTimer gameTimer(gameTime);
+   broadcastPacket(reinterpret_cast<uint8 *>(&gameTimer), sizeof(GameTimer), CHL_S2C);
+}

@@ -33,7 +33,7 @@ uint8 Stats::getSize(uint8 blockId, uint32 stat) {
       switch(stat) {
       case FM1_Spells_Enabled:
          return 2;
-      case FM1_Summonerspells_Enabled:
+      case FM1_SummonerSpells_Enabled:
          return 2; // not 100% sure
       }
       

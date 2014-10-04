@@ -900,7 +900,7 @@ class BeginAutoAttack : public BasePacket {
 public:
    BeginAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_BeginAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
-      buffer << attacked->getX() << 44.3f << attacked->getY(); // New change as of 4.17. For now, Z is constant (no implementation to find Z)
+      buffer << attacked->getX() << attacked->getZ() << attacked->getY(); // New change as of 4.17.
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
       if (isCritical)
@@ -915,7 +915,7 @@ class NextAutoAttack : public BasePacket {
 public:
    NextAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical, bool initial) : BasePacket(PKT_S2C_NextAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
-      buffer << attacked->getX() << 44.3f << attacked->getY(); // New change as of 4.17. For now, Z is constant (no implementation to find Z)
+      buffer << attacked->getX() << attacked->getZ() << attacked->getY(); // New change as of 4.17.
       if (initial)
          buffer << (uint8)0x80; // These flags appear to change only to 0x80 and 0x7F after the first autoattack.
       else

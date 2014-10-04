@@ -132,8 +132,10 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
       PlayerInfo info(p);
       sendPacket(peer, info, CHL_S2C);
 
-      p->getChampion()->getStats().setSummonerspellEnabled(0, true);
-      p->getChampion()->getStats().setSummonerspellEnabled(1, true);
+      p->getChampion()->getStats().setSummonerSpellEnabled(0, true);
+      p->getChampion()->getStats().setSummonerSpellEnabled(1, true);
+      
+      // TODO: Recall slot
    }
 
    const std::map<uint32, Object*>& objects = map->getObjects();
@@ -221,19 +223,6 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
 
    StatePacket end(PKT_S2C_EndSpawn);
    bool p3 = sendPacket(peer, reinterpret_cast<uint8 *>(&end), sizeof(StatePacket), CHL_S2C);
-   BuyItemAns recall;
-   recall.header.netId = peerInfo(peer)->getChampion()->getNetId();
-   recall.itemId = 2001;
-   recall.slotId = 7;
-   recall.stack = 1;
-   
-   bool p4 = sendPacket(peer, reinterpret_cast<uint8 *>(&recall), sizeof(BuyItemAns), CHL_S2C); //activate recall slot
-   GameTimer timer(0); //0xC0
-   sendPacket(peer, reinterpret_cast<uint8 *>(&timer), sizeof(GameTimer), CHL_S2C);
-   GameTimer timer2(0.4f); //0xC0
-   sendPacket(peer, reinterpret_cast<uint8 *>(&timer2), sizeof(GameTimer), CHL_S2C);
-   GameTimerUpdate timer3(0.4f); //0xC1
-   sendPacket(peer, reinterpret_cast<uint8 *>(&timer3), sizeof(GameTimerUpdate), CHL_S2C);
 
    return true;
 }
@@ -257,6 +246,15 @@ bool Game::handleStartGame(HANDLE_ARGS) {
    if(_started) {
       for(auto p : players) {
          map->addObject(p->getChampion());
+
+         // Send the initial game time sync packets, then let the map send another
+         float gameTime = map->getGameTime() / 1000000.f;
+
+         GameTimer timer(gameTime); // 0xC1
+         sendPacket(p->getPeer(), reinterpret_cast<uint8 *>(&timer), sizeof(GameTimer), CHL_S2C);
+
+         GameTimerUpdate timer2(gameTime); // 0xC2
+         sendPacket(p->getPeer(), reinterpret_cast<uint8 *>(&timer2), sizeof(GameTimerUpdate), CHL_S2C);
       }
    }
 
@@ -562,7 +560,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
        // coords
       if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
          printf("At %f;%f\n", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
-         debugMsg << "At Coords: " << peerInfo(peer)->getChampion()->getX() << ";" << peerInfo(peer)->getChampion()->getY();
+         debugMsg << "At Coords - X:" << peerInfo(peer)->getChampion()->getX() << " Y:" << peerInfo(peer)->getChampion()->getY() << " Z:" << peerInfo(peer)->getChampion()->getZ();
          notifyDebugMessage(debugMsg.str());
          return true;
       }

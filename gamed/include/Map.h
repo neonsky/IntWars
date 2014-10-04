@@ -24,6 +24,7 @@ protected:
    uint64 gameTime;
    uint64 nextSpawnTime;
    uint64 firstGoldTime; // Time that gold should begin to generate
+   uint64 nextSyncTime;
    Game* game;
    bool firstBlood;
    bool killReduction;

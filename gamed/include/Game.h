@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PEER_MTU 996
 #define RELIABLE ENET_PACKET_FLAG_RELIABLE
 #define UNRELIABLE 0
-#define GAME_VERSION "Version 4.17.0.233 [PUBLIC]"
+#define GAME_VERSION "Version 4.17.0.267 [PUBLIC]"
 
 #define peerInfo(p) ((ClientInfo*)p->data)
 
@@ -41,7 +41,7 @@ class Game
 		Game();
 		~Game();
                 
-                uint32 strToId(std::string str);
+      uint32 strToId(std::string str);
 
 		bool initialize(ENetAddress *address, const char *baseKey);
 		void netLoop();
@@ -103,6 +103,7 @@ class Game
       void notifyEnterVision(Object* o, uint32 side);
       void notifyChampionSpawned(Champion* c, uint32 side);
       void notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float totalCd = 0.0f);
+      void notifyGameTimer();
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);
