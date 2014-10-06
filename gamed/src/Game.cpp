@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "LuaScript.h"
 #include "SummonersRift.h"
 
-#define REFRESH_RATE 5
+#define REFRESH_RATE 16666 // 60 fps
 
 uint32 GetNewNetID() {
 	static uint32 dwStart = 0x40000001;
@@ -211,10 +211,14 @@ void Game::netLoop()
       tEnd = tStart;
 	   tStart = std::chrono::high_resolution_clock::now();
 	   tDiff = std::chrono::duration_cast<std::chrono::microseconds>(tStart - tEnd).count();
+      
       if(_started) {
          map->update(tDiff);
       }
-      tDiff = std::chrono::duration_cast<std::chrono::microseconds>(tStart - tEnd).count();
-      std::this_thread::sleep_for(std::chrono::microseconds(REFRESH_RATE*1000));
+      
+      tEnd = std::chrono::high_resolution_clock::now();
+      if(tEnd-(std::chrono::microseconds(REFRESH_RATE)) < tStart) {
+         std::this_thread::sleep_for(std::chrono::microseconds(REFRESH_RATE)-(tEnd-tStart));
+      }
    }
 }
