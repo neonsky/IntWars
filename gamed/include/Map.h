@@ -8,9 +8,9 @@
 #include "Object.h"
 #include "AIMesh.h"
 #include "Champion.h"
-#include "CollisionHandler.h"
 
 class Game;
+class CollisionHandler;
 
 class Map {
 
@@ -34,7 +34,7 @@ protected:
    
 public:
    Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime);
-   virtual ~Map() { delete collisionHandler; }
+   virtual ~Map();// { delete collisionHandler; }
    virtual void update(long long diff);
    virtual float getGoldPerSecond() = 0;
    virtual bool spawn() = 0;
@@ -50,8 +50,6 @@ public:
    virtual float getExpFor(Unit* u) const = 0 ;
    
    Game* getGame() const { return game; }
-
-   CollisionHandler* getPathFinder() { return collisionHandler; }
    
    const std::map<uint32, Object*>& getObjects() { return objects; }
    void stopTargeting(Unit* target);

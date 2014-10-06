@@ -2,17 +2,19 @@
 #define _COLLISIONHANDLER_H
 
 #include "stdafx.h"
+#include "Map.h"
 #include "Vector2.h"
-#include "Pathfinder.h"
 
 class Object;
-class CollisionHandler : public Pathfinder
+class CollisionHandler
 {
 public:
-   CollisionHandler() {}
+   CollisionHandler(Map*map);// : chart(map) { Pathfinder::setMap(this); }
    ~CollisionHandler() {}
 
 	void update(float a_DT);
+private: 
+   Map *chart;
 };
 
 #endif

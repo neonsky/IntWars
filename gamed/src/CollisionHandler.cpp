@@ -2,6 +2,12 @@
 #include "Map.h"
 #include "AIMesh.h"
 #include "Unit.h"
+#include "Pathfinder.h"
+
+CollisionHandler::CollisionHandler(Map*map) : chart(map)
+{ 
+   Pathfinder::setMap(map); 
+}
 
 void CollisionHandler::update(float a_DT)
 {
@@ -38,7 +44,7 @@ void CollisionHandler::update(float a_DT)
                                                                                                          // Have to multiply this radius by 2 for some reason.. Idk why.
                                                                                                          // TODO: Figure out why.
 
-         if (!mesh->isWalkable(test.X, test.Y)) // If we cant walk here according to the mesh.
+         if (!chart->getAIMesh()->isWalkable(test.X, test.Y)) // If we cant walk here according to the mesh.
             o1->onCollision(0);
       }
 	}

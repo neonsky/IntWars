@@ -2,11 +2,13 @@
 #include "MinionStats.h"
 #include "Map.h"
 #include "Game.h"
+#include "Pathfinder.h"
+#include "Logger.h"
 
 using namespace std;
 
-Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<MovementVector>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, 1100), type(type), position(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
-   switch(position) {
+Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<MovementVector>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, 1100), type(type), spawnPosition(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
+   switch (spawnPosition) {
    case SPAWN_BLUE_TOP:
       setSide(0);
       setPosition(907, 1715);
@@ -156,9 +158,25 @@ void Minion::update(int64 diff) {
 
 void Minion::onCollision(Object * a_Collider)
 {
-   if (a_Collider != 0) // Be careful, could be a wall!
+   if (a_Collider == 0) return;
+
+   if((lastCollisionPosition-getPosition()).SqrLength()>getCollisionRadius()*getCollisionRadius())
    {
-      //printf("Minion %d collided with %d\n", this, a_Collider);
-      // auto new_path = map->getPathFinder()->getPath(getPosition(), getTarget());
+      Target *t = getTarget();
+      Vector2 targetpos;
+      if (t)
+      {
+         //CORE_WARNING("Pathing to target. (%f,%f)->(%f,%f)", getPosition().X, getPosition().Y, t->getPosition().X, t->getPosition().Y);
+         targetpos = t->getPosition();
+      }
+      else
+      {
+         targetpos = (a_Collider->getPosition() - getPosition()).Normalize(); // direction
+         targetpos *= a_Collider->getCollisionRadius() + getCollisionRadius(); // direction with length, displacement
+         targetpos = getPosition() - targetpos; // position + difference = endpos, but we need to go the exact other way
+         //CORE_WARNING("Pathing away from minion. (%f,%f)->(%f,%f)", getPosition().X, getPosition().Y, targetpos.X, targetpos.Y);
+      }
+
+      //Path new_path = Pathfinder::getPath(getPosition(), targetpos);
    }
 }

@@ -2,6 +2,7 @@
 #define _MINION_H
 
 #include "Unit.h"
+#include "Vector2.h"
 
 enum MinionSpawnPosition : uint32 {
    SPAWN_BLUE_TOP = 0xeb364c40,
@@ -22,7 +23,7 @@ enum MinionSpawnType : uint8 {
 class Minion : public Unit {
 
 protected:
-   MinionSpawnPosition position;
+   MinionSpawnPosition spawnPosition;
    MinionSpawnType type;
    
    /**
@@ -30,10 +31,10 @@ protected:
     */
    const std::vector<MovementVector> constWaypoints;
    int curConstWaypoint;
-
+   Vector2 lastCollisionPosition;
 public:
    Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const std::vector<MovementVector>& constWaypoints = std::vector<MovementVector>());
-   uint32 getPosition() const { return position; }
+   uint32 getSpawnPosition() const { return spawnPosition; }
    uint32 getType() const { return type; }
    
    virtual void update(int64 diff) override;

@@ -56,8 +56,7 @@ void Logger::fillOutputBuffer(std::string &outputBuffer, const std::string &tag,
 
     if(funcName != NULL)
     {
-        // outputBuffer += "\nFunction: ";
-        outputBuffer += "Function: ";
+        outputBuffer += "\nFunction: ";
         outputBuffer += funcName;
     }
     if(sourceFile != NULL)
@@ -72,7 +71,7 @@ void Logger::fillOutputBuffer(std::string &outputBuffer, const std::string &tag,
         outputBuffer += std::to_string(lineNum);
     }
 
-    // outputBuffer += '\n';
+    outputBuffer += "\n\n";
 }
 
 FILE *Logger::loadFileStream(FILE *stream, const char *filename)

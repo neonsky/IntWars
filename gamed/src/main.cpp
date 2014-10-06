@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "RAFManager.h"
 #include "Inibin.h"
 #include "ItemManager.h"
+#include "Logger.h"
 #include "Pathfinder.h"
 
 #define SERVER_HOST ENET_HOST_ANY 
@@ -33,6 +34,8 @@ int main(int argc, char ** argv)
 {
    printf("Yorick %s\n", SERVER_VERSION);
    puts("Loading RAF files in filearchives/ ..");
+
+   Logger::instance().setLogFile("../../log.txt");
    
    std::string basePath = RAFManager::getInstance()->findGameBasePath();
 

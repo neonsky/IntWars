@@ -1,13 +1,16 @@
 #include "Map.h"
 #include "Game.h"
 #include "Unit.h"
-#include "Pathfinder.h"
 #include "CollisionHandler.h"
 
 Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(10 * 1000000), firstBlood(true), killReduction(true)
 {
-   collisionHandler = new CollisionHandler();
-   collisionHandler->setMap(this);
+   collisionHandler = new CollisionHandler(this);
+}
+
+Map::~Map()
+{ 
+   delete collisionHandler; 
 }
 
 void Map::update(int64 diff) {
@@ -18,7 +21,7 @@ void Map::update(int64 diff) {
          kv = objects.erase(kv);
          continue;
       }
-      
+
       if(kv->second->isMovementUpdated()) {
          game->notifyMovement(kv->second);
          kv->second->clearMovementUpdated();

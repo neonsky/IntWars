@@ -289,7 +289,7 @@ public:
       buffer << (uint32)0x00150017; // unk
       buffer << (uint8)0x03; // SpawnType - 3 = minion
       buffer << m->getNetId() << m->getNetId();
-      buffer << (uint32)m->getPosition();
+      buffer << (uint32)m->getSpawnPosition();
       buffer << (uint8)0xFF; // unk
       buffer << (uint8)1; // wave number ?
       

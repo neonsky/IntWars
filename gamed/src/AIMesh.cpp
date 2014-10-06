@@ -161,8 +161,13 @@ float AIMesh::getY(float argX, float argY)
    {
       argX = (int)((argX - lowX)*highX); argY = (int)((argY - lowY)*highY);
 
+
       if ((argX >= 0.0f && argX < AIMESH_TEXTURE_SIZE) && (argY >= 0.0f && argY < AIMESH_TEXTURE_SIZE))
-         return heightMap[(int)((AIMESH_TEXTURE_SIZE - argX) + (AIMESH_TEXTURE_SIZE - argY)*AIMESH_TEXTURE_SIZE)];
+      {
+         int pos = (int)((AIMESH_TEXTURE_SIZE - argX) + (AIMESH_TEXTURE_SIZE - argY)*AIMESH_TEXTURE_SIZE);
+         if (pos<AIMESH_TEXTURE_SIZE*AIMESH_TEXTURE_SIZE)
+            return heightMap[pos];
+      }
    }
    return -99999.99f;
 }
