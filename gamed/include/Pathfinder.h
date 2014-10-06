@@ -90,6 +90,7 @@ protected:
    Vector2 fromPositionToGrid(Vector2 position);
    std::vector<Vector2> reconstructPath();
    std::vector<Vector2> reconstructUnfinishedPath();
+   void cleanPath(Path &path);
    bool traverseOpenList(bool first);
 
    void addRealPosToOpenList(Vector2 position, PathNode* parent)

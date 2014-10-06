@@ -2,6 +2,7 @@
 #define _AIMESH_H
 #include <vector>
 #include <string>
+#include "Target.h"
 #include "Vector2.h"
 
 #define MAX_TRIANGLE_COUNT (2<<15) 
@@ -47,6 +48,7 @@ struct __AIMESHFILE
 }; 
 #pragma pack(pop)
 
+class Object;
 class AIMesh
 {
 public:
@@ -59,6 +61,8 @@ public:
    bool isWalkable(float argX, float argY) { return getY(argX, argY) > -254.0f; }
    float castRay(Vector2 origin, Vector2 direction) { return sqrt(castRaySqr(origin, direction)); }
    float castRaySqr(Vector2 origin, Vector2 direction);
+   bool isAnythingBetween(Vector2 a, Vector2 b);
+   bool isAnythingBetween(Object* a, Object* b);
 
    float getWidth() { return mapWidth; }
    float getHeight() { return mapHeight; }

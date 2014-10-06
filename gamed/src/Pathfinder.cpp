@@ -31,6 +31,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
          path.error = PATH_ERROR_OUT_OF_TRIES;
          CORE_WARNING("PATH_ERROR_OUT_OF_TRIES");
          path.waypoints = job.reconstructUnfinishedPath();
+         job.cleanPath(path);
          job.cleanLists();
          return path;
       }
@@ -39,6 +40,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
          path.error = PATH_ERROR_NONE;
          CORE_WARNING("We finished a path.");
          path.waypoints = job.reconstructPath();
+         job.cleanPath(path);
          job.cleanLists();
          return path;
       }
@@ -46,7 +48,8 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 
    CORE_WARNING("PATH_ERROR_OPENLIST_EMPTY");
    path.error = PATH_ERROR_OPENLIST_EMPTY;
-   path.waypoints.push_back(from); 
+   path.waypoints.push_back(from);
+   job.cleanPath(path);
    job.cleanLists();
    return path;
 }
@@ -112,7 +115,7 @@ std::vector<Vector2> PathJob::reconstructPath( ) // Make a std::vector of the wa
    return ret;
 }
 
-std::vector<Vector2> PathJob::reconstructUnfinishedPath( ) // Let's go over the closed list and go back to the start, create a path from the best choice.
+std::vector<Vector2> PathJob::reconstructUnfinishedPath() // Let's go over the closed list and go back to the start, create a path from the best choice.
 {
    std::vector<Vector2> ret;
    
@@ -132,6 +135,32 @@ std::vector<Vector2> PathJob::reconstructUnfinishedPath( ) // Let's go over the 
    }
 
    return ret;
+}
+
+void PathJob::cleanPath(Path &path)
+{
+   if (path.waypoints.size() < 1) return;
+   CORE_WARNING("Cleaning path.. Current size is %d", path.waypoints.size());
+
+   int dirX = 0, dirY = 0;
+   auto prevPoint = path.waypoints.begin();
+   for (auto i = path.waypoints.begin()+1; i!=path.waypoints.end(); i++)
+   {
+      if (((*i).X - (*prevPoint).X == dirX) &&
+         ((*i).Y - (*prevPoint).Y == dirY))
+      {
+         path.waypoints.erase(prevPoint);
+      }
+      else
+      {
+         dirX = ((*i).X - (*prevPoint).X);
+         dirY = ((*i).Y - (*prevPoint).Y);
+      }
+
+      prevPoint = i;
+   }
+
+   CORE_WARNING("Done cleaning. New size is %d", path.waypoints.size());
 }
 
 PathNode* PathJob::isNodeOpen(int x, int y)
