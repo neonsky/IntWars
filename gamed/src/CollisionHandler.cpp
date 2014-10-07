@@ -17,6 +17,8 @@ void CollisionHandler::update(float a_DT)
    //auto i = objects.begin();
 	{
 		Object* o1 = i->second;
+      if (o1->getDirection().SqrLength()<0.05f) // Added slight elipson error. You never know.
+         continue; // Don't collide when I am not moving.
 
       Unit * unit = dynamic_cast<Unit*>(o1);
       if (unit && unit->isDead()) continue; // Don't collide with anything if we're dead.

@@ -207,6 +207,7 @@ void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, 
 // Blatantly copy the line function
 float AIMesh::castRaySqr(Vector2 origin, Vector2 direction)
 {
+   origin = TranslateToTextureCoordinate(origin);
    float x1 = origin.X;
    float y1 = origin.Y;
    float x2 = direction.X * 10000.0f;
@@ -252,30 +253,7 @@ bool AIMesh::isAnythingBetween(Object* a, Object* b)
 
 bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
 {
-   float x1 = a.X;
-   float y1 = a.Y;
-   float x2 = b.X;
-   float y2 = b.Y;
-
-   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE) ||
-      (x2 < 0) || (y2 < 0) || (x2 >= AIMESH_TEXTURE_SIZE) || (y2 >= AIMESH_TEXTURE_SIZE))
-   {
-      return true; // One is outside the screen
-   }
-
-   float br = x2 - x1;
-   float h = y2 - y1;
-   float l = fabsf(br);
-   if (fabsf(h) > l) l = fabsf(h);
-   int il = (int)l;
-   float dx = br / (float)l;
-   float dy = h / (float)l;
-   for (int i = 0; i <= il; i++)
-   {
-      if (heightMap[(int)((AIMESH_TEXTURE_SIZE - (int)floor(x1 + 0.5f)) + (AIMESH_TEXTURE_SIZE - (int)floor(y1 + 0.5f))*AIMESH_TEXTURE_SIZE)] <= -254.0f)
-         return true;
-      x1 += dx, y1 += dy;
-   }
+   return (castRaySqr(a, (b - a)) < (b - a).SqrLength());
 }
 
 

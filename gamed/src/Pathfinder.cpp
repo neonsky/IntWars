@@ -6,13 +6,22 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <chrono>
 
 Map * Pathfinder::chart = 0;
+auto g_Clock = std::clock();
+
+int successes = 0 , oot = 0, empties = 0;
 
 Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 {
    Path path;
    PathJob job;
+
+   if ((std::clock() - g_Clock) > 10000 && (successes + oot + empties)>0)
+   {
+      std::cout << "Pathfinding successrate: " << (((float)successes / (float)(successes + oot + empties))*(100.0f)) << std::endl;
+   } 
 
    if (chart == 0) CORE_FATAL("Tried to find a path without setting the map.");
    if (getMesh() == 0) CORE_FATAL("Can't start pathfinding without initialising the AIMesh");
@@ -29,6 +38,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       if (tries == MAX_PATHFIND_TRIES)
       {
          path.error = PATH_ERROR_OUT_OF_TRIES;
+         oot++;
          CORE_WARNING("PATH_ERROR_OUT_OF_TRIES");
          path.waypoints = job.reconstructUnfinishedPath();
          job.cleanPath(path);
@@ -38,6 +48,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       else if (job.traverseOpenList(tries==0))
       {
          path.error = PATH_ERROR_NONE;
+         successes++;
          CORE_WARNING("We finished a path.");
          path.waypoints = job.reconstructPath();
          job.cleanPath(path);
@@ -48,6 +59,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 
    CORE_WARNING("PATH_ERROR_OPENLIST_EMPTY");
    path.error = PATH_ERROR_OPENLIST_EMPTY;
+   empties++;
    path.waypoints.push_back(from);
    job.cleanPath(path);
    job.cleanLists();
@@ -139,8 +151,9 @@ std::vector<Vector2> PathJob::reconstructUnfinishedPath() // Let's go over the c
 
 void PathJob::cleanPath(Path &path)
 {
-   if (path.waypoints.size() < 1) return;
-   CORE_WARNING("Cleaning path.. Current size is %d", path.waypoints.size());
+   if (path.waypoints.size() < 2) return;
+   int startSize = path.waypoints.size();
+   CORE_WARNING("Cleaning path.. Current size is %d", startSize);
 
    int dirX = 0, dirY = 0;
    auto prevPoint = path.waypoints.begin();
@@ -150,6 +163,7 @@ void PathJob::cleanPath(Path &path)
          ((*i).Y - (*prevPoint).Y == dirY))
       {
          path.waypoints.erase(prevPoint);
+         CORE_WARNING("Erased a waypoint");
       }
       else
       {
@@ -161,6 +175,8 @@ void PathJob::cleanPath(Path &path)
    }
 
    CORE_WARNING("Done cleaning. New size is %d", path.waypoints.size());
+   if (startSize != path.waypoints.size())
+      CORE_WARNING("Removed %d nodes", startSize-path.waypoints.size());
 }
 
 PathNode* PathJob::isNodeOpen(int x, int y)

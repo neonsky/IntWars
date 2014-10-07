@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Game.h"
 #include "Packets.h"
-#undef min
-#define min(a, b)       ((a) < (b) ? (a) : (b))
+//#undef min // No, do NOT do this.
+//#define min(a, b)       ((a) < (b) ? (a) : (b))
 
 void Game::initHandlers()
 {
@@ -56,7 +56,7 @@ void Game::registerHandler(bool (Game::*handler)(HANDLE_ARGS), PacketCmd pktcmd,
 
 void Game::printPacket(const uint8 *buffer, uint32 size)
 {
-
+#define ppMIN(a, b)       ((a) < (b) ? (a) : (b))
    unsigned int i;
    printf("Printing with size %u\n", size);
    
@@ -75,7 +75,7 @@ void Game::printPacket(const uint8 *buffer, uint32 size)
       }
       
       if(i%16 == 0) {
-         printf("%04d-%04d ", i, min(i+15, size-1));
+         printf("%04d-%04d ", i, ppMIN(i + 15, size - 1));
       }
 
       printf("%02x ", buffer[i]);

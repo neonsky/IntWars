@@ -41,8 +41,11 @@ void Object::setTarget(Target* target) {
 
 void Object::Move(int64 diff) {
 
-	if(!target)
+   if (!target)
+   {
+      direction = Vector2();
       return;
+   }
 
    currentUpwardDisplacement = map->getHeightAtLocation(getPosition().X, getPosition().Y);
 
