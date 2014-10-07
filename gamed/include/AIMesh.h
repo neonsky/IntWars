@@ -69,6 +69,7 @@ public:
    float getSize() { return (mapHeight > mapWidth)? mapHeight : mapWidth; }
 
    Vector2 TranslateToTextureCoordinate(Vector2 vector);
+   Vector2 TranslateToRealCoordinate(Vector2 vector);
 	
    bool isLoaded() { return loaded; }
 private:

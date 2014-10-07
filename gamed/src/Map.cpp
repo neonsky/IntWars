@@ -192,7 +192,7 @@ bool Map::teamHasVisionOn(int side, Object* o) {
 
    for(auto kv : objects) 
    {
-      if(kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius()) 
+      if (kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius() && !mesh.isAnythingBetween(kv.second, o))
       {
          Unit * unit = dynamic_cast<Unit*>(kv.second);
          if ((unit) && unit->isDead()) continue;

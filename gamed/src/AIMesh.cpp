@@ -177,7 +177,18 @@ Vector2 AIMesh::TranslateToTextureCoordinate(Vector2 vector)
 {
    if (loaded)
    {
-      vector.X = (int)((vector.X - lowX)*highX); vector.Y = (int)((vector.Y - lowY)*highY);
+      vector.X = (int)((vector.X - lowX)*highX);
+      vector.Y = (int)((vector.Y - lowY)*highY);
+   }
+   return vector;
+}
+
+Vector2 AIMesh::TranslateToRealCoordinate(Vector2 vector)
+{
+   if (loaded)
+   {
+      vector.X = (vector.X/highX)+lowX;
+      vector.Y = (vector.Y/highY)+lowY;
    }
    return vector;
 }
@@ -204,51 +215,69 @@ void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, 
    }
 }
 
+#include <chrono>
+
+auto times = std::clock();
+auto time2 = std::clock();
+
 // Blatantly copy the line function
 float AIMesh::castRaySqr(Vector2 origin, Vector2 direction)
 {
-   origin = TranslateToTextureCoordinate(origin);
+   origin = TranslateToTextureCoordinate(origin);   
+
    float x1 = origin.X;
    float y1 = origin.Y;
-   float x2 = direction.X * 10000.0f;
-   float y2 = direction.Y * 10000.0f;
+   float x2 = direction.X * (float)AIMESH_TEXTURE_SIZE;
+   float y2 = direction.Y * (float)AIMESH_TEXTURE_SIZE;
+   
 
-   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE))
-   {
+   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE)) 
       return 0.0f; // Outside of map, collide immediately
-   }
 
    float b = x2 - x1;
    float h = y2 - y1;
    float l = fabsf(b);
    if (fabsf(h) > l) l = fabsf(h);
-   int il = (int)l;
    float dx = b / (float)l;
    float dy = h / (float)l;
-   //for (int i = 0; i <= il; i++)
-   while (true)
+
+   while(isWalkable(x1, y1))
    {
-      if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE))
-      {
-         if (heightMap[(int)((AIMESH_TEXTURE_SIZE - (int)floor(x1 + 0.5f)) + (AIMESH_TEXTURE_SIZE - (int)floor(y1 + 0.5f))*AIMESH_TEXTURE_SIZE)] <= -254.0f)// is it walkable
-         {
-            return (Vector2(x1, y1) - origin).SqrLength() + 0.00005f;
-         }
-         x1 += dx, y1 += dy;
-      }
-      else break; // Because we're outside the screen
+      x1 += dx, y1 += dy;
    }
 
-   return (Vector2(x1, y1) - origin).SqrLength(); // Outside of map, collide immediately
+   return (TranslateToRealCoordinate(Vector2(x1, y1)) - origin).SqrLength();
 }
+
 
 bool AIMesh::isAnythingBetween(Object* a, Object* b)
 {
    Vector2 direction = (b->getPosition() - a->getPosition());
+  
    float distance = direction.Length();
    direction = direction / distance;
-   Vector2 a_pos = a->getPosition() + direction*a->getCollisionRadius();
-   return (castRaySqr(a_pos, direction) < distance*distance);
+   Vector2 a_pos = a->getPosition();// +direction*a->getCollisionRadius(); // TODO: add something for towers
+
+   float raydist = castRaySqr(a_pos, direction);// < distance*distance)
+   bool raydistb = (raydist < distance*distance);
+
+   /*if (std::clock() - times > 4000)
+   {
+      std::cout << "a pos: (" << a->getPosition().X << ", " << a->getPosition().Y << ")" << std::endl;
+      std::cout << "b pos: (" << b->getPosition().X << ", " << b->getPosition().Y << ")" << std::endl;
+      std::cout << "a_pos: (" << a_pos.X << ", " << a_pos.Y << ")" << std::endl;
+      std::cout << "direction: (" << direction.X << ", " << direction.Y << ")" << std::endl;
+      std::cout << "distance: (" << distance << ", " << distance*distance << ")" << std::endl;
+      std::cout << "Ray dist: " << raydist << std::endl;
+      std::cout << "collisionRadius: (" << a->getCollisionRadius()*1.2f << ")" << std::endl;
+      std::cout << "GetY: " << getY(a_pos.X, a_pos.Y) << std::endl;
+      if (raydistb)
+         std::cout << "raydistb is true. Something is in the way." << std::endl << std::endl;
+      else std::cout << "raydistb is false. Nothing is there." << std::endl << std::endl;
+      times = std::clock();
+   }*/
+
+   return raydistb;
 }
 
 bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
