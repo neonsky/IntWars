@@ -113,6 +113,7 @@ enum PacketCmd : uint8
    PKT_C2S_SynchVersion = 0xBD,
    PKT_C2S_CharLoaded = 0xBE,
 
+   PKT_S2C_SetTarget2 = 0xC0,
    PKT_S2C_CharStats = 0xC4,
    PKT_S2C_FogUpdate2 = 0x23,
    PKT_S2C_LevelPropSpawn = 0xD0,

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
 #include "Packets.h"
+#include "Logger.h"
 
 #include <iostream>
 
@@ -45,24 +46,23 @@ void Game::notifyRemoveBuff(Unit* u, std::string buffName) {
    broadcastPacket(remove, CHL_S2C);
 }
 
-void Game::notifyTeleport(Unit* u, float _x, float _y){
-    
-   // TeleportRequest first(u->getNetId(), u->teleportToX, u->teleportToY, true);
-    
-    
-    u->setPosition(_x, _y);
-    
-   // sendPacket(currentPeer, first, CHL_S2C);
-    _x = MovementVector::targetXToNormalFormat(_x);
-    _y = MovementVector::targetYToNormalFormat(_y);
-    
-    
-    TeleportRequest second(u->getNetId(), _x, _y, false);
-    broadcastPacket(second, CHL_S2C);
-    
-       
-    //todo check for vision? and send to each player 
-    
+void Game::notifyTeleport(Unit* u, float _x, float _y) {
+   // Can't teleport to this point of the map
+   if (!map->isWalkable(_x, _y)) {
+      _x = MovementVector::targetXToNormalFormat(u->getPosition().X);
+      _y = MovementVector::targetYToNormalFormat(u->getPosition().Y);
+   } else {
+      u->setPosition(_x, _y);
+
+      //TeleportRequest first(u->getNetId(), u->teleportToX, u->teleportToY, true);
+      //sendPacket(currentPeer, first, CHL_S2C);
+
+      _x = MovementVector::targetXToNormalFormat(_x);
+      _y = MovementVector::targetYToNormalFormat(_y);
+   }
+
+   TeleportRequest second(u->getNetId(), _x, _y, false);
+   broadcastPacketVision(u, second, CHL_S2C);
 }
 
 void Game::notifyMovement(Object* o) {
@@ -143,6 +143,9 @@ void Game::notifyRemoveItem(Champion* c, uint8 slot) {
 void Game::notifySetTarget(Unit* attacker, Unit* target) {
    SetTarget st(attacker, target);
    broadcastPacket(st, CHL_S2C);
+
+   SetTarget2 st2(attacker, target);
+   broadcastPacket(st2, CHL_S2C);
 }
 
 void Game::notifyChampionDie(Champion* die, Unit* killer) {

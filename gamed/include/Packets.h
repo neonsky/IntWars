@@ -949,6 +949,19 @@ public:
 
 };
 
+class SetTarget2 : public BasePacket {
+public:
+   SetTarget2(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_SetTarget2, attacker->getNetId()) {
+      if (attacked != 0) {
+         buffer << attacked->getNetId();
+      }
+      else {
+         buffer << (uint32)0;
+      }
+   }
+
+};
+
 class ChampionDie : public BasePacket {
 public:
    ChampionDie(Champion* die, Unit* killer) : BasePacket(PKT_S2C_ChampionDie, die->getNetId()) {

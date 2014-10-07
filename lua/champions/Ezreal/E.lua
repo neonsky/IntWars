@@ -8,11 +8,16 @@ function finishCasting()
     local trueCoords
 
     if(to:length() > 475) then
-
         to:normalize()
         local range = Vector2:Mult(to,475)
         trueCoords = Vector2:new(current.x, current.y)
-	trueCoords:add(range)
+        trueCoords:add(range)
+    elseif(to:length() >= 237.5 and isWalkable(getSpellToX(), getSpellToY()) == false) then
+        -- Apply position fix when requested teleport distance is more than half
+        to:normalize()
+        local range = Vector2:Mult(to,475)
+        trueCoords = Vector2:new(current.x, current.y)
+        trueCoords:add(range)
     else
         trueCoords = Vector2:new(getSpellToX(), getSpellToY())
     end
@@ -21,7 +26,7 @@ function finishCasting()
     teleportTo(trueCoords.x, trueCoords.y)
     addParticleTarget("Ezreal_arcaneshift_flash.troy", getOwner());
     
-    print("Ezreal E used from Lua, teleporting to " ..trueCoords.x .. " " .. trueCoords.y)
+    --print("Ezreal E used from Lua, teleporting to " ..trueCoords.x .. " " .. trueCoords.y)
 end
 
 function applyEffects()

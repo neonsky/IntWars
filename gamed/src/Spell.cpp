@@ -162,6 +162,9 @@ void Spell::loadLua(LuaScript& script){
       owner->getMap()->getGame()->notifyTeleport(owner, _x, _y);
       return;
    });
+   script.lua.set_function("isWalkable", [this](float _x, float _y) {
+      return owner->getMap()->isWalkable(_x, _y);
+   });
    
    /*script.lua.set_function("addMovementSpeedBuff", [this](Unit* u, float amount, float duration) { // expose teleport to lua
        Buff* b = new Buff(duration);
