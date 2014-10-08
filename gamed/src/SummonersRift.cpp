@@ -73,7 +73,7 @@ const static vector<vector<MovementVector> > ConstWaypoints =
    },
 };
 
-SummonersRift::SummonersRift(Game* game) : Map(game, 90*1000000, 30*1000000, 90*1000000) 
+SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000) 
 {
    mesh.load("LEVELS/Map1/AIPath.aimesh");
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_R_03_A", 10097.62f, 808.73f, 2550, 156, 0));

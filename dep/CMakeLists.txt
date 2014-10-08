@@ -6,7 +6,7 @@ include_directories(include include/raf)
 include_directories(include ../gamed/include)
 
 IF(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  SET(CMAKE_CXX_FLAGS "-g -std=c++11 -pedantic")
+  SET(CMAKE_CXX_FLAGS "-O2 -std=c++11 -pedantic")
 ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   SET(CMAKE_CXX_FLAGS "/EHsc") #So it doesn't constantly throw warnings
 ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")

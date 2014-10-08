@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SERVER_PORT 5119
 #define SERVER_KEY "17BLOhi6KZsTtldTsizvHg=="
 
-#define SERVER_VERSION "0.1.0"
+#define SERVER_VERSION "0.2.0"
 
 int main(int argc, char ** argv) 
 {
