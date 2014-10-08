@@ -142,7 +142,7 @@ public:
         
         buffer << "NA1";
         buffer.fill(0, 2332); // 128 - 3 + 661 + 1546
-        buffer << (uint32)0x26f7dc52; // Game Features (turret range indicators, etc.)
+        buffer << (uint32)487826; // Game Features (turret range indicators, etc.)
         buffer.fill(0, 256);
         buffer << (uint32)0;
         buffer.fill(1, 19);

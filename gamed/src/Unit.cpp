@@ -165,7 +165,7 @@ void Unit::dealDamageTo(Unit* target, float damage, DamageType type, DamageSourc
     
     //Get health from lifesteal/spellvamp
     if (regain != 0) {
-        stats->setCurrentHealth (max (0.f, stats->getCurrentHealth() + (regain * damage)));
+        stats->setCurrentHealth(min(stats->getMaxHealth(), stats->getCurrentHealth() + (regain * damage)));
         map->getGame()->notifyUpdatedStats(this);
     }
 }
