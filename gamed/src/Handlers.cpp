@@ -63,7 +63,6 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
 bool Game::handleGameNumber(ENetPeer *peer, ENetPacket *packet) {
     WorldSendGameNumber world;
     world.gameId = 1;
-    strcpy((char *)world.data1, "EUW1");
     memcpy(world.data, peerInfo(peer)->getName().c_str(), peerInfo(peer)->getName().length());
     return sendPacket(peer, reinterpret_cast<uint8 *>(&world), sizeof(WorldSendGameNumber), CHL_S2C);
 }
@@ -145,6 +144,10 @@ bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
       if(t) {
          TurretSpawn turretSpawn(t);
          sendPacket(peer, turretSpawn, CHL_S2C);
+
+         // To suppress game HP-related errors for enemy turrets out of vision
+         SetHealth sh(t);
+         sendPacket(peer, sh, CHL_S2C);
          continue;
       }
    

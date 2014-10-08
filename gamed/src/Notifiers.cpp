@@ -240,3 +240,8 @@ void Game::notifyGameTimer() {
    GameTimer gameTimer(gameTime);
    broadcastPacket(reinterpret_cast<uint8 *>(&gameTimer), sizeof(GameTimer), CHL_S2C);
 }
+
+void Game::notifyAnnounceEvent(uint8 messageId, bool isMapSpecific) {
+   Announce announce(messageId, isMapSpecific ? map->getMapId() : 0);
+   broadcastPacket(announce, CHL_S2C);
+}

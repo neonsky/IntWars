@@ -55,10 +55,10 @@ enum PacketCmd : uint8
    PKT_S2C_AttentionPing = 0x40,
 
    PKT_S2C_Emotion = 0x42,
+   PKT_S2C_Announce = 0x45,
    PKT_C2S_AutoAttackOption = 0x47,
    PKT_C2S_Emotion = 0x48,
    PKT_S2C_HeroSpawn = 0x4C,
-   PKT_S2C_Announce = 0x4D,
 
    // Packet 0xC0 format is [Net ID 1] [Net ID 2], purpose still unknown
    PKT_S2C_GameTimer = 0xC1,

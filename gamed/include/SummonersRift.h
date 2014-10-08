@@ -19,6 +19,7 @@ public:
    
    bool spawn() override;
 
+   const int getMapId() const override { return 1; }
 };
 
 #endif

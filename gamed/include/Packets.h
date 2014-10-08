@@ -122,8 +122,7 @@ public:
          buffer << p->summonerSkills[1];
          buffer << (uint8)0; // bot boolean
          buffer << p->getTeam();
-         buffer << p->getName();
-         buffer.fill(0, 64-p->getName().length());
+         buffer.fill(0, 64); // name is no longer here
          buffer.fill(0, 64);
          buffer << p->getRank();
          buffer.fill(0, 24-p->getRank().length());
@@ -141,7 +140,12 @@ public:
         buffer << gameMode;
         buffer.fill(0, 128-gameMode.length());
         
-        buffer.fill(0, 2574);
+        buffer << "NA1";
+        buffer.fill(0, 2332); // 128 - 3 + 661 + 1546
+        buffer << (uint32)0x26f7dc52; // Game Features (turret range indicators, etc.)
+        buffer.fill(0, 256);
+        buffer << (uint32)0;
+        buffer.fill(1, 19);
     }
 
    /* PacketHeader header;
@@ -480,16 +484,13 @@ typedef struct _SynchVersion {
 typedef struct _WorldSendGameNumber {
     _WorldSendGameNumber() {
         header.cmd = PKT_World_SendGameNumber;
-        memset(data, 0, sizeof(data1));
         memset(data, 0, sizeof(data));
         gameId = 0;
     }
 
     PacketHeader header;
-    uint64 gameId; //_0x0000
-    uint8 server[5]; //0x0008
-    uint8 data1[27]; //0x000D
-    uint8 data[0x80];//0x0028
+    uint64 gameId;
+    uint8 data[128];
 } WorldSendGameNumber;
 
 
@@ -677,13 +678,6 @@ struct SpellSet {
     uint32 level;
 };
 
-struct Announce {
-    PacketHeader header;
-    uint8 msg;
-    uint64 unknown;
-    uint32 mapNo;
-};
-
 typedef struct _SkillUpPacket {
     PacketHeader header;
     uint8 skill;
@@ -744,6 +738,17 @@ typedef struct _EmotionResponse {
 
 /* New Style Packets */
 
+class Announce : public BasePacket {
+public:
+   Announce(uint8 messageId, uint32 mapId = 0) : BasePacket(PKT_S2C_Announce) {
+      buffer << messageId;
+      buffer << (uint64)0;
+      
+      if (mapId > 0) {
+         buffer << mapId;
+      }
+   }
+};
 
 class AddBuff : public Packet {
 public:

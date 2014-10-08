@@ -104,6 +104,7 @@ class Game
       void notifyChampionSpawned(Champion* c, uint32 side);
       void notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float totalCd = 0.0f);
       void notifyGameTimer();
+      void notifyAnnounceEvent(uint8 messageId, bool isMapSpecific);
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);

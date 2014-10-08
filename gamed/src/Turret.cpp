@@ -3,7 +3,7 @@
 #include "TurretStats.h"
 #include "Game.h"
 
-#define TURRET_RANGE 775
+#define TURRET_RANGE 905
 
 Turret::Turret(Map* map, uint32 id, const std::string& name, float x, float y, float hp, float ad, int side) : Unit(map, id, "", new TurretStats(), 50, x, y, 1200), name(name)  {
    stats->setCurrentHealth(hp);

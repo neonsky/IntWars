@@ -25,6 +25,7 @@ protected:
    uint64 nextSpawnTime;
    uint64 firstGoldTime; // Time that gold should begin to generate
    uint64 nextSyncTime;
+   std::vector<std::pair<bool, std::tuple<uint64, uint8, bool>>> announcerEvents;
    Game* game;
    bool firstBlood;
    bool killReduction;
@@ -67,6 +68,8 @@ public:
    void setKillReduction(bool state) { killReduction = state; }
    
    bool teamHasVisionOn(int side, Object* o);
+
+   virtual const int getMapId() const = 0;
 };
 
 #endif

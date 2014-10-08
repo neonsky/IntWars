@@ -91,6 +91,21 @@ void Map::update(int64 diff) {
       kv->second->update(diff);
       ++kv;
    }
+
+   for (auto i = announcerEvents.begin(); i != announcerEvents.end(); i++) {
+      bool isCompleted = (*i).first;
+
+      if (!isCompleted) {
+         uint64 eventTime = std::get<0>((*i).second);
+         uint8 messageId = std::get<1>((*i).second);
+         bool isMapSpecific = std::get<2>((*i).second);
+
+         if (gameTime >= eventTime) {
+            game->notifyAnnounceEvent(messageId, isMapSpecific);
+            (*i).first = true;
+         }
+      }
+   }
    
    // By default, synchronize the game time every 10 seconds
    if (nextSyncTime >= 10 * 1000000) {
