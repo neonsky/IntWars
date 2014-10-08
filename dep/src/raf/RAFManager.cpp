@@ -110,7 +110,7 @@ std::string RAFManager::findGameBasePath()
 
 	for(size_t i=0; i< strKeyPathLM.size();i++)
 	{
-		if( RegOpenKeyExA(HKEY_CURRENT_USER, strKeyPathLM[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS )
+		if( RegOpenKeyExA(HKEY_LOCAL_MACHINE, strKeyPathLM[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS )
 		{
 			continue;
 		}
