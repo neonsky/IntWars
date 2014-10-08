@@ -17,7 +17,7 @@ function applyEffects()
 
    local reduc = math.min(getNumberObjectsHit(), 5)
 
-   dealPhysicalDamage(getEffectValue(0)*(1-reduc/10.0))
+   dealPhysicalDamage((getEffectValue(0)+getOwner():getStats():getTotalAd()+(1.3*getOwner():getStats():getTotalAd()))+getEffectValue(0)*(1-reduc/10.0))
    
    addParticleTarget("caitlyn_Base_peaceMaker_tar_02.troy", getTarget())
 end
