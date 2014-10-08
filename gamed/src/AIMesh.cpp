@@ -256,7 +256,7 @@ bool AIMesh::isAnythingBetween(Object* a, Object* b)
   
    float distance = direction.Length();
    direction = direction / distance;
-   Vector2 a_pos = a->getPosition();// +direction*a->getCollisionRadius(); // TODO: add something for towers
+   Vector2 a_pos = a->getPosition();// +direction*a->getCollisionRadius(); // TODO: add the collisionRadius for towers.  I disabled this for more precision on non-towers.
 
    float raydist = castRaySqr(a_pos, direction);// < distance*distance)
    bool raydistb = (raydist < distance*distance);
