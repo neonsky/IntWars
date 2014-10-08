@@ -107,6 +107,7 @@ enum PacketCmd : uint8
    PKT_S2C_SetHealth = 0xAE, 
    PKT_C2S_Click = 0xAF, 
 
+   PKT_S2C_SpellAnimation = 0xB0,
    PKT_S2C_CastSpellAns = 0xB5,
    PKT_S2C_MinionSpawn = 0xBA,
    PKT_S2C_HeroSpawn2 = 0xBA,

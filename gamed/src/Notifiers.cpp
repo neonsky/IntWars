@@ -245,3 +245,8 @@ void Game::notifyAnnounceEvent(uint8 messageId, bool isMapSpecific) {
    Announce announce(messageId, isMapSpecific ? map->getMapId() : 0);
    broadcastPacket(announce, CHL_S2C);
 }
+
+void Game::notifySpellAnimation(Unit* u, const std::string& animation) {
+   SpellAnimation sa(u, animation);
+   broadcastPacketVision(u, sa, CHL_S2C);
+}

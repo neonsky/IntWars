@@ -344,6 +344,18 @@ public:
    }
 };
 
+class SpellAnimation : public BasePacket {
+public:
+   SpellAnimation(Unit* u, const std::string& animationName) : BasePacket(PKT_S2C_SpellAnimation, u->getNetId()) {
+      buffer << (uint32)0x00000005; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << (uint32)0x00000000; // unk
+      buffer << 1.0f; // unk
+      buffer << animationName;
+      buffer << (uint8)0;
+   }
+};
+
 class LeaveVision : public BasePacket {
 public:
    LeaveVision(Object* o) : BasePacket(PKT_S2C_LeaveVision, o->getNetId()) { }

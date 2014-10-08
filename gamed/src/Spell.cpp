@@ -231,6 +231,11 @@ void Spell::loadLua(LuaScript& script){
       owner->getMap()->getGame()->notifyParticleSpawn(owner, u, particle);
       return;
    });
+   
+   script.lua.set_function("spellAnimation", [this](const std::string& animation, Unit* u) { 
+      owner->getMap()->getGame()->notifySpellAnimation(u, animation);
+      return;
+   });
 
    try{
       script.loadScript(scriptloc); //todo: abstract class that loads a lua file for any lua
