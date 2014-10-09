@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "LuaScript.h"
 #include <sstream>
+#include <algorithm>
 
 Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats(), 30, 0, 0, 1200), type(type), skillPoints(0), respawnTimer(0), playerId(playerId)  {
    stats->setGold(475.0f);
@@ -123,6 +124,31 @@ Spell* Champion::levelUpSpell(uint8 slot) {
 
 void Champion::update(int64 diff) {
    Unit::update(diff);
+
+   if (!isDead() && moveOrder == MOVE_ORDER_ATTACKMOVE && !unitTarget) {
+      const std::map<uint32, Object*>& objects = map->getObjects();
+      float distanceToTarget = 9000000.f;
+      Unit* nextTarget = 0;
+      float range = std::max(stats->getRange(), DETECT_RANGE);
+
+      for (auto& it : objects) {
+         Unit* u = dynamic_cast<Unit*> (it.second);
+
+         if (!u || u->isDead() || u->getSide() == getSide() || distanceWith(u) > range) {
+            continue;
+         }
+
+         if (distanceWith(u) < distanceToTarget) {
+            distanceToTarget = distanceWith(u);
+            nextTarget = u;
+         }
+      }
+
+      if (nextTarget) {
+         setUnitTarget(nextTarget);
+         map->getGame()->notifySetTarget(this, nextTarget);
+      }
+   }
 
    if(!stats->isGeneratingGold() && map->getGameTime() >= map->getFirstGoldTime()) {
    		stats->setGeneratingGold(true);

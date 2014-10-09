@@ -127,7 +127,8 @@ enum PacketCmd : uint8
 enum MoveType : uint8
 {
    EMOTE = 1,
-   MOVE = 4,
+   MOVE = 2,
+   ATTACKMOVE = 7,
    STOP = 10,
 };
 

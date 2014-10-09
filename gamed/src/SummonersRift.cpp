@@ -110,10 +110,10 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1
    expToLevelUp = { 0, 280, 660, 1140, 1720, 2400, 3180, 4060, 5040, 6120, 7300, 8580, 9960, 11440, 13020, 14700, 16480, 18360 };
 
    // Announcer events
-   announcerEvents.push_back(std::make_pair(false, make_tuple(30 * 1000000, 119, true)));
-   announcerEvents.push_back(std::make_pair(false, make_tuple(60 * 1000000, 120, true)));
-   announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 127, false))); // 90 * 1000000
-   announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 118, false))); // 90 * 1000000
+   announcerEvents.push_back(std::make_pair(false, make_tuple(30 * 1000000, 119, true))); // Welcome to SR
+   announcerEvents.push_back(std::make_pair(false, make_tuple(60 * 1000000, 120, true))); // 30 seconds until minions spawn
+   announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 127, false))); // Minions have spawned (90 * 1000000)
+   announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 118, false))); // Minions have spawned [2] (90 * 1000000)
 }
 
 void SummonersRift::update(long long diff) {

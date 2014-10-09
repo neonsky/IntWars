@@ -328,6 +328,10 @@ std::vector<MovementVector> readWaypoints(uint8 *buffer, int coordCount) {
 bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
    MovementReq *request = reinterpret_cast<MovementReq *>(packet->data);
    std::vector<MovementVector> vMoves = readWaypoints(&request->moveData, request->vectorNo);
+
+   if (peerInfo(peer)->getChampion()->isDead()) {
+      return true;
+   }
     
    switch(request->type) {
    //TODO, Implement stop commands
@@ -350,6 +354,12 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
    case EMOTE:
       //Logging->writeLine("Emotion\n");
       return true;
+   case ATTACKMOVE:
+      peerInfo(peer)->getChampion()->setMoveOrder(MOVE_ORDER_ATTACKMOVE);
+      break;
+   case MOVE:
+      peerInfo(peer)->getChampion()->setMoveOrder(MOVE_ORDER_MOVE);
+      break;
    }
    
    // Sometimes the client will send a wrong position as the first one, override it with server data

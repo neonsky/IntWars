@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstdlib>
 
-#define DETECT_RANGE 400
 #define EXP_RANGE 1400
 
 using namespace std;
@@ -16,16 +15,23 @@ Unit::~Unit() {
 
 void Unit::update(int64 diff) {
 
-      if(unitScript.isLoaded()){
-   try{
-   unitScript.lua.get <sol::function> ("onUpdate").call <void> (diff);
-   }catch(sol::error e){
-      printf("%s", e.what());
-   }
+   if (unitScript.isLoaded()) {
+      try {
+         unitScript.lua.get <sol::function> ("onUpdate").call <void> (diff);
+      } catch (sol::error e) {
+         printf("%s", e.what());
+      }
    }
 
    if (isDead()) {
-   return;
+      if (unitTarget) {
+         setUnitTarget(0);
+         lastTarget = 0;
+         isAttacking = false;
+         map->getGame()->notifySetTarget(this, 0);
+         initialAttackDone = false;
+      }
+      return;
    }
 
    if (unitTarget && unitTarget->isDead()) {
@@ -34,24 +40,32 @@ void Unit::update(int64 diff) {
       map->getGame()->notifySetTarget(this, 0);
       initialAttackDone = false;
    }
-   
-   if(!unitTarget && isAttacking) {
-      isAttacking = false;
-      initialAttackDone = false;
+
+   if (!unitTarget && isAttacking) {
+      if (!lastTarget || lastTarget && lastTarget->isDead()) {
+         isAttacking = false;
+         initialAttackDone = false;
+         lastTarget = 0;
+      }
    }
 
-   if (isAttacking) {
+   if (isAttacking && lastTarget) {
       autoAttackCurrentDelay += diff / 1000000.f;
       if (autoAttackCurrentDelay >= autoAttackDelay/stats->getAttackSpeedMultiplier()) {
-         if(!isMelee()) {
-            Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, unitTarget, 0, autoAttackProjectileSpeed, 0);
+         if (!isMelee()) {
+            Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, lastTarget, 0, autoAttackProjectileSpeed, 0);
             map->addObject(p);
             map->getGame()->notifyShowProjectile(p);
          } else {
-            autoAttackHit(unitTarget);
+            autoAttackHit(lastTarget);
          }
          autoAttackCurrentCooldown = 1.f / (stats->getTotalAttackSpeed());
          isAttacking = false;
+
+         if (!unitTarget) {
+            lastTarget = 0;
+            initialAttackDone = false;
+         }
       }
    } else if (unitTarget && distanceWith(unitTarget) <= stats->getRange()) {
       refreshWaypoints();
@@ -61,7 +75,8 @@ void Unit::update(int64 diff) {
          autoAttackCurrentDelay = 0;
          autoAttackProjId = GetNewNetID();
          autoAttackFlag = true;
-         
+         lastTarget = unitTarget;
+
          if (!initialAttackDone) {
             initialAttackDone = true;
             map->getGame()->notifyBeginAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit);
@@ -72,22 +87,6 @@ void Unit::update(int64 diff) {
       }
    } else {
       refreshWaypoints();
-      if (moveOrder == MOVE_ORDER_ATTACKMOVE && !unitTarget) {
-         const std::map<uint32, Object*>& objects = map->getObjects();
-
-         for (auto& it : objects) {
-            Unit* u = dynamic_cast<Unit*> (it.second);
-
-            if (!u || u->isDead() || u->getSide() == getSide() || distanceWith(u) > DETECT_RANGE) {
-               continue;
-            }
-
-            setUnitTarget(u);
-            map->getGame()->notifySetTarget(this, u);
-
-            break;
-         }
-      }
 
       Object::update(diff);
    }
@@ -156,7 +155,7 @@ void Unit::dealDamageTo(Unit* target, float damage, DamageType type, DamageSourc
     //Damage dealing. (based on leagueoflegends' wikia)
     damage = defense >= 0 ? (100 / (100 + defense)) * damage : (2 - (100 / (100 - defense))) * damage;
 
-    target->getStats().setCurrentHealth(max(0.f, target->getStats().getCurrentHealth() - damage));
+    target->getStats().setCurrentHealth(std::max(0.f, target->getStats().getCurrentHealth() - damage));
     if (!target->deathFlag && target->getStats().getCurrentHealth() <= 0) {
         target->deathFlag = true;
         target->die(this);
@@ -235,6 +234,10 @@ void Unit::die(Unit* killer) {
 void Unit::setUnitTarget(Unit* target) {
    unitTarget = target;
    refreshWaypoints();
+}
+
+void Unit::setLastTarget(Unit* target) {
+   lastTarget = target;
 }
 
 void Unit::refreshWaypoints() {

@@ -103,6 +103,34 @@ Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition po
 
 void Minion::update(int64 diff) {
    Unit::update(diff);
+
+   if (isDead()) {
+      return;
+   }
+
+   if (moveOrder == MOVE_ORDER_ATTACKMOVE && !unitTarget) {
+      const std::map<uint32, Object*>& objects = map->getObjects();
+      Unit* nextTarget = 0;
+      unsigned int nextTargetPriority = 10;
+
+      for (auto& it : objects) {
+         Unit* u = dynamic_cast<Unit*> (it.second);
+
+         if (!u || u->isDead() || u->getSide() == getSide() || distanceWith(u) > DETECT_RANGE) {
+            continue;
+         }
+
+         auto priority = classifyTarget(u);
+         if (priority < nextTargetPriority) {
+            nextTarget = u;
+            nextTargetPriority = priority;
+         }
+      }
+      if (nextTarget) {
+         setUnitTarget(nextTarget); // Set the new target and refresh waypoints
+         map->getGame()->notifySetTarget(this, nextTarget);
+      }
+   }
    
    if(autoAttackFlag && (!unitTarget || distanceWith(unitTarget) > stats->getRange())) {
       map->getGame()->notifyStopAutoAttack(this);
