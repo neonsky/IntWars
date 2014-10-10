@@ -1,6 +1,8 @@
 #include "Unit.h"
 #include "Map.h"
 #include "Game.h"
+#include "Turret.h"
+#include "Minion.h"
 
 #include <algorithm>
 #include <cstdlib>

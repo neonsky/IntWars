@@ -259,7 +259,7 @@ void Game::notifyDash(Unit* u, float _x, float _y) {
    // TODO: Fix dash: it stays in the current location and doesn't hit a wall if the target location can't be reached
    float _z = u->getZ();
 
-   if (!map->isWalkable(_x, _y)) {
+   /*if (!map->isWalkable(_x, _y)) {
       _x = u->getPosition().X;
       _y = u->getPosition().Y;
    }
@@ -272,8 +272,8 @@ void Game::notifyDash(Unit* u, float _x, float _y) {
       _y = u->getPosition().Y - _y;
 
       u->setPosition(newX, newY);
-   }
+   }*/
 
-   Dash dash(u, _x, _y, _z);
+   Dash dash(u, _x, _y);
    broadcastPacketVision(u, dash, CHL_S2C);
 }

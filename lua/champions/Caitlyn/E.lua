@@ -1,31 +1,35 @@
 Vector2 = require 'Vector2' -- include 2d vector lib 
 
 function finishCasting()
-    -- Apply knockback
-    local original = Vector2:new(getOwnerX(), getOwnerY())
+   
+    -- Create projectile for slowing enemies
     local current = Vector2:new(getOwnerX(), getOwnerY())
     local to = Vector2:new(getSpellToX(), getSpellToY())
-
-    current:sub(to)
-    current:normalize()
-    
-    local range = Vector2:Mult(current,400)
-    local trueCoords = Vector2:Add(original, range)
-
-    dashTo(trueCoords.x, trueCoords.y, getOwner())
-    setAnimation("RUN", "SPELL3B", getOwner())
-    
-    -- Create projectile for slowing enemies
-    current = Vector2:new(getOwnerX(), getOwnerY())
-    to = Vector2:new(getSpellToX(), getSpellToY())
     
     to:sub(current)
     to:normalize()
     
-    range = Vector2:Mult(to, 1000)
-    trueCoords = Vector2:Add(current, range)
+    local range = Vector2:Mult(to, 1000)
+    local trueCoords = Vector2:Add(current, range)
     
     addProjectile(trueCoords.x, trueCoords.y)
+
+    -- Apply knockback
+    local original = Vector2:new(getOwnerX(), getOwnerY())
+    current = Vector2:new(getOwnerX(), getOwnerY())
+    to = Vector2:new(getSpellToX(), getSpellToY())
+
+    current:sub(to)
+    current:normalize()
+    
+    range = Vector2:Mult(current,400)
+    trueCoords = Vector2:Add(original, range)
+
+    dashTo(trueCoords.x, trueCoords.y, getOwner())
+    setAnimation("RUN", "SPELL3B", getOwner())
+    
+
+    
     resetAnimations(getOwner())
 end
 

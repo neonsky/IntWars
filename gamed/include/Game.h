@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Map.h"
 #include "common.h"
 #include "Client.h"
-#include "Packets.h"
+
+class Minion;
+class Packet;
 
 #define HANDLE_ARGS ENetPeer *peer, ENetPacket *packet
 #define PEER_MTU 996

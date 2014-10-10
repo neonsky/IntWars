@@ -2,6 +2,7 @@
 #include "Turret.h"
 #include "Game.h"
 #include "LevelProp.h"
+#include "Minion.h"
 
 using namespace std;
 

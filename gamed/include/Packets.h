@@ -370,12 +370,43 @@ public:
    }
 };
 
-class Dash : public BasePacket {
+class FaceDirection : public BasePacket {
 public:
-   Dash(Unit* u, float relativeX, float relativeY, float relativeZ) : BasePacket(PKT_S2C_Dash, u->getNetId()) {
+   FaceDirection(Unit* u, float relativeX, float relativeY, float relativeZ) : BasePacket(PKT_S2C_FaceDirection, u->getNetId()) {
       buffer << relativeX << relativeZ << relativeY;
       buffer << (uint8)0;
-      buffer << (float)0.0833; // Cast time of dash
+      buffer << (float)0.0833; // Time to turn ?
+   }
+};
+
+/*
+0000-0015 64 2f 02 00 00 01 00 05 19 00 00 40 00 32 b1 95 d/.........@.2..
+0016-0031 44 00 00 00 00 00 00 14 42 00 80 89 43 00 00 00 D.......B...C...
+0032-0047 00 00 b5 9b 07 4c df 36 00 a3 c2 68 01 20 02 85 .....L.6...h. ..
+0048-0053 f2 7d f2 23 f3 5a                               .}.#.Z
+*/
+class Dash : public GamePacket {
+public:
+   Dash(Unit* u, float toX, float toY) : GamePacket(PKT_S2C_Dash, 0) {
+      buffer << (uint16)1; // nb updates ?
+      buffer << (uint8)5; // unk
+      buffer << u->getNetId();
+      buffer << (uint8)0; // unk
+      buffer << 1200.f; // Dash speed
+      buffer << (uint32)0; // unk
+      buffer << u->getX() << u->getY();
+      buffer << (uint32)0; // unk
+      buffer << (uint8)0;
+      
+      /* 
+      This is a mix of waypoints and other data.
+      The 2 last waypoints are the start and end position of the dash, gotta figure out the rest..
+      */
+      buffer << (uint32)0x4c079bb5;
+      buffer << (uint32)0xa30036df;
+      buffer << (uint32)0x200168c2;
+      buffer << (uint32)0x7df28502;
+      buffer << (uint32)0x5af323f2;
    }
 };
 

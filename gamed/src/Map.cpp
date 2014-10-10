@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Unit.h"
 #include "CollisionHandler.h"
+#include "Minion.h"
 
 Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(0), firstBlood(true), killReduction(true)
 {
