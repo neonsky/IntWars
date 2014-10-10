@@ -92,13 +92,13 @@ std::string RAFManager::findGameBasePath()
    {
       if (RegOpenKeyExA(HKEY_CLASSES_ROOT, strKeyPathCU[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot open key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
+         CORE_WARNING("Cannot open key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
       if (RegQueryValueExA(hKey, strKeyName.c_str(), NULL, &dwValueType, (LPBYTE)byteValue, &dwValueSize) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot read key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
+         CORE_WARNING("Cannot read key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
