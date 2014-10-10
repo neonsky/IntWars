@@ -174,8 +174,8 @@ void Spell::loadLua(LuaScript& script){
       return;
    });*/
    
-      script.lua.set_function("addBuff", [this](Buff b){
-      owner->addBuff(new Buff(b));
+   script.lua.set_function("addBuff", [this](Buff b, Unit* u){
+      u->addBuff(new Buff(b));
       return;
    });
    
@@ -234,6 +234,26 @@ void Spell::loadLua(LuaScript& script){
    
    script.lua.set_function("spellAnimation", [this](const std::string& animation, Unit* u) { 
       owner->getMap()->getGame()->notifySpellAnimation(u, animation);
+      return;
+   });
+
+   // TODO: Set multiple animations
+   script.lua.set_function("setAnimation", [this](const std::string& animation1, const std::string& animation2, Unit* u) {
+      std::vector<std::pair<std::string, std::string>> animationPairs;
+      animationPairs.push_back(std::make_pair(animation1, animation2));
+
+      owner->getMap()->getGame()->notifySetAnimation(u, animationPairs);
+      return;
+   });
+
+   script.lua.set_function("resetAnimations", [this](Unit* u) {
+      std::vector<std::pair<std::string, std::string>> animationPairs;
+      owner->getMap()->getGame()->notifySetAnimation(u, animationPairs);
+      return;
+   });
+
+   script.lua.set_function("dashTo", [this](float x, float y, Unit* u) {
+      owner->getMap()->getGame()->notifyDash(u, x, y);
       return;
    });
 
@@ -312,6 +332,11 @@ void Spell::applyEffects(Unit* u, Projectile* p) {
    
    script.lua.set_function("getNumberObjectsHit", [this, &p]() { 
       return p->getObjectsHit().size();
+   });
+
+   script.lua.set_function("addBuff", [this](Buff b, Unit* u){
+      u->addBuff(new Buff(b));
+      return;
    });
    
    loadLua(script); //comment this line for no reload on the fly, better performance

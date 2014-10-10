@@ -64,6 +64,7 @@ enum PacketCmd : uint8
    PKT_S2C_GameTimer = 0xC1,
    PKT_S2C_GameTimerUpdate = 0xC2,
 
+   PKT_S2C_Dash = 0x50,
    PKT_S2C_LeaveVision = 0x51,
    PKT_C2S_StartGame = 0x52,
    PKT_S2C_SynchVersion = 0x54,
@@ -81,6 +82,7 @@ enum PacketCmd : uint8
    PKT_S2C_LoadScreenInfo = 0x67,
    PKT_ChatBoxMessage = 0x68,
    PKT_S2C_SetTarget = 0x6A,
+   PKT_S2C_SetAnimation = 0x6B,
    PKT_S2C_ShowProjectile = 0x6E,
    PKT_S2C_BuyItemAns = 0x6F,
    PKT_S2C_AddBuff = 0xB7,

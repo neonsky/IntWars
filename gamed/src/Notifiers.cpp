@@ -236,7 +236,6 @@ void Game::notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float t
 
 void Game::notifyGameTimer() {
    float gameTime = map->getGameTime() / 1000000.f;
-
    GameTimer gameTimer(gameTime);
    broadcastPacket(reinterpret_cast<uint8 *>(&gameTimer), sizeof(GameTimer), CHL_S2C);
 }
@@ -249,4 +248,32 @@ void Game::notifyAnnounceEvent(uint8 messageId, bool isMapSpecific) {
 void Game::notifySpellAnimation(Unit* u, const std::string& animation) {
    SpellAnimation sa(u, animation);
    broadcastPacketVision(u, sa, CHL_S2C);
+}
+
+void Game::notifySetAnimation(Unit* u, const std::vector<std::pair<std::string, std::string>>& animationPairs) {
+   SetAnimation setAnimation(u, animationPairs);
+   broadcastPacketVision(u, setAnimation, CHL_S2C);
+}
+
+void Game::notifyDash(Unit* u, float _x, float _y) {
+   // TODO: Fix dash: it stays in the current location and doesn't hit a wall if the target location can't be reached
+   float _z = u->getZ();
+
+   if (!map->isWalkable(_x, _y)) {
+      _x = u->getPosition().X;
+      _y = u->getPosition().Y;
+   }
+   else {
+      // Relative coordinates to dash towards
+      float newX = _x;
+      float newY = _y;
+      _z -= map->getHeightAtLocation(_x, _y);
+      _x = u->getPosition().X - _x;
+      _y = u->getPosition().Y - _y;
+
+      u->setPosition(newX, newY);
+   }
+
+   Dash dash(u, _x, _y, _z);
+   broadcastPacketVision(u, dash, CHL_S2C);
 }

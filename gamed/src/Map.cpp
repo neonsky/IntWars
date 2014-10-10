@@ -3,7 +3,7 @@
 #include "Unit.h"
 #include "CollisionHandler.h"
 
-Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(10 * 1000000), firstBlood(true), killReduction(true)
+Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(0), firstBlood(true), killReduction(true)
 {
    collisionHandler = new CollisionHandler(this);
 }
@@ -107,14 +107,14 @@ void Map::update(int64 diff) {
       }
    }
    
+   gameTime += diff;
+   nextSyncTime += diff;
+
    // By default, synchronize the game time every 10 seconds
    if (nextSyncTime >= 10 * 1000000) {
       game->notifyGameTimer();
       nextSyncTime = 0;
    }
-   
-   gameTime += diff;
-   nextSyncTime += diff;
    
    if(waveNumber) { 
       if(gameTime >= nextSpawnTime+waveNumber*8*100000) { // Spawn new wave every 0.8s

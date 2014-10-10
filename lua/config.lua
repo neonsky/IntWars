@@ -2,7 +2,7 @@ players = {
 	["player1"] = {
 		["rank"] = "DIAMOND",
 		["name"] = "Test",
-		["champion"] = "Ezreal",
+		["champion"] = "Caitlyn",
 		["team"] = "BLUE", -- BLUE or PURPLE
 		["skin"] = 0,
 		["summoner1"] = "HEAL",
@@ -12,7 +12,6 @@ players = {
 	},
    
 	--[[-- uncomment this for more players! you can also add more, up to 12!
-
 	["player2"] = {
 		["rank"] = "DIAMOND",
 		["name"] = "Test2",
@@ -22,8 +21,9 @@ players = {
 		["summoner1"] = "FLASH",
 		["summoner2"] = "IGNITE",
 		["ribbon"] = 2,
-      ["icon"] = 0 -- Summoner Icon ID
+      ["icon"] = 0
 	},
+   --]]
 
    --[[
 	["player3"] = {
@@ -34,16 +34,17 @@ players = {
 		["skin"] = 3,
 		["summoner1"] = "CLEANSE",
 		["summoner2"] = "TELEPORT",
-		["ribbon"] = 2
+		["ribbon"] = 2,
+      ["icon"] = 0
 	}--]]
 }
 game = {
 --[[
-1 	- 	Summoner's rift
+1 	- 	Summoner's Rift
 6 	- 	Crystal Scar
-8 	- 	Twisted TReeline
+8 	- 	Twisted Treeline
 12 	- 	Howling Abyss
-11 	- 	New Summoner's rift (only on the PBE client)
+11 	- 	New Summoner's Rift (only on the PBE client)
 --]]
-	["map"]=1
+	["map"] = 1
 }

@@ -106,6 +106,8 @@ class Game
       void notifyGameTimer();
       void notifyAnnounceEvent(uint8 messageId, bool isMapSpecific);
       void notifySpellAnimation(Unit* u, const std::string& animation);
+      void notifySetAnimation(Unit* u, const std::vector<std::pair<std::string, std::string>>& animationPairs);
+      void notifyDash(Unit* u, float _x, float _y);
 
 		// Tools
 		static void printPacket(const uint8 *buf, uint32 len);

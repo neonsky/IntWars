@@ -73,7 +73,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
     unitScript.loadScript(scriptloc);
     
     unitScript.lua.set_function("dealMagicDamage", [this](Unit* target, float amount) { this->dealDamageTo(target,amount,DAMAGE_TYPE_MAGICAL,DAMAGE_SOURCE_SPELL); });
-    unitScript.lua.set_function("addBuff", [this](Unit* target, Buff b){
+    unitScript.lua.set_function("addBuff", [this](Buff b, Unit* target){
       target->addBuff(new Buff(b));
       return;
    });

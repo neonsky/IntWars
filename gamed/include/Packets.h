@@ -356,6 +356,29 @@ public:
    }
 };
 
+class SetAnimation : public BasePacket {
+public:
+   SetAnimation(Unit* u, const std::vector<std::pair<std::string, std::string>> animationPairs) : BasePacket(PKT_S2C_SetAnimation, u->getNetId()) {
+      buffer << (uint8)animationPairs.size();
+
+      for (int i = 0; i < animationPairs.size(); i++) {
+         buffer << (uint32)animationPairs[i].first.length();
+         buffer << animationPairs[i].first;
+         buffer << (uint32)animationPairs[i].second.length();
+         buffer << animationPairs[i].second;
+      }
+   }
+};
+
+class Dash : public BasePacket {
+public:
+   Dash(Unit* u, float relativeX, float relativeY, float relativeZ) : BasePacket(PKT_S2C_Dash, u->getNetId()) {
+      buffer << relativeX << relativeZ << relativeY;
+      buffer << (uint8)0;
+      buffer << (float)0.0833; // Cast time of dash
+   }
+};
+
 class LeaveVision : public BasePacket {
 public:
    LeaveVision(Object* o) : BasePacket(PKT_S2C_LeaveVision, o->getNetId()) { }
