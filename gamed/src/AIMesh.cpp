@@ -221,14 +221,14 @@ auto times = std::clock();
 auto time2 = std::clock();
 
 // Blatantly copy the line function
-float AIMesh::castRaySqr(Vector2 origin, Vector2 direction)
+float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
 {
    origin = TranslateToTextureCoordinate(origin);   
 
    float x1 = origin.X;
    float y1 = origin.Y;
-   float x2 = direction.X * (float)AIMESH_TEXTURE_SIZE;
-   float y2 = direction.Y * (float)AIMESH_TEXTURE_SIZE;
+   float x2 = direction.X * (float)getWidth(); // Make sure it's long enough
+   float y2 = direction.Y * (float)getHeight();// We need an infinite line, kinda. This will surely hit something.
    
 
    if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE)) 
@@ -241,12 +241,38 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 direction)
    float dx = b / (float)l;
    float dy = h / (float)l;
 
-   while(isWalkable(x1, y1))
+   while (isWalkable(x1, y1) != inverseRay) // The result needs to be the invert of inverseRay. if inverseRay is a boolean that 
+                                            // tells us what the boolean of isWalkable needs to be. If not, keep traversing.
    {
       x1 += dx, y1 += dy;
    }
 
    return (TranslateToRealCoordinate(Vector2(x1, y1)) - origin).SqrLength();
+}
+
+Vector2 AIMesh::getClosestTerrainExit(Object* a, Vector2 location, bool noForward)
+{
+   if (isWalkable(location.X, location.Y)) // Are we terrain?
+      return location;
+
+   Vector2 displacement = (location - a->getPosition()).Normalize(); 
+
+   if (noForward) // With dashes, only go back
+   {
+      float dist = castRay(location, -displacement, true); // Distance towards target
+      displacement *= dist; // Multiply the delta by the distance
+      return location + (displacement*dist); // return the location of the displacement
+   }
+   else // Otherwise check whether we should go forward or back
+   {
+      float dist2 = castRay(location, displacement, true); // Distance away from target
+      float dist = castRay(location, -displacement, true); // Distance towards target
+
+      if (dist2 < dist) dist = dist2; // Get the closest to the location
+
+      displacement *= dist; // Multiply the delta by the distance
+      return location + (displacement*dist); // return the location of the displacement
+   }
 }
 
 
