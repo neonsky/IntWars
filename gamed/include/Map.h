@@ -67,6 +67,8 @@ public:
    bool getKillReduction() { return killReduction; }
    void setKillReduction(bool state) { killReduction = state; }
    
+   MovementVector toMovementVector(float x, float y);
+   
    bool teamHasVisionOn(int side, Object* o);
 
    virtual const int getMapId() const = 0;

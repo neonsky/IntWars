@@ -32,10 +32,6 @@ struct MovementVector {
     static int16 targetYToNormalFormat(float _y){
         return (int16)((_y) - MAP_HEIGHT)/2;
     }
-    void setCoordinatesToNormalFormat(){
-        x = targetXToNormalFormat(x);
-        y = targetYToNormalFormat(y);
-    }
 };
 
 class Unit;

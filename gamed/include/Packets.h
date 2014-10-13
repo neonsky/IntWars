@@ -379,12 +379,6 @@ public:
    }
 };
 
-/*
-0000-0015 64 2f 02 00 00 01 00 05 19 00 00 40 00 32 b1 95 d/.........@.2..
-0016-0031 44 00 00 00 00 00 00 14 42 00 80 89 43 00 00 00 D.......B...C...
-0032-0047 00 00 b5 9b 07 4c df 36 00 a3 c2 68 01 20 02 85 .....L.6...h. ..
-0048-0053 f2 7d f2 23 f3 5a                               .}.#.Z
-*/
 class Dash : public GamePacket {
 public:
    Dash(Unit* u, float toX, float toY) : GamePacket(PKT_S2C_Dash, 0) {
@@ -398,15 +392,17 @@ public:
       buffer << (uint32)0; // unk
       buffer << (uint8)0;
       
-      /* 
-      This is a mix of waypoints and other data.
-      The 2 last waypoints are the start and end position of the dash, gotta figure out the rest..
-      */
-      buffer << (uint32)0x4c079bb5;
-      buffer << (uint32)0xa30036df;
-      buffer << (uint32)0x200168c2;
-      buffer << (uint32)0x7df28502;
-      buffer << (uint32)0x5af323f2;
+      buffer << (uint32)0x4c079bb5; // unk
+      buffer << (uint32)0xa30036df; // unk
+      buffer << (uint32)0x200168c2; // unk
+      
+      buffer << (uint8)0x00; // Vector bitmask on whether they're int16 or int8
+      
+      MovementVector from = u->getMap()->toMovementVector(u->getX(), u->getY());
+      MovementVector to = u->getMap()->toMovementVector(toX, toY);
+      
+      buffer << from.x << from.y;
+      buffer << to.x << to.y;
    }
 };
 
