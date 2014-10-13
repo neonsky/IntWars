@@ -326,12 +326,13 @@ std::vector<MovementVector> readWaypoints(uint8 *buffer, int coordCount) {
 }
 
 bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
-   MovementReq *request = reinterpret_cast<MovementReq *>(packet->data);
-   std::vector<MovementVector> vMoves = readWaypoints(&request->moveData, request->vectorNo);
 
-   if (peerInfo(peer)->getChampion()->isDead()) {
+   if(peerInfo(peer)->getChampion()->isDashing() || peerInfo(peer)->getChampion()->isDead()) {
       return true;
    }
+   
+   MovementReq *request = reinterpret_cast<MovementReq *>(packet->data);
+   std::vector<MovementVector> vMoves = readWaypoints(&request->moveData, request->vectorNo);
     
    switch(request->type) {
    //TODO, Implement stop commands

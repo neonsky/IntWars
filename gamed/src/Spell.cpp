@@ -252,8 +252,10 @@ void Spell::loadLua(LuaScript& script){
       return;
    });
 
-   script.lua.set_function("dashTo", [this](float x, float y, Unit* u) {
-      owner->getMap()->getGame()->notifyDash(u, x, y);
+   script.lua.set_function("dashTo", [this](Unit* u, float x, float y, float dashSpeed) {
+      u->dashTo(x, y, dashSpeed);
+      u->setUnitTarget(0);
+      owner->getMap()->getGame()->notifyDash(u, x, y, dashSpeed);
       return;
    });
 
@@ -263,8 +265,6 @@ void Spell::loadLua(LuaScript& script){
        printf("Error in spell script:\n%s \n", e.what());
    }
 }
-
-
 
 void Spell::doLua(){
    

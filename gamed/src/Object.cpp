@@ -8,7 +8,7 @@ using namespace std;
 
 Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius),
                                                                                                      visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0),
-                                                                                                     visibleByTeam{false, false} {
+                                                                                                     dashing(false), visibleByTeam{false, false} {
 }
 
 Object::~Object() {
@@ -55,23 +55,26 @@ void Object::Move(int64 diff) {
    Vector2 goingTo (to - cur);
 	direction = goingTo.Normalize();
 
-	double deltaMovement = (double)(getMoveSpeed()) * 0.000001f*diff;
+   float moveSpeed = dashing ? dashSpeed : getMoveSpeed();
+   double deltaMovement = (double)(moveSpeed) * 0.000001f*diff;
 
    float xx = direction.X * deltaMovement;
    float yy = direction.Y * deltaMovement;
 
-      
    x+= xx;
    y+= yy;
 
 	/* If the target was a simple point, stop when it is reached */
-	if(target->isSimpleTarget() && distanceWith(target) < deltaMovement*3) {
-	   if(++curWaypoint >= waypoints.size()) {
+   if(target->isSimpleTarget() && distanceWith(target) < deltaMovement*2) {
+      if(dashing) {
+         dashing = false;
+         setTarget(0);
+      } else if(++curWaypoint >= waypoints.size()) {
          setTarget(0);
       } else {
          setTarget(waypoints[curWaypoint].toTarget());
       }
-	}
+   }
 }
 
 void Object::update(int64 diff) {
@@ -119,4 +122,11 @@ void Object::setVisibleByTeam(uint32 side, bool visible) {
 
 float Object::getZ() {
    return map->getHeightAtLocation(x, y);
+}
+
+void Object::dashTo(float x, float y, float dashSpeed) {
+   dashing = true;
+   this->dashSpeed = dashSpeed;
+   setTarget(new Target(x, y));
+   waypoints.clear();
 }

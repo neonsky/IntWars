@@ -32,6 +32,7 @@ struct MovementVector {
     static int16 targetYToNormalFormat(float _y){
         return (int16)((_y) - MAP_HEIGHT)/2;
     }
+    
 };
 
 class Unit;
@@ -60,6 +61,9 @@ protected:
    float currentUpwardDisplacement;
    Vector2 direction;
    uint32 visionRadius;
+   
+   bool dashing;
+   float dashSpeed;
    
    bool visibleByTeam[2];
       
@@ -121,6 +125,9 @@ public:
 
    bool isVisibleByTeam(uint32 side);
    void setVisibleByTeam(uint32 side, bool visible);
+   
+   void dashTo(float x, float y, float dashSpeed);
+   bool isDashing() const { return dashing; }
 };
 
 #endif /* OBJECT_H_ */

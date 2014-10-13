@@ -255,7 +255,7 @@ void Game::notifySetAnimation(Unit* u, const std::vector<std::pair<std::string, 
    broadcastPacketVision(u, setAnimation, CHL_S2C);
 }
 
-void Game::notifyDash(Unit* u, float _x, float _y) {
+void Game::notifyDash(Unit* u, float _x, float _y, float dashSpeed) {
    // TODO: Fix dash: it stays in the current location and doesn't hit a wall if the target location can't be reached
    float _z = u->getZ();
 
@@ -274,6 +274,6 @@ void Game::notifyDash(Unit* u, float _x, float _y) {
       u->setPosition(newX, newY);
    }*/
 
-   Dash dash(u, _x, _y);
+   Dash dash(u, _x, _y, dashSpeed);
    broadcastPacketVision(u, dash, CHL_S2C);
 }

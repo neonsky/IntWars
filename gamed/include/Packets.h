@@ -381,12 +381,12 @@ public:
 
 class Dash : public GamePacket {
 public:
-   Dash(Unit* u, float toX, float toY) : GamePacket(PKT_S2C_Dash, 0) {
+   Dash(Unit* u, float toX, float toY, float dashSpeed) : GamePacket(PKT_S2C_Dash, 0) {
       buffer << (uint16)1; // nb updates ?
       buffer << (uint8)5; // unk
       buffer << u->getNetId();
       buffer << (uint8)0; // unk
-      buffer << 1200.f; // Dash speed
+      buffer << dashSpeed; // Dash speed
       buffer << (uint32)0; // unk
       buffer << u->getX() << u->getY();
       buffer << (uint32)0; // unk

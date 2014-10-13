@@ -25,7 +25,7 @@ function finishCasting()
     range = Vector2:Mult(current,400)
     trueCoords = Vector2:Add(original, range)
 
-    dashTo(trueCoords.x, trueCoords.y, getOwner())
+    dashTo(getOwner(),trueCoords.x, trueCoords.y, 1000)
     setAnimation("RUN", "SPELL3B", getOwner())
     
 

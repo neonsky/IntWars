@@ -10,10 +10,10 @@ function finishCasting()
     to:sub(current)
     to:normalize()
     
-    local range = Vector2:Mult(to, 450)
+    local range = Vector2:Mult(to, 425)
     local trueCoords = Vector2:Add(current, range)
     
-    dashTo(trueCoords.x, trueCoords.y, getOwner())
+    dashTo(getOwner(), trueCoords.x, trueCoords.y, 1200)
 end
 
 function applyEffects()
