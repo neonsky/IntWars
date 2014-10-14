@@ -112,7 +112,7 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1
 
    // Announcer events
    announcerEvents.push_back(std::make_pair(false, make_tuple(30 * 1000000, 119, true))); // Welcome to SR
-   announcerEvents.push_back(std::make_pair(false, make_tuple(60 * 1000000, 120, true))); // 30 seconds until minions spawn
+   if (firstSpawnTime - 30 * 1000000 >= 0.0f) announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime - 30 * 1000000, 120, true))); // 30 seconds until minions spawn
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 127, false))); // Minions have spawned (90 * 1000000)
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 118, false))); // Minions have spawned [2] (90 * 1000000)
 }

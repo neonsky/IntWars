@@ -3,7 +3,9 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include "Logger.h"
 #include "Object.h"
+#include "Champion.h"
 #include "RAFManager.h"
 
 #define FRACPOS(x)		((x)-((int)(x)))
@@ -69,7 +71,7 @@ bool AIMesh::load(std::string inputFile)
 bool AIMesh::outputMesh(unsigned width, unsigned height)
 {
    mapHeight = mapWidth = 0;
-	for (unsigned i = 0; i < width*height; i++) heightMap[i] = -255.0f; // Clear the map
+	for (unsigned i = 0; i < width*height; i++) heightMap[i] = -99999.99f; // Clear the map
 
    lowX = 9e9, lowY = 9e9, highX = 0, highY = 0, lowestZ = 9e9; // Init triangle
 
@@ -165,7 +167,7 @@ float AIMesh::getY(float argX, float argY)
 
       if ((argX >= 0.0f && argX < AIMESH_TEXTURE_SIZE) && (argY >= 0.0f && argY < AIMESH_TEXTURE_SIZE))
       {
-         int pos = (int)((AIMESH_TEXTURE_SIZE - argX) + (AIMESH_TEXTURE_SIZE - argY)*AIMESH_TEXTURE_SIZE);
+         int pos = (int)((argX) + (argY)*AIMESH_TEXTURE_SIZE);
          if (pos<AIMESH_TEXTURE_SIZE*AIMESH_TEXTURE_SIZE)
             return heightMap[pos];
       }
@@ -193,114 +195,90 @@ Vector2 AIMesh::TranslateToRealCoordinate(Vector2 vector)
    return vector;
 }
 
-// Line function from Jacco Bikker's SDL Tmpl8 3.0c
-void AIMesh::drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height)
-{
-   if ((x1 < 0) || (y1 < 0) || (x1 >= width) || (y1 >= height) ||
-      (x2 < 0) || (y2 < 0) || (x2 >= width) || (y2 >= height))
-   {
-      return;
-   }
-   float b = x2 - x1;
-   float h = y2 - y1;
-   float l = fabsf(b);
-   if (fabsf(h) > l) l = fabsf(h);
-   int il = (int)l;
-   float dx = b / (float)l;
-   float dy = h / (float)l;
-   for (int i = 0; i <= il; i++)
-   {
-      heightInfo[(unsigned)x1 + (unsigned)y1 * width] = (char)255;
-      x1 += dx, y1 += dy;
-   }
-}
-
+/*
 #include <chrono>
-
-auto times = std::clock();
-auto time2 = std::clock();
+bool tellme = false;
+auto times = std::clock();*/
 
 // Blatantly copy the line function
 float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
 {
-   origin = TranslateToTextureCoordinate(origin);   
+   /*if (tellme)
+      CORE_WARNING("Casting Ray from %f, %f in direction %f,%f", origin.X, origin.Y, direction.X, direction.Y);*/
+
+   origin = TranslateToTextureCoordinate(origin);
+   //direction = origin + (direction*2.0f); // Make sure it's long enough to reach a new square
+   direction = TranslateToTextureCoordinate(direction); // Translate it to correct stuff 
 
    float x1 = origin.X;
    float y1 = origin.Y;
-   float x2 = direction.X * (float)getWidth(); // Make sure it's long enough
-   float y2 = direction.Y * (float)getHeight();// We need an infinite line, kinda. This will surely hit something.
-   
+   float x2 = direction.X;
+   float y2 = direction.Y;
 
-   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE)) 
+   /*if (tellme)
+      CORE_WARNING("The ray will fire from %f, %f to %f,%f", x1, y1, x2, y2);*/
+
+   if ((x1 < 0) || (y1 < 0) || (x1 >= AIMESH_TEXTURE_SIZE) || (y1 >= AIMESH_TEXTURE_SIZE))
       return 0.0f; // Outside of map, collide immediately
 
-   float b = x2 - x1;
-   float h = y2 - y1;
-   float l = fabsf(b);
-   if (fabsf(h) > l) l = fabsf(h);
-   float dx = b / (float)l;
-   float dy = h / (float)l;
+   Vector2 delta = direction - origin;
+   delta = delta.Normalize();
 
    while (isWalkable(x1, y1) != inverseRay) // The result needs to be the invert of inverseRay. if inverseRay is a boolean that 
                                             // tells us what the boolean of isWalkable needs to be. If not, keep traversing.
    {
-      x1 += dx, y1 += dy;
+      // BUG: Keeps traversing. Gotta fix it, kinda busy.
+      //if (tellme) CORE_WARNING("(%f, %f), (%f, %f), y: %f\n", x1, y1, dx, dy, getY(x1, y1));
+      x1 += delta.X, y1 += delta.Y;
    }
 
-   return (TranslateToRealCoordinate(Vector2(x1, y1)) - origin).SqrLength();
+   /*if (tellme)
+      CORE_WARNING("The ray ended at %f, %f. w: %s iR: %s y: %f", x1, y1, (isWalkable(x1, y1)) ? ("true") : ("false"), (inverseRay) ? ("true") : ("false"), getY(x1, y1));
+   tellme = false;*/
+   return (TranslateToRealCoordinate(Vector2(x1, y1)) - TranslateToRealCoordinate(origin)).SqrLength();
 }
-
-Vector2 AIMesh::getClosestTerrainExit(Object* a, Vector2 location, bool noForward)
-{
-   if (isWalkable(location.X, location.Y)) // Are we terrain?
-      return location;
-
-   Vector2 displacement = (location - a->getPosition()).Normalize(); 
-
-   if (noForward) // With dashes, only go back
-   {
-      float dist = castRay(location, -displacement, true); // Distance towards target
-      displacement *= dist; // Multiply the delta by the distance
-      return location + (displacement*dist); // return the location of the displacement
-   }
-   else // Otherwise check whether we should go forward or back
-   {
-      float dist2 = castRay(location, displacement, true); // Distance away from target
-      float dist = castRay(location, -displacement, true); // Distance towards target
-
-      if (dist2 < dist) dist = dist2; // Get the closest to the location
-
-      displacement *= dist; // Multiply the delta by the distance
-      return location + (displacement*dist); // return the location of the displacement
-   }
-}
-
 
 bool AIMesh::isAnythingBetween(Object* a, Object* b)
 {
    Vector2 direction = (b->getPosition() - a->getPosition());
   
-   float distance = direction.Length();
-   direction = direction / distance;
    Vector2 a_pos = a->getPosition();// +direction*a->getCollisionRadius(); // TODO: add the collisionRadius for towers.  I disabled this for more precision on non-towers.
+   
+   
+   /*if (std::clock() - times > 4000 && (dynamic_cast<Champion*>(a) != 0 || dynamic_cast<Champion*>(b) != 0))
+   {
+      tellme = true;
+   }*/
 
-   float raydist = castRaySqr(a_pos, direction);// < distance*distance)
-   bool raydistb = (raydist < distance*distance);
+   float raydist = castRaySqr(a_pos, b->getPosition());// < distance*distance)
+   bool raydistb = (raydist < direction.SqrLength());
 
    /*if (std::clock() - times > 4000)
    {
-      std::cout << "a pos: (" << a->getPosition().X << ", " << a->getPosition().Y << ")" << std::endl;
-      std::cout << "b pos: (" << b->getPosition().X << ", " << b->getPosition().Y << ")" << std::endl;
-      std::cout << "a_pos: (" << a_pos.X << ", " << a_pos.Y << ")" << std::endl;
-      std::cout << "direction: (" << direction.X << ", " << direction.Y << ")" << std::endl;
-      std::cout << "distance: (" << distance << ", " << distance*distance << ")" << std::endl;
-      std::cout << "Ray dist: " << raydist << std::endl;
-      std::cout << "collisionRadius: (" << a->getCollisionRadius()*1.2f << ")" << std::endl;
-      std::cout << "GetY: " << getY(a_pos.X, a_pos.Y) << std::endl;
-      if (raydistb)
-         std::cout << "raydistb is true. Something is in the way." << std::endl << std::endl;
-      else std::cout << "raydistb is false. Nothing is there." << std::endl << std::endl;
-      times = std::clock();
+      if (dynamic_cast<Champion*>(a) != 0)
+      {
+         CORE_WARNING("Champion position: (%f, %f)", a->getPosition().X, a->getPosition().Y);
+         CORE_WARNING("Minion position: (%f, %f)", b->getPosition().X, b->getPosition().Y);
+         CORE_WARNING("Translated c: (%f, %f)", this->TranslateToTextureCoordinate(a->getPosition()).X, this->TranslateToTextureCoordinate(a->getPosition()).Y);
+         CORE_WARNING("Translated m: (%f, %f)", this->TranslateToTextureCoordinate(b->getPosition()).X, this->TranslateToTextureCoordinate(b->getPosition()).Y);
+         CORE_WARNING("dir: (%f, %f)", direction.Normalize().X, direction.Normalize().Y);
+         if (raydistb)
+            CORE_WARNING("raydistb is true. Something is in the way.");
+         else CORE_WARNING("raydistb is false. Nothing is there.");
+         times = std::clock();
+      }
+      else if (dynamic_cast<Champion*>(b) != 0)
+      {
+         CORE_WARNING("Champion position: (%f, %f)", b->getPosition().X, b->getPosition().Y);
+         CORE_WARNING("Minion position: (%f, %f)", a->getPosition().X, a->getPosition().Y);
+         CORE_WARNING("Translated Champ: (%f, %f)", this->TranslateToTextureCoordinate(b->getPosition()).X, this->TranslateToTextureCoordinate(b->getPosition()).Y);
+         CORE_WARNING("Translated minion: (%f, %f)", this->TranslateToTextureCoordinate(a->getPosition()).X, this->TranslateToTextureCoordinate(a->getPosition()).Y);
+         CORE_WARNING("dir: (%f, %f)", direction.Normalize().X, direction.Normalize().Y);
+         if (raydistb)
+            CORE_WARNING("raydistb is true. Something is in the way.");
+         else CORE_WARNING("raydistb is false. Nothing is there.");
+         times = std::clock();
+      }
    }*/
 
    return raydistb;
@@ -308,7 +286,7 @@ bool AIMesh::isAnythingBetween(Object* a, Object* b)
 
 bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
 {
-   return (castRaySqr(a, (b - a)) < (b - a).SqrLength());
+   return (castRaySqr(a, b) < (b - a).SqrLength());
 }
 
 
@@ -317,7 +295,7 @@ bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
 {
 #define MIN(a,b) (((a)>(b))?(b):(a))
 #define MAX(a,b) (((a)>(b))?(a):(b))
-   std::ofstream imageFile("maps/test.tga", std::ios::binary);
+   std::ofstream imageFile("test.tga", std::ios::out | std::ios::binary);
    if (!imageFile) return false;
 
    // The image header
@@ -335,7 +313,7 @@ bool AIMesh::writeFile(float *pixelInfo, unsigned width, unsigned height)
    for (int y = height - 1; y >= 0; y--)
       for (int x = 0; x < width; x++)
       {
-         /* blue */  imageFile.put((char)MAX(MIN(pixelInfo[(y * height) + x]+(255-190),255.0f), 0.0f));
+         /* blue */  imageFile.put((char)MAX(MIN(pixelInfo[(y * height) + x]+(255-185),255.0f), 0.0f));
          /* green */ imageFile.put(((float)(y) / 1024.0f)*256.0f);
          /* red */   imageFile.put(((float)(x) / 1024.0f)*256.0f);
       }
@@ -437,9 +415,9 @@ void AIMesh::drawTriangle(Triangle triangle, float *heightInfo, unsigned width, 
                // Get the point on the texture that we need to draw. It basically picks a pixel based on the uv.
 
                //a_Target->GetRenderTarget()->Plot(x, tempHeight - y, 255);
-               heightInfo[(height - x) + (height-y)* height] = z;
-               xMap[height - x + (height - y)* height] = scanlineLowest[y].x + deltaX*i;
-               yMap[height - x + (height - y)* height] = scanlineLowest[y].y;
+               heightInfo[x + (y)* height] = z;
+               xMap[x + (y)* height] = scanlineLowest[y].x + deltaX*i;
+               yMap[x + (y)* height] = scanlineLowest[y].y;
                if (z < lowestZ) lowestZ = z;
             }
 
