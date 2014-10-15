@@ -75,10 +75,10 @@ public:
    bool isLoaded() { return loaded; }
 private:
    void drawLine(float x1, float y1, float x2, float y2, char *heightInfo, unsigned width, unsigned height);
-   void drawTriangle(Triangle triangle, float *heightInfo, unsigned width, unsigned height);
+   void drawTriangle(Triangle triangle, unsigned width, unsigned height);
    void fillScanLine(Vertex vertex1, Vertex vertex2);
 	bool outputMesh(unsigned width, unsigned height);
-	bool writeFile(float *pixelInfo, unsigned width, unsigned height);
+	bool writeFile(unsigned width, unsigned height);
 
 
 	std::vector<unsigned char> buffer;
