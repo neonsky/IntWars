@@ -203,6 +203,8 @@ auto times = std::clock();*/
 // Blatantly copy the line function
 float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
 {
+   return 0.0f; // Cast Ray is buggy
+
    /*if (tellme)
       CORE_WARNING("Casting Ray from %f, %f in direction %f,%f", origin.X, origin.Y, direction.X, direction.Y);*/
 
