@@ -59,8 +59,10 @@ public:
 
    float getY(float argX, float argY);
    bool isWalkable(float argX, float argY) { return getY(argX, argY) > -254.0f; }
-   float castRay(Vector2 origin, Vector2 direction, bool inverseRay = false) { return sqrt(castRaySqr(origin, direction, inverseRay)); }
-   float castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay = false);
+   float castRay(Vector2 origin, Vector2 destination, bool inverseRay = false) { return sqrt(castRaySqr(origin, destination, inverseRay)); }
+   float castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay = false);
+   float castInfiniteRaySqr(Vector2 origin, Vector2 direction, bool inverseRay = false);
+   float castInfiniteRay(Vector2 origin, Vector2 direction, bool inverseRay = false) { return sqrt(castInfiniteRaySqr(origin, direction, inverseRay)); }
    bool isAnythingBetween(Vector2 a, Vector2 b);
    bool isAnythingBetween(Object* a, Object* b);
    Vector2 getClosestTerrainExit(Object* a, Vector2 location, bool noForward = true);

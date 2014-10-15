@@ -195,12 +195,12 @@ Vector2 AIMesh::TranslateToRealCoordinate(Vector2 vector)
 }
 
 // Blatantly copy the line function
-float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
+float AIMesh::castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay)
 {
    float x1 = origin.X;
    float y1 = origin.Y;
-   float x2 = direction.X;
-   float y2 = direction.Y;
+   float x2 = destination.X;
+   float y2 = destination.Y;
 
    if ((x1 < 0) || (y1 < 0) || (x1 >= mapWidth) || (y1 >= mapHeight))
    {
@@ -216,7 +216,7 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
    float dy = h / (float)l;
    for (int i = 0; i <= il; i++)
    {
-      if (isWalkable(x1, y1) == inverseRay) break;
+      if (!isWalkable(x1, y1) == inverseRay) break;
       // Inverse = report on walkable
       // Normal = report on terrain
       // so break when isWalkable == true and inverse == true
@@ -228,16 +228,38 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
    return (/*TranslateToRealCoordinate*/(Vector2(x1, y1)) - /*TranslateToRealCoordinate*/(origin)).SqrLength();
 }
 
+float AIMesh::castInfiniteRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
+{
+   return castRaySqr(origin, origin + (direction*(float)AIMESH_TEXTURE_SIZE), inverseRay);
+}
+
 bool AIMesh::isAnythingBetween(Object* a, Object* b)
 {
-   return (castRaySqr(a->getPosition(), b->getPosition()) < (b->getPosition() - a->getPosition()).SqrLength());
+   return (castRaySqr(a->getPosition(), b->getPosition()) <= (b->getPosition() - a->getPosition()).SqrLength());
 }
 
 bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
 {
-   return (castRaySqr(a, b) < (b - a).SqrLength());
+   return (castRaySqr(a, b) <= (b - a).SqrLength());
 }
 
+Vector2 AIMesh::getClosestTerrainExit(Object* a, Vector2 location, bool noForward)
+{
+   Vector2 dir = (location - a->getPosition());
+   if (isWalkable(location.X, location.Y))
+      return location;
+
+   float distBackwards = castInfiniteRay(location, -dir, true); // Find the first opening firing backwards
+   float dist = -distBackwards;
+
+   if (!noForward)
+   {
+      float distForward = castInfiniteRay(location, dir, true); // Fire forward
+      dist = (distBackwards < distForward) ? (-distBackwards) : (distForward);
+   }
+
+   return a->getPosition() + (dir.Normalize()*dist);
+}
 
 
 bool AIMesh::writeFile(unsigned width, unsigned height)
