@@ -242,6 +242,7 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 direction, bool inverseRay)
 
 bool AIMesh::isAnythingBetween(Object* a, Object* b)
 {
+   return false;
    Vector2 direction = (b->getPosition() - a->getPosition());
   
    Vector2 a_pos = a->getPosition();// +direction*a->getCollisionRadius(); // TODO: add the collisionRadius for towers.  I disabled this for more precision on non-towers.
@@ -288,6 +289,7 @@ bool AIMesh::isAnythingBetween(Object* a, Object* b)
 
 bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
 {
+   return false;
    return (castRaySqr(a, b) < (b - a).SqrLength());
 }
 
