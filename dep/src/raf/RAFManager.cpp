@@ -72,11 +72,10 @@ std::string RAFManager::findGameBasePath()
 #ifdef _WIN32
 	HKEY hKey;
 	std::vector<string> strKeyPathCU, strKeyPathLM;
-   strKeyPathCU.push_back("SOFTWARE\\RIOT GAMES\\RADS"); 
-   strKeyPathCU.push_back("VirtualStore\\MACHINE\\SOFTWARE\\Wow6432Node\\RIOT GAMES\\RADS");
-   strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\Wow6432Node\\RIOT GAMES\\RADS");
+	strKeyPathCU.push_back("SOFTWARE\\RIOT GAMES\\RADS"); 
+	strKeyPathCU.push_back("VirtualStore\\MACHINE\\SOFTWARE\\Wow6432Node\\RIOT GAMES\\RADS");
+	strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\Wow6432Node\\RIOT GAMES\\RADS");
 	strKeyPathCU.push_back("SOFTWARE\\Classes\\VirtualStore\\MACHINE\\SOFTWARE\\RIOT GAMES\\RADS");
-	strKeyPathCU.push_back("SOFTWARE\\RIOT GAMES\\RADS");
 
 	strKeyPathLM.push_back("Software\\Wow6432Node\\Riot Games\\RADS");
 	strKeyPathLM.push_back("SOFTWARE\\RIOT GAMES\\RADS");
@@ -84,7 +83,7 @@ std::string RAFManager::findGameBasePath()
 	string strKeyName = "LOCALROOTFOLDER";
 	DWORD dwValueType;
 	TCHAR byteValue[100];
-   DWORD dwValueSize;
+	DWORD dwValueSize;
 
 
    //Check CLASSES_ROOT keys
