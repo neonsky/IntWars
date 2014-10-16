@@ -203,6 +203,13 @@ void Game::notifySpawn(Unit* u) {
 void Game::notifyLeaveVision(Object* o, uint32 side) {
    LeaveVision lv(o);
    broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, lv, CHL_S2C);
+
+   // Not exactly sure what this is yet
+   Champion* c = dynamic_cast<Champion*>(o);
+   if (!o) {
+      DeleteObjectFromVision deleteObj(o);
+      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, deleteObj, CHL_S2C);
+   }
 }
 
 void Game::notifyEnterVision(Object* o, uint32 side) {

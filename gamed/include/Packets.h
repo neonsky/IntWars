@@ -142,7 +142,7 @@ public:
         
         buffer << "NA1";
         buffer.fill(0, 2332); // 128 - 3 + 661 + 1546
-        buffer << (uint32)487826; // Game Features (turret range indicators, etc.)
+        buffer << (uint32)487826; // gameFeatures (turret range indicators, etc.)
         buffer.fill(0, 256);
         buffer << (uint32)0;
         buffer.fill(1, 19);
@@ -181,7 +181,9 @@ typedef struct _PingLoadInfo {
     uint64 userId;
     float loaded;
     float ping;
-    float f3;
+    uint16 unk2;
+    uint16 unk3;
+    uint8 unk4;
 } PingLoadInfo;
 
 uint8 *createDynamicPacket(uint8 *str, uint32 size);
@@ -409,6 +411,12 @@ public:
 class LeaveVision : public BasePacket {
 public:
    LeaveVision(Object* o) : BasePacket(PKT_S2C_LeaveVision, o->getNetId()) { }
+
+};
+
+class DeleteObjectFromVision : public BasePacket {
+public:
+   DeleteObjectFromVision(Object* o) : BasePacket(PKT_S2C_DeleteObject, o->getNetId()) { }
 
 };
 
@@ -658,17 +666,17 @@ public:
 	HeroSpawn(ClientInfo* player, int playerId) : Packet(PKT_S2C_HeroSpawn) {
 		buffer << (uint32)0; // ???
 		buffer << (uint32)player->getChampion()->getNetId();
-		buffer << (uint32)playerId; // +1 for each player ?
-		buffer << (uint8)0; // netNodeID ?
-		buffer << (uint8)1; // SkillLevel
+		buffer << (uint32)playerId; // player Id
+		buffer << (uint8)40; // netNodeID ?
+		buffer << (uint8)0; // botSkillLevel Beginner=0 Intermediate=1
       if(player->getTeam() == TEAM_BLUE) {
-         buffer << (uint8)1; // teamIsOrder Blue=Order=1 Purple=Choas=0
+         buffer << (uint8)1; // teamNumber BotTeam=2,3 Blue=Order=1 Purple=Chaos=0
       } else {
-         buffer << (uint8)0; // teamIsOrder Blue=Order=1 Purple=Choas=0
+         buffer << (uint8)0; // teamNumber BotTeam=2,3 Blue=Order=1 Purple=Chaos=0
       }
 		buffer << (uint8)0; // isBot
-		buffer << (uint8)0; // botRank
-		buffer << (uint8)0; // spawnPosIndex ?
+		//buffer << (uint8)0; // botRank (deprecated as of 4.18)
+		buffer << (uint8)0; // spawnPosIndex
 		buffer << (uint32)player->getSkinNo();
 		buffer << player->getName();
 		buffer.fill(0, 128-player->getName().length());
@@ -676,6 +684,7 @@ public:
 		buffer.fill(0, 40-player->getChampion()->getType().length());
 		buffer << (float)0.f; // deathDurationRemaining
 		buffer << (float)0.f; // timeSinceDeath
+      buffer << (uint32)0; // UNK (4.18)
 		buffer << (uint8)0; // bitField
 	}
 };
@@ -700,7 +709,8 @@ public:
    TurretSpawn(Turret* t) : BasePacket(PKT_S2C_TurretSpawn) {
       buffer << t->getNetId();
       buffer << t->getName();
-      buffer.fill(0, 28-t->getName().length()+42);
+      buffer.fill(0, 64 - t->getName().length());
+      buffer << "\x00\x22\x00\x00\x80\x01";
    }
 
    /*PacketHeader header;
@@ -857,20 +867,23 @@ class DamageDone : public BasePacket {
 public:
    DamageDone(Unit* source, Unit* target, float amount, DamageType type) : BasePacket(PKT_S2C_DamageDone, target->getNetId()) {
       buffer << (uint8)((type << 4) | 0x04);
+      buffer << (uint16)0x4B; // 4.18
+      buffer << amount; // 4.18
       buffer << target->getNetId();
       buffer << source->getNetId();
-      buffer << amount;
    }
 };
 
 class NpcDie : public BasePacket {
 public:
    NpcDie(Unit* die, Unit* killer) : BasePacket(PKT_S2C_NPC_Die, die->getNetId()) {
+      buffer << (uint8)0x26;
+      buffer << (uint32)1;
+      buffer << (uint16)0;
       buffer << killer->getNetId();
-      buffer << (uint32)0; // unk
+      buffer << (uint8)0; // unk
       buffer << (uint32)7; // unk
-      buffer << (uint16)0; // unk
-      buffer << (uint32)0xE80000B3; // unk
+      buffer << (uint8)3; // unk
    }
 };
 
@@ -916,7 +929,7 @@ struct AttentionPing {
         unk1 = ping->unk1;
         x = ping->x;
         y = ping->y;
-        z = ping->z;
+        targetNetId = ping->targetNetId;
         type = ping->type;
     }
 
@@ -924,7 +937,7 @@ struct AttentionPing {
     uint32 unk1;
     float x;
     float y;
-    float z;
+    uint32 targetNetId;
     uint8 type;
 };
 
@@ -934,8 +947,11 @@ public:
       buffer << (uint32)0; //unk1
       buffer << ping->x;
       buffer << ping->y;
-      buffer << ping->z;
+      buffer << ping->targetNetId;
       buffer << (uint32)player->getChampion()->getNetId();
+      buffer << ping->type;
+      buffer << (uint8)0xFB; // 4.18
+      /*
       switch (ping->type)
       {
          case 0:
@@ -960,6 +976,7 @@ public:
             buffer << (uint8)0xb6; // Assistance Needed
             break;            
       }
+      */
    }
 };
 
@@ -967,13 +984,23 @@ class BeginAutoAttack : public BasePacket {
 public:
    BeginAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical) : BasePacket(PKT_S2C_BeginAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
-      buffer << attacked->getX() << attacked->getZ() << attacked->getY(); // New change as of 4.17.
       buffer << (uint8)0x80; // unk
       buffer << futureProjNetId; // Basic attack projectile ID, to be spawned later
       if (isCritical)
         buffer << (uint8)0x49;
       else
         buffer << (uint8)0x40; // unk -- seems to be flags related to things like critical strike (0x49)
+      // not sure what this is, but it should be correct (or maybe attacked x z y?) - 4.18
+      buffer << (uint8)0x80;
+      buffer << (uint8)0x01;
+      buffer << MovementVector::targetXToNormalFormat(attacked->getX());
+      buffer << (uint8)0x80;
+      buffer << (uint8)0x01;
+      buffer << MovementVector::targetYToNormalFormat(attacked->getY());
+      buffer << (uint8)0xCC;
+      buffer << (uint8)0x35;
+      buffer << (uint8)0xC4;
+      buffer << (uint8)0xD1;
       buffer << attacker->getX() << attacker->getY();
    }
 };
@@ -982,7 +1009,6 @@ class NextAutoAttack : public BasePacket {
 public:
    NextAutoAttack(Unit* attacker, Unit* attacked, uint32 futureProjNetId, bool isCritical, bool initial) : BasePacket(PKT_S2C_NextAutoAttack, attacker->getNetId()) {
       buffer << attacked->getNetId();
-      buffer << attacked->getX() << attacked->getZ() << attacked->getY(); // New change as of 4.17.
       if (initial)
          buffer << (uint8)0x80; // These flags appear to change only to 0x80 and 0x7F after the first autoattack.
       else
@@ -993,6 +1019,9 @@ public:
         buffer << (uint8)0x49;
       else
         buffer << (uint8)0x40; // unk -- seems to be flags related to things like critical strike (0x49)
+
+      // not sure what this is, but it should be correct (or maybe attacked x z y?) - 4.18
+      buffer << "\x40\x01\x7B\xEF\xEF\x01\x2E\x55\x55\x35\x94\xD3";
    }
 };
 
@@ -1032,18 +1061,19 @@ public:
 class ChampionDie : public BasePacket {
 public:
    ChampionDie(Champion* die, Unit* killer) : BasePacket(PKT_S2C_ChampionDie, die->getNetId()) {
+      buffer << killer->getNetId(); // 4.18, supposed to be a new net ID?
+      buffer << (uint8)0;
       buffer << killer->getNetId();
-      buffer << (uint32)0; // unk
-      buffer << (uint32)7; // unk
-      buffer << die->getRespawnTimer()/1000000.f; // Respawn timer
-      buffer << (uint16)0x9F00; // unk
+      buffer << (uint8)0;
+      buffer << (uint8)7;
+      buffer << die->getRespawnTimer() / 1000000.f; // Respawn timer, float
    }
 };
 
 class ChampionRespawn : public BasePacket {
 public:
    ChampionRespawn(Champion* c) : BasePacket(PKT_S2C_ChampionRespawn, c->getNetId()) {
-      buffer << c->getX() << c->getY() << 230.f;
+      buffer << c->getX() << c->getY() << c->getZ();
    } 
 };
 
@@ -1104,7 +1134,8 @@ public:
 
 struct CastSpell {
     PacketHeader header;
-    uint8 spellSlot; // 2 first(highest) bits: 10 - ability or item, 01 - summoner spell
+    uint8 spellSlotType; // 4.18 [deprecated? -> 2 first(highest) bits: 10 - ability or item, 01 - summoner spell]
+    uint8 spellSlot; // 0-3 [0-1 if spellSlotType has summoner spell bits set]
     float x, y;
     float x2, y2;
     uint32 targetNetId; // If 0, use coordinates, else use target net id
@@ -1321,7 +1352,7 @@ class LevelPropSpawn : public BasePacket {
 
             buffer << 1.0f << 1.0f << 1.0f; // Scaling
             buffer << (uint32)300; // unk
-            buffer << (uint8)1; // bIsProp -- if is a prop, become unselectable and use direction params
+            buffer << (uint32)2; // nPropType [size 1 -> 4] (4.18) -- if is a prop, become unselectable and use direction params
             
             buffer << lp->getName();
             buffer.fill(0, 64-lp->getName().length());
@@ -1395,6 +1426,7 @@ public:
    SetCooldown(uint32 netId, uint8 slotId, float currentCd, float totalCd = 0.0f)
          : BasePacket(PKT_S2C_SetCooldown, netId) {
       buffer << slotId;
+      buffer << (uint8)0xF8; // 4.18
       buffer << totalCd;
       buffer << currentCd;
    }

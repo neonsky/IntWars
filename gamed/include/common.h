@@ -28,7 +28,8 @@ enum GameCmd : uint8
 //Currently attuned to GAME_VERSION [Game.h]
 enum PacketCmd : uint8
 {                                            
-   PKT_KeyCheck = 0x00, 
+   PKT_KeyCheck = 0x00,
+   PKT_C2S_HeartBeat = 0x08,
    PKT_S2C_RemoveItem = 0x0B,
    PKT_S2C_NextAutoAttack = 0x0C,
 
@@ -48,6 +49,7 @@ enum PacketCmd : uint8
    PKT_S2C_ChampionRespawn = 0x2F,
 
    PKT_S2C_StopAutoAttack = 0x34,
+   PKT_S2C_DeleteObject = 0x35, // not sure what this is, happens when turret leaves vision
    PKT_C2S_SkillUp = 0x39,
    PKT_S2C_SpawnProjectile = 0x3B,
    PKT_S2C_SwapItems = 0x3E,
@@ -103,7 +105,8 @@ enum PacketCmd : uint8
    PKT_S2C_Ping_Load_Info = 0x95,
    PKT_C2S_CastSpell = 0x9A,
    PKT_S2C_TurretSpawn = 0x9D,
-   PKT_S2C_NPC_Die = 0x9E,
+   PKT_S2C_NPC_Hide = 0x9E, // (4.18) not sure what this became
+   PKT_S2C_NPC_Die = 0xFE,
 
    PKT_C2S_Surrender = 0xA4,
    PKT_C2S_StatsConfirm = 0xA8, 

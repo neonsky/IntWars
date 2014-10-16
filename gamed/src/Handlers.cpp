@@ -402,16 +402,18 @@ bool Game::handleClick(HANDLE_ARGS) {
 bool Game::handleCastSpell(HANDLE_ARGS) {
    CastSpell *spell = reinterpret_cast<CastSpell *>(packet->data);
 
-   if(spell->spellSlot & (1 << 6)) {
-      printf("SummonerSpell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   // There are some bits triggering this
+   if (spell->spellSlotType == 0xED || spell->spellSlotType == 0xE9 || spell->spellSlotType == 0x8B || spell->spellSlotType == 0x63) {
+      printf("Summoner Spell Cast\n");
+      printf("Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
       return true;
    }
 
-   printf("Spell Cast : Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlot & 0x3F, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   printf("Spell Cast : Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    uint32 futureProjNetId = GetNewNetID();
    uint32 spellNetId = GetNewNetID();
-   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot & 0x3F, spell->x, spell->y, 0, futureProjNetId, spellNetId);
+   Spell* s = peerInfo(peer)->getChampion()->castSpell(spell->spellSlot, spell->x, spell->y, 0, futureProjNetId, spellNetId);
 
    if(!s) {
       return false;
