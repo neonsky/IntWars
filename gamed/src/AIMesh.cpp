@@ -58,7 +58,7 @@ bool AIMesh::load(std::string inputFile)
       fileStream = (__AIMESHFILE*)buffer.data();
       outputMesh(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
 
-      writeFile(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
+      //writeFile(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
 
       std::cout << "Opened AIMesh file for this map." << std::endl;
       loaded = true;
@@ -216,7 +216,7 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay)
    float dy = h / (float)l;
    for (int i = 0; i <= il; i++)
    {
-      if (!isWalkable(x1, y1) == inverseRay) break;
+      if (isWalkable(x1, y1) == inverseRay) break;
       // Inverse = report on walkable
       // Normal = report on terrain
       // so break when isWalkable == true and inverse == true
