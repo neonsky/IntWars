@@ -4,17 +4,42 @@
 #include "stdafx.h"
 #include "Map.h"
 #include "Vector2.h"
+/*#include <cstdlib>*/
+
+#define MANAGED_DIVISION_COUNT 3*3
 
 class Object;
+struct CollisionDivision
+{
+   Vector2 min, max;
+   std::vector<Object*> objects;
+};
+
 class CollisionHandler
 {
 public:
-   CollisionHandler(Map*map);// : chart(map) { Pathfinder::setMap(this); }
-   ~CollisionHandler() {}
+   CollisionHandler(Map * map);
+   void init(int divisionsOverWidth);
+   ~CollisionHandler(){ /*std::free(managedDivisions);*/ }
 
-	void update(float a_DT);
-private: 
-   Map *chart;
+   void addObject(Object *object);
+   void getDivisions(Object *object, CollisionDivision *divisionArray[], int &a_DivisionCount);
+
+   void update(float a_DT);
+
+private:
+   void checkForCollisions(int pos);
+   void correctDivisions(int pos);
+   void correctUnmanagedDivision();
+   void addToDivision(Object* object, int x, int y);
+   void addUnmanagedObject(Object* object);
+   
+   void removeFromDivision(Object* object, int i);
+   int width, height;
+   CollisionDivision managedDivisions[MANAGED_DIVISION_COUNT];
+   CollisionDivision unmanagedDivision;
+   int divisionCount;
+   Map* chart;
 };
 
 #endif

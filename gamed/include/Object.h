@@ -58,7 +58,6 @@ protected:
    uint32 attackerCount;
    
    uint32 collisionRadius;
-   float currentUpwardDisplacement;
    Vector2 direction;
    uint32 visionRadius;
    
@@ -68,8 +67,6 @@ protected:
    bool visibleByTeam[2];
       
 public:
-   float getUpDisplacement() { return currentUpwardDisplacement; }
-
    virtual ~Object();
    Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius = 0);
 
@@ -114,8 +111,11 @@ public:
    void setPosition(float x, float y);
    float getZ();
 
+
    void setCollisionRadius(uint32 collisionRadius) { this->collisionRadius = collisionRadius; }
    uint32 getCollisionRadius() const { return collisionRadius; }
+   virtual float getLargestRadius() { return collisionRadius; }
+
    uint32 getVisionRadius() const { return visionRadius; }
    bool collide(Object* o);
    

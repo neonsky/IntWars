@@ -34,6 +34,7 @@ protected:
    CollisionHandler *collisionHandler;
    
 public:
+   CollisionHandler *getCollisionHandler() { return collisionHandler; }
    Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime);
    virtual ~Map();// { delete collisionHandler; }
    virtual void update(long long diff);

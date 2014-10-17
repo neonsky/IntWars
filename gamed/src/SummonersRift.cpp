@@ -1,6 +1,7 @@
 #include "SummonersRift.h"
 #include "Turret.h"
 #include "Game.h"
+#include "collisionHandler.h"
 #include "LevelProp.h"
 #include "Minion.h"
 
@@ -77,6 +78,8 @@ const static vector<vector<MovementVector> > ConstWaypoints =
 SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000) 
 {
    mesh.load("LEVELS/Map1/AIPath.aimesh");
+   collisionHandler->init(3); // Needs to be initialised after AIMesh
+
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_R_03_A", 10097.62f, 808.73f, 2550, 156, 0));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_R_02_A", 6512.53f, 1262.62f, 2550, 170, 0));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T1_C_07_A", 3747.26f, 1041.04f, 2550, 190, 0));

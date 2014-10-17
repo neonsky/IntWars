@@ -3,51 +3,239 @@
 #include "AIMesh.h"
 #include "Unit.h"
 #include "Pathfinder.h"
+#include "Logger.h"
+#include "Object.h"
+#include <iostream>
 
 CollisionHandler::CollisionHandler(Map*map) : chart(map)
 { 
-   Pathfinder::setMap(map); 
+   Pathfinder::setMap(map);
+   divisionCount = -1;
 }
 
-void CollisionHandler::update(float a_DT)
+void CollisionHandler::init(int divisionsOverWidth)
 {
-	const std::map<uint32, Object*>& objects = chart->getObjects();
+   width = chart->getAIMesh()->getWidth();
+   height = chart->getAIMesh()->getHeight();
 
-	for (auto i = objects.begin(); i != objects.end(); i++)
-   //auto i = objects.begin();
-	{
-		Object* o1 = i->second;
-      if (o1->getDirection().SqrLength()<0.05f) // Added slight elipson error. You never know.
-         continue; // Don't collide when I am not moving.
+   //divisionCount = divisionsOverWidth;
+   divisionCount = sqrt(MANAGED_DIVISION_COUNT);
 
-      Unit * unit = dynamic_cast<Unit*>(o1);
-      if (unit && unit->isDead()) continue; // Don't collide with anything if we're dead.
-
-      for (auto j = objects.begin(); j != objects.end(); j++) if (j != i) // Object-Object collision
+   //managedDivisions = (CollisionDivision*)std::malloc(sizeof(CollisionDivision)*divisionsOverWidth*divisionsOverWidth);
+   for (int y = 0; y < divisionsOverWidth; y++)
+   {
+      for (int x = 0; x < divisionsOverWidth; x++)
       {
-         Object* o2 = j->second;
+         managedDivisions[y*divisionsOverWidth + x].min.X = x*(width / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].min.Y = y*(height / divisionsOverWidth);
 
-         unit = dynamic_cast<Unit*>(o2);
-         if (unit && unit->isDead()) continue; // Can't collide with dead things.
-
-         if ((o1->getPosition() - o2->getPosition()).SqrLength() < (o1->getCollisionRadius() + o2->getCollisionRadius())*(o1->getCollisionRadius() + o2->getCollisionRadius())) //distance check
-         {
-            o1->onCollision(o2); // Call the collision callback
-            //o2->onCollision(01); 
-            // Don't do this, it's being done in a later iteration, given that o1 doesn't move away in onCollision.
-            // Uh, if it does, uncomment it I guess.
-         }
-		}
-
-      Target *target = o1->getTarget();
-      if (target)
-      {
-         Vector2 test = o1->getPosition() + (o1->getDirection()*((float)o1->getCollisionRadius()*2.0f)); // Get the outer bound of your character in the direction I am walking.
-                                                                                                         // Have to multiply this radius by 2 for some reason.. Idk why.
-                                                                                                         // TODO: Figure out why.
-
-         if (!chart->getAIMesh()->isWalkable(test.X, test.Y)) // If we cant walk here according to the mesh.
-            o1->onCollision(0);
+         managedDivisions[y*divisionsOverWidth + x].max.X = (x + 1)*(width / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].max.Y = (y + 1)*(height / divisionsOverWidth);
       }
-	}
+   }
+}
+
+void CollisionHandler::checkForCollisions(int pos)
+{
+   auto curDiv = managedDivisions[pos];
+   for (int i = 0; i < curDiv.objects.size(); i++)
+   {
+      auto o1 = curDiv.objects.at(i);
+      for (int j = 0; j < curDiv.objects.size(); j++) if (j != i)
+      {
+         auto o2 = curDiv.objects.at(j);
+         auto displ = (o2->getPosition() - o1->getPosition());
+         if (displ.SqrLength() < (o1->getLargestRadius() + o2->getLargestRadius())*(o1->getLargestRadius() + o2->getLargestRadius()))
+         {
+            o1->onCollision(o2);
+            //o2->onCollision(o1); // Is being done by the second iteration.
+         }
+      }
+   }
+}
+
+void CollisionHandler::update(float deltatime)
+{
+   correctUnmanagedDivision();
+
+   for (int i = 0; i < divisionCount*divisionCount; i++)
+   {
+      checkForCollisions(i);
+      correctDivisions(i);
+   }
+}
+
+void CollisionHandler::correctDivisions(int pos)
+{
+   CollisionDivision curDiv = managedDivisions[pos];
+   for (int j = 0; j < curDiv.objects.size(); j++)
+   {
+      Object* o = (curDiv.objects.at(j));
+
+      Vector2 center = curDiv.min + ((curDiv.max - curDiv.min)*0.5f);
+
+      //if (o->moved)
+      {
+         if ((o->getPosition().X - o->getLargestRadius() > curDiv.max.X || o->getPosition().Y - o->getLargestRadius() > curDiv.max.Y ||
+            o->getPosition().X + o->getLargestRadius() < curDiv.min.X || o->getPosition().Y + o->getLargestRadius() < curDiv.min.Y))
+         {
+            removeFromDivision(o, pos);
+            addObject(o);
+         }
+         else if ((o->getPosition().X + o->getLargestRadius() > curDiv.max.X || o->getPosition().Y + o->getLargestRadius() > curDiv.max.Y ||
+            o->getPosition().X - o->getLargestRadius() < curDiv.min.X || o->getPosition().Y - o->getLargestRadius() < curDiv.min.Y))
+         {
+            addObject(o);
+         }
+      }
+   }
+}
+
+void CollisionHandler::correctUnmanagedDivision()
+{
+   CollisionDivision curDiv = unmanagedDivision;
+   for (int j = 0; j < curDiv.objects.size(); j++)
+   {
+      Object* o = (curDiv.objects.at(j));
+
+      Vector2 center = curDiv.min + ((curDiv.max - curDiv.min)*0.5f);
+
+      //if (o->moved)
+      {
+         if ((o->getPosition().X - o->getLargestRadius() > width || o->getPosition().Y - o->getLargestRadius() > height ||
+            o->getPosition().X + o->getLargestRadius() < 0 || o->getPosition().Y + o->getLargestRadius() < 0))
+         {
+            removeFromDivision(o, -1);
+            addObject(o);
+         }
+      }
+   }
+}
+
+void CollisionHandler::addObject(Object *a_Object)
+{
+   if (divisionCount == -1)
+   {
+      CORE_WARNING("Added an object before we initialised!");
+      addUnmanagedObject(a_Object);
+   }
+
+   float divX = a_Object->getPosition().X / (float)(width / divisionCount);
+   float divY = a_Object->getPosition().Y / (float)(height / divisionCount);
+
+   int divi = (int)divY*divisionCount + (int)divX;
+
+   if (divX < 0 || divX > divisionCount || divY < 0 || divY > divisionCount)
+   {
+      CORE_WARNING("Object spawned outside of map.");
+      addUnmanagedObject(a_Object);
+   }
+   else
+   {
+      addToDivision(a_Object, (int)divX, (int)divY);
+      CollisionDivision curDiv = managedDivisions[divi];
+
+      bool a = false, b = false;
+      if (abs(a_Object->getPosition().X - curDiv.max.X) < a_Object->getLargestRadius())
+         addToDivision(a_Object, (int)divX + 1, (int)divY);
+      if (abs(a_Object->getPosition().X - curDiv.min.X) < a_Object->getLargestRadius())
+         a = true, addToDivision(a_Object, (int)divX - 1, (int)divY);
+
+      if (abs(a_Object->getPosition().Y - curDiv.max.Y) < a_Object->getLargestRadius())
+         addToDivision(a_Object, (int)divX, (int)divY + 1);
+      if (abs(a_Object->getPosition().Y - curDiv.min.Y) < a_Object->getLargestRadius())
+         b = true, addToDivision(a_Object, (int)divX, (int)divY - 1);
+
+      if (a && b)
+         b = true, addToDivision(a_Object, (int)divX - 1, (int)divY - 1);
+   }
+}
+
+void CollisionHandler::getDivisions(Object *a_Object, CollisionDivision *a_Divisions[], int &a_DivisionCount)
+{
+   for (int i = 0; i < 4; i++)
+   {
+      a_Divisions[i] = 0;
+   }
+
+   int currentDiv = 0;
+   float divX = a_Object->getPosition().X / (float)(width / divisionCount);
+   float divY = a_Object->getPosition().Y / (float)(height / divisionCount);
+
+   int divi = (int)divY*divisionCount + (int)divX;
+
+   if (divY >= 0 && divY < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[divi];
+      currentDiv++;
+   }
+
+   bool a = false, b = false;
+   auto curDiv = managedDivisions[divi];
+   if (abs(a_Object->getPosition().X - curDiv.max.X) < a_Object->getLargestRadius() && divX + 1 >= 0 && divX + 1 < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      currentDiv++;
+   }
+   else if (abs(a_Object->getPosition().X - curDiv.min.X) < a_Object->getLargestRadius() && divX - 1 >= 0 && divX - 1 < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX - 1];
+      currentDiv++;
+      a = true;
+   }
+   if (abs(a_Object->getPosition().Y - curDiv.max.Y) < a_Object->getLargestRadius() && divY + 1 >= 0 && divY + 1 < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      currentDiv++;
+   }
+   else if (abs(a_Object->getPosition().Y - curDiv.min.Y) < a_Object->getLargestRadius() && divY - 1 >= 0 && divY - 1 < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      currentDiv++;
+      b = true;
+   }
+
+   if (a && b && divX + 1 >= 0 && divX + 1 < divisionCount)
+   {
+      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      currentDiv++;
+   }
+}
+
+void CollisionHandler::addToDivision(Object* a_Object, int x, int y)
+{
+   if (y >= 0 && y < divisionCount && x >= 0 && x < divisionCount)
+   {
+      int pos = y*divisionCount + x;
+      if (std::find(managedDivisions[pos].objects.begin(), managedDivisions[pos].objects.end(), a_Object) == managedDivisions[pos].objects.end())
+      {
+         managedDivisions[pos].objects.push_back(a_Object);
+      }
+   }
+}
+
+void CollisionHandler::addUnmanagedObject(Object* a_Object)
+{
+   //if(y < 0 || y >= divisionCount || x < 0 || x >= divisionCount))
+   {
+      if (std::find(unmanagedDivision.objects.begin(), unmanagedDivision.objects.end(), a_Object) == unmanagedDivision.objects.end())
+      {
+         unmanagedDivision.objects.push_back(a_Object);
+      }
+   }
+}
+
+
+void CollisionHandler::removeFromDivision(Object* a_Object, int i)
+{
+   CollisionDivision * curDiv;
+   if (i == -1) curDiv = &unmanagedDivision;
+   else curDiv = &managedDivisions[i];
+
+   auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), a_Object);
+   while (j != curDiv->objects.end())
+   {
+      curDiv->objects.erase(j);
+      j = std::find(curDiv->objects.begin(), curDiv->objects.end(), a_Object);
+   }
 }

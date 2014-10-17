@@ -3,12 +3,15 @@
 #include <algorithm>
 #include "Vector2.h"
 #include "Map.h"
+#include "CollisionHandler.h"
 
 using namespace std;
 
 Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius),
                                                                                                      visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0),
-                                                                                                     dashing(false), visibleByTeam{false, false} {
+                                                                                                     dashing(false), visibleByTeam{false, false} 
+{
+   map->getCollisionHandler()->addObject(this);
 }
 
 Object::~Object() {
@@ -46,8 +49,6 @@ void Object::Move(int64 diff) {
       direction = Vector2();
       return;
    }
-
-   currentUpwardDisplacement = map->getHeightAtLocation(getPosition().X, getPosition().Y);
 
    Vector2 to(target->getX(), target->getY());
    Vector2 cur(x, y);
