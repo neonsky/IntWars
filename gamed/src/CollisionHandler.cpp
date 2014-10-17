@@ -35,19 +35,33 @@ void CollisionHandler::init(int divisionsOverWidth)
    }
 }
 
+#define FindError std::cout << __FUNCTION__ << ":" << __LINE__ << std::endl;
+
 void CollisionHandler::checkForCollisions(int pos)
 {
    auto curDiv = managedDivisions[pos];
    for (int i = 0; i < curDiv.objects.size(); i++)
    {
       auto o1 = curDiv.objects.at(i);
+      if (abs(o1->getPosition().X) < 0.0001f && abs(o1->getPosition().Y) < 0.0001f)
+      {
+         removeObject(o1);
+         continue;
+      }
+
       for (int j = 0; j < curDiv.objects.size(); j++) if (j != i)
       {
          auto o2 = curDiv.objects.at(j);
+         if (abs(o2->getPosition().X) < 0.0001f && abs(o2->getPosition().Y) < 0.0001f)
+         {
+            removeObject(o2);
+            continue;
+         }
+
          auto displ = (o2->getPosition() - o1->getPosition());
          if (displ.SqrLength() < (o1->getLargestRadius() + o2->getLargestRadius())*(o1->getLargestRadius() + o2->getLargestRadius()))
          {
-            o1->onCollision(o2);
+            //o1->onCollision(o2);
             //o2->onCollision(o1); // Is being done by the second iteration.
          }
       }
@@ -56,6 +70,9 @@ void CollisionHandler::checkForCollisions(int pos)
 
 void CollisionHandler::update(float deltatime)
 {
+   return; // TODO: Fix collisions. :/
+   // The objects are not being destructed, the removeObject is not called for autoattacks or something.
+
    correctUnmanagedDivision();
 
    for (int i = 0; i < divisionCount*divisionCount; i++)
@@ -71,6 +88,12 @@ void CollisionHandler::correctDivisions(int pos)
    for (int j = 0; j < curDiv.objects.size(); j++)
    {
       Object* o = (curDiv.objects.at(j));
+
+      if (abs(o->getPosition().X) < 0.0001f && abs(o->getPosition().Y) < 0.0001f)
+      {
+         removeObject(o);
+         continue;
+      }
 
       Vector2 center = curDiv.min + ((curDiv.max - curDiv.min)*0.5f);
 
@@ -226,16 +249,33 @@ void CollisionHandler::addUnmanagedObject(Object* a_Object)
 }
 
 
-void CollisionHandler::removeFromDivision(Object* a_Object, int i)
+void CollisionHandler::removeObject(Object* object)
+{
+   CollisionDivision * curDiv;
+   for (int i = -1; i < divisionCount; i++)
+   {
+      if (i == -1) curDiv = &unmanagedDivision;
+      else curDiv = &managedDivisions[i];
+
+      auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
+      while (j != curDiv->objects.end())
+      {
+         curDiv->objects.erase(j);
+         j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
+      }
+   }
+}
+
+void CollisionHandler::removeFromDivision(Object* object, int i)
 {
    CollisionDivision * curDiv;
    if (i == -1) curDiv = &unmanagedDivision;
    else curDiv = &managedDivisions[i];
 
-   auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), a_Object);
+   auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
    while (j != curDiv->objects.end())
    {
       curDiv->objects.erase(j);
-      j = std::find(curDiv->objects.begin(), curDiv->objects.end(), a_Object);
+      j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
    }
 }

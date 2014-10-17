@@ -23,6 +23,7 @@ public:
    ~CollisionHandler(){ /*std::free(managedDivisions);*/ }
 
    void addObject(Object *object);
+   void removeObject(Object* object);
    void getDivisions(Object *object, CollisionDivision *divisionArray[], int &a_DivisionCount);
 
    void update(float a_DT);
