@@ -214,7 +214,8 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay)
    int il = (int)l;
    float dx = b / (float)l;
    float dy = h / (float)l;
-   for (int i = 0; i <= il; i++)
+   int i;
+   for (i = 0; i <= il; i++)
    {
       if (isWalkable(x1, y1) == inverseRay) break;
       // Inverse = report on walkable
@@ -225,6 +226,8 @@ float AIMesh::castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay)
       y1 += dy;
    }
 
+   if (i == il)
+      return (/*TranslateToRealCoordinate*/(Vector2(x2, y2)) - /*TranslateToRealCoordinate*/(origin)).SqrLength();
    return (/*TranslateToRealCoordinate*/(Vector2(x1, y1)) - /*TranslateToRealCoordinate*/(origin)).SqrLength();
 }
 
