@@ -99,16 +99,25 @@ bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
 }
 
 bool Game::handleMap(ENetPeer *peer, ENetPacket *packet) {
-    LoadScreenPlayerName loadName(*peerInfo(peer));
-    LoadScreenPlayerChampion loadChampion(*peerInfo(peer));
     //Builds team info
     LoadScreenInfo screenInfo(players);
     bool pInfo = sendPacket(peer, screenInfo, CHL_LOADING_SCREEN);
-    //For all players send this info
-    bool pName = sendPacket(peer, loadName, CHL_LOADING_SCREEN);
-    bool pHero = sendPacket(peer, loadChampion, CHL_LOADING_SCREEN);
 
-    return (pInfo && pName && pHero);
+    //For all players send this info
+    bool bOk = false;
+    for (ClientInfo* player : players) {
+       LoadScreenPlayerName loadName(*player);
+       LoadScreenPlayerChampion loadChampion(*player);
+       bool pName = sendPacket(peer, loadName, CHL_LOADING_SCREEN);
+       bool pHero = sendPacket(peer, loadChampion, CHL_LOADING_SCREEN);
+
+       bOk = (pName && pHero);
+
+       if (!bOk)
+          break;
+    }
+
+    return (pInfo && bOk);
 }
 
 //building the map
@@ -434,6 +443,12 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       
       // help command
       if (strncmp(message->getMessage(), cmd[9], strlen(cmd[9])) == 0) {
+         debugMsg << "List of available commands: ";
+
+         for (auto c : cmd) {
+            debugMsg << c << " ";
+         }
+         notifyDebugMessage(debugMsg.str());
          return true;
       }
       

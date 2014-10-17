@@ -122,12 +122,12 @@ void Game::notifyItemBought(Champion* c, const ItemInstance* i) {
    response.slotId = i->getSlot();
    response.stack = i->getStacks();
    
-   broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
+   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
 }
 
 void Game::notifyItemsSwapped(Champion* c, uint8 fromSlot, uint8 toSlot) {
    SwapItemsAns sia(c, fromSlot, toSlot);
-   broadcastPacket(sia, CHL_S2C);
+   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, sia, CHL_S2C);
 }
 
 void Game::notifyLevelUp(Champion* c) {
@@ -137,7 +137,7 @@ void Game::notifyLevelUp(Champion* c) {
 
 void Game::notifyRemoveItem(Champion* c, uint8 slot) {
    RemoveItem ri(c, slot);
-   broadcastPacket(ri, CHL_S2C);
+   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, ri, CHL_S2C);
 }
 
 void Game::notifySetTarget(Unit* attacker, Unit* target) {
@@ -148,8 +148,8 @@ void Game::notifySetTarget(Unit* attacker, Unit* target) {
    broadcastPacket(st2, CHL_S2C);
 }
 
-void Game::notifyChampionDie(Champion* die, Unit* killer) {
-   ChampionDie cd(die, killer);
+void Game::notifyChampionDie(Champion* die, Unit* killer, uint32 goldFromKill) {
+   ChampionDie cd(die, killer, goldFromKill);
    broadcastPacket(cd, CHL_S2C);
 }
 
@@ -224,8 +224,10 @@ void Game::notifyEnterVision(Object* o, uint32 side) {
    
    Champion* c = dynamic_cast<Champion*>(o);
    
+   // TODO: Fix bug where enemy champion is not visible to user when vision is acquired until the enemy champion moves
    if(c) {
-      notifyChampionSpawned(c, side);
+      EnterVisionAgain eva(c);
+      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
       notifySetHealth(c);
       return;
    }

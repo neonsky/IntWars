@@ -291,7 +291,7 @@ struct Unk {
 
 class MinionSpawn : public BasePacket {
 public:
-   MinionSpawn(const Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
+   MinionSpawn(const Minion* m) : BasePacket(PKT_S2C_ObjectSpawn, m->getNetId()) {
       buffer << (uint32)0x00150017; // unk
       buffer << (uint8)0x03; // SpawnType - 3 = minion
       buffer << m->getNetId() << m->getNetId();
@@ -341,7 +341,7 @@ public:
       }
    }
    
-   MinionSpawn(uint32 itemHash) : BasePacket(PKT_S2C_MinionSpawn, itemHash) {
+   MinionSpawn(uint32 netId) : BasePacket(PKT_S2C_ObjectSpawn, netId) {
       buffer.fill(0, 3);
    }
 };
@@ -425,7 +425,7 @@ public:
  */
 class EnterVisionAgain : public BasePacket {
 public:
-   EnterVisionAgain(Minion* m) : BasePacket(PKT_S2C_MinionSpawn, m->getNetId()) {
+   EnterVisionAgain(Minion* m) : BasePacket(PKT_S2C_ObjectSpawn, m->getNetId()) {
       buffer.fill(0, 13);
       buffer << 1.0f;
       buffer.fill(0, 13);
@@ -445,6 +445,46 @@ public:
       }
    }
 
+   EnterVisionAgain(Champion* c) : BasePacket(PKT_S2C_ObjectSpawn, c->getNetId()) {
+      buffer << (uint16)0; // extraInfo
+      buffer << (uint8)0; //c->getInventory().getItems().size(); // itemCount?
+      //buffer << (uint8)7; // unknown
+
+      /*
+      for (int i = 0; i < c->getInventory().getItems().size(); i++) {
+         ItemInstance* item = c->getInventory().getItems()[i];
+
+         if (item != 0 && item->getTemplate() != 0) {
+            buffer << (uint8)item->getStacks();
+            buffer << (uint8)0; // unk
+            buffer << (uint32)item->getTemplate()->getId();
+            buffer << (uint8)item->getSlot();
+         }
+         else {
+            buffer.fill(0, 7);
+         }
+      }
+      */
+
+      buffer.fill(0, 10);
+      buffer << (float)1.0f;
+      buffer.fill(0, 13);
+
+      buffer << (uint8)2; // Type of data: Waypoints=2
+      buffer << (uint32)clock(); // unk
+
+      const std::vector<MovementVector>& waypoints = c->getWaypoints();
+
+      buffer << (uint8)((waypoints.size() - c->getCurWaypoint() + 1) * 2); // coordCount
+      buffer << c->getNetId();
+      buffer << (uint8)0; // movement mask; 1=KeepMoving?
+      buffer << MovementVector::targetXToNormalFormat(c->getX());
+      buffer << MovementVector::targetYToNormalFormat(c->getY());
+      for (int i = c->getCurWaypoint(); i < waypoints.size(); ++i) {
+         buffer << waypoints[i].x;
+         buffer << waypoints[i].y;
+      }
+   }
 };
 
 class AddGold : public BasePacket {
@@ -592,14 +632,14 @@ struct CharacterStats {
 
 struct ChatMessage {
     uint8 cmd;
-    uint32 netId;
-    uint32 unk1;
-    uint8 unk2;
+    uint32 playerId;
+    uint32 botNetId;
+    uint8 isBotMessage;
 
-    uint32 playerNo;
+    uint32 unk1; // playerNo?
     ChatType type;
     uint32 length;
-    uint8 unk3[32];
+    uint8 unk2[32];
     int8 msg;
 
     int8 *getMessage() {
@@ -690,7 +730,7 @@ public:
 };
 
 struct HeroSpawn2 : public BasePacket {
-    HeroSpawn2(Champion* p) : BasePacket(PKT_S2C_HeroSpawn2, p->getNetId()) {
+    HeroSpawn2(Champion* p) : BasePacket(PKT_S2C_ObjectSpawn, p->getNetId()) {
         buffer.fill(0, 15);
         buffer << (uint8)0x80; // unk
         buffer << (uint8)0x3F; // unk
@@ -1060,10 +1100,14 @@ public:
 
 class ChampionDie : public BasePacket {
 public:
-   ChampionDie(Champion* die, Unit* killer) : BasePacket(PKT_S2C_ChampionDie, die->getNetId()) {
-      buffer << killer->getNetId(); // 4.18, supposed to be a new net ID?
+   ChampionDie(Champion* die, Unit* killer, uint32 goldFromKill) : BasePacket(PKT_S2C_ChampionDie, die->getNetId()) {
+      buffer << goldFromKill; // Gold from kill?
       buffer << (uint8)0;
-      buffer << killer->getNetId();
+      if (killer != 0)
+         buffer << killer->getNetId();
+      else
+         buffer << (uint32)0;
+
       buffer << (uint8)0;
       buffer << (uint8)7;
       buffer << die->getRespawnTimer() / 1000000.f; // Respawn timer, float

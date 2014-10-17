@@ -279,11 +279,9 @@ void Champion::die(Unit* killer) {
    }
    
    if (!cKiller) {
-      map->getGame()->notifyChampionDie(this, killer);
+      map->getGame()->notifyChampionDie(this, killer, 0);
       return;
    }
-   
-   map->getGame()->notifyChampionDie(this, cKiller);
    
    cKiller->setChampionGoldFromMinions(0);
    
@@ -307,18 +305,21 @@ void Champion::die(Unit* killer) {
    }
     
    if(!gold) {
+      map->getGame()->notifyChampionDie(this, cKiller, 0);
       return;
    }
     
    if(map->getKillReduction() && !map->getFirstBlood()){
       gold -= gold*0.25f;
-      printf("Still some minutes for full gold reward on champion kills");
+      printf("Still some minutes for full gold reward on champion kills\n");
    }
    
    if(map->getFirstBlood()){
       gold += 100;
       map->setFirstBlood(false);
    }
+
+   map->getGame()->notifyChampionDie(this, cKiller, gold);
    
 	cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
 	map->getGame()->notifyAddGold(cKiller, this, gold);
