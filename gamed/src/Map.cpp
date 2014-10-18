@@ -15,7 +15,7 @@ Map::~Map()
 }
 
 void Map::update(int64 diff) {
-   collisionHandler->update(diff);
+   // collisionHandler->update(diff);
    for(auto kv = objects.begin(); kv != objects.end();) {
       if(kv->second->isToRemove() && kv->second->getAttackerCount() == 0) {
          collisionHandler->removeObject(kv->second);
