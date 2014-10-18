@@ -18,6 +18,7 @@ void Map::update(int64 diff) {
    collisionHandler->update(diff);
    for(auto kv = objects.begin(); kv != objects.end();) {
       if(kv->second->isToRemove() && kv->second->getAttackerCount() == 0) {
+         collisionHandler->removeObject(kv->second);
          delete kv->second;
          kv = objects.erase(kv);
          continue;
@@ -143,6 +144,8 @@ Object* Map::getObjectById(uint32 id) {
 void Map::addObject(Object* o) {
    objects[o->getNetId()] = o;
    
+   collisionHandler->addObject(o);
+
    Unit* u = dynamic_cast<Unit*>(o);
    if(!u) {
       return;

@@ -37,8 +37,6 @@ void CollisionHandler::init(int divisionsOverWidth)
    }
 }
 
-#define FindError std::cout << __FUNCTION__ << ":" << __LINE__ << std::endl;
-
 void CollisionHandler::checkForCollisions(int pos)
 {
    auto curDiv = managedDivisions[pos];
@@ -134,118 +132,118 @@ void CollisionHandler::correctUnmanagedDivision()
    }
 }
 
-void CollisionHandler::addObject(Object *a_Object)
+void CollisionHandler::addObject(Object *object)
 {
-   if (dynamic_cast<Minion*>(a_Object) == 0 && dynamic_cast<Champion*>(a_Object) == 0)//&& dynamic_cast<Turret*>(a_Object) == 0 && dynamic_cast<LevelProp*>(a_Object) == 0)
+   if (dynamic_cast<Minion*>(object) == 0 && dynamic_cast<Champion*>(object) == 0)//&& dynamic_cast<Turret*>(object) == 0 && dynamic_cast<LevelProp*>(object) == 0)
       return;
 
    if (divisionCount == -1)
    {
       //printf("Added an object before we initialised the CollisionHandler!");
-      //addUnmanagedObject(a_Object);
+      //addUnmanagedObject(object);
    }
 
-   float divX = a_Object->getPosition().X / (float)(width / divisionCount);
-   float divY = a_Object->getPosition().Y / (float)(height / divisionCount);
+   float divX = object->getPosition().X / (float)(width / divisionCount);
+   float divY = object->getPosition().Y / (float)(height / divisionCount);
 
    int divi = (int)divY*divisionCount + (int)divX;
 
    if (divX < 0 || divX > divisionCount || divY < 0 || divY > divisionCount)
    {
-      //printf("Object spawned outside of map. (%f, %f)", a_Object->getPosition().X, a_Object->getPosition().Y);
-      //addUnmanagedObject(a_Object);
+      //printf("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
+      //addUnmanagedObject(object);
    }
    else
    {
-      addToDivision(a_Object, (int)divX, (int)divY);
+      addToDivision(object, (int)divX, (int)divY);
       CollisionDivision curDiv = managedDivisions[divi];
 
       bool a = false, b = false;
-      if (abs(a_Object->getPosition().X - curDiv.max.X) < a_Object->getCollisionRadius())
-         addToDivision(a_Object, (int)divX + 1, (int)divY);
-      if (abs(a_Object->getPosition().X - curDiv.min.X) < a_Object->getCollisionRadius())
-         a = true, addToDivision(a_Object, (int)divX - 1, (int)divY);
+      if (abs(object->getPosition().X - curDiv.max.X) < object->getCollisionRadius())
+         addToDivision(object, (int)divX + 1, (int)divY);
+      if (abs(object->getPosition().X - curDiv.min.X) < object->getCollisionRadius())
+         a = true, addToDivision(object, (int)divX - 1, (int)divY);
 
-      if (abs(a_Object->getPosition().Y - curDiv.max.Y) < a_Object->getCollisionRadius())
-         addToDivision(a_Object, (int)divX, (int)divY + 1);
-      if (abs(a_Object->getPosition().Y - curDiv.min.Y) < a_Object->getCollisionRadius())
-         b = true, addToDivision(a_Object, (int)divX, (int)divY - 1);
+      if (abs(object->getPosition().Y - curDiv.max.Y) < object->getCollisionRadius())
+         addToDivision(object, (int)divX, (int)divY + 1);
+      if (abs(object->getPosition().Y - curDiv.min.Y) < object->getCollisionRadius())
+         b = true, addToDivision(object, (int)divX, (int)divY - 1);
 
       if (a && b)
-         b = true, addToDivision(a_Object, (int)divX - 1, (int)divY - 1);
+         b = true, addToDivision(object, (int)divX - 1, (int)divY - 1);
    }
 }
 
-void CollisionHandler::getDivisions(Object *a_Object, CollisionDivision *a_Divisions[], int &a_DivisionCount)
+void CollisionHandler::getDivisions(Object *object, CollisionDivision *divs[], int &divCount)
 {
    for (int i = 0; i < 4; i++)
    {
-      a_Divisions[i] = 0;
+      divs[i] = 0;
    }
 
-   int currentDiv = 0;
-   float divX = a_Object->getPosition().X / (float)(width / divisionCount);
-   float divY = a_Object->getPosition().Y / (float)(height / divisionCount);
+   divCount = 0;
+   float divX = object->getPosition().X / (float)(width / divisionCount);
+   float divY = object->getPosition().Y / (float)(height / divisionCount);
 
    int divi = (int)divY*divisionCount + (int)divX;
 
    if (divY >= 0 && divY < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[divi];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[divi];
+      divCount++;
    }
 
    bool a = false, b = false;
    auto curDiv = managedDivisions[divi];
-   if (abs(a_Object->getPosition().X - curDiv.max.X) < a_Object->getCollisionRadius() && divX + 1 >= 0 && divX + 1 < divisionCount)
+   if (abs(object->getPosition().X - curDiv.max.X) < object->getCollisionRadius() && divX + 1 >= 0 && divX + 1 < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      divCount++;
    }
-   else if (abs(a_Object->getPosition().X - curDiv.min.X) < a_Object->getCollisionRadius() && divX - 1 >= 0 && divX - 1 < divisionCount)
+   else if (abs(object->getPosition().X - curDiv.min.X) < object->getCollisionRadius() && divX - 1 >= 0 && divX - 1 < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX - 1];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX - 1];
+      divCount++;
       a = true;
    }
-   if (abs(a_Object->getPosition().Y - curDiv.max.Y) < a_Object->getCollisionRadius() && divY + 1 >= 0 && divY + 1 < divisionCount)
+   if (abs(object->getPosition().Y - curDiv.max.Y) < object->getCollisionRadius() && divY + 1 >= 0 && divY + 1 < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      divCount++;
    }
-   else if (abs(a_Object->getPosition().Y - curDiv.min.Y) < a_Object->getCollisionRadius() && divY - 1 >= 0 && divY - 1 < divisionCount)
+   else if (abs(object->getPosition().Y - curDiv.min.Y) < object->getCollisionRadius() && divY - 1 >= 0 && divY - 1 < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      divCount++;
       b = true;
    }
 
    if (a && b && divX + 1 >= 0 && divX + 1 < divisionCount)
    {
-      a_Divisions[currentDiv] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
-      currentDiv++;
+      divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
+      divCount++;
    }
 }
 
-void CollisionHandler::addToDivision(Object* a_Object, int x, int y)
+void CollisionHandler::addToDivision(Object* object, int x, int y)
 {
    if (y >= 0 && y < divisionCount && x >= 0 && x < divisionCount)
    {
       int pos = y*divisionCount + x;
-      if (std::find(managedDivisions[pos].objects.begin(), managedDivisions[pos].objects.end(), a_Object) == managedDivisions[pos].objects.end())
+      if (std::find(managedDivisions[pos].objects.begin(), managedDivisions[pos].objects.end(), object) == managedDivisions[pos].objects.end())
       {
-         managedDivisions[pos].objects.push_back(a_Object);
+         managedDivisions[pos].objects.push_back(object);
       }
    }
 }
 
-void CollisionHandler::addUnmanagedObject(Object* a_Object)
+void CollisionHandler::addUnmanagedObject(Object* object)
 {
    //if(y < 0 || y >= divisionCount || x < 0 || x >= divisionCount))
    {
-      if (std::find(unmanagedDivision.objects.begin(), unmanagedDivision.objects.end(), a_Object) == unmanagedDivision.objects.end())
+      if (std::find(unmanagedDivision.objects.begin(), unmanagedDivision.objects.end(), object) == unmanagedDivision.objects.end())
       {
-         unmanagedDivision.objects.push_back(a_Object);
+         unmanagedDivision.objects.push_back(object);
       }
    }
 }

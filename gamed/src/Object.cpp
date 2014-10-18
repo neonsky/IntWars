@@ -11,12 +11,10 @@ Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, ui
                                                                                                      visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0),
                                                                                                      dashing(false), visibleByTeam{false, false} 
 {
-   map->getCollisionHandler()->addObject(this);
 }
 
 Object::~Object() 
 {
-   map->getCollisionHandler()->removeObject(this);
 }
 
 void Object::calculateVector(float xtarget, float ytarget) {
