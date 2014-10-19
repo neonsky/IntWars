@@ -17,7 +17,7 @@ protected:
    int64 respawnTimer;
    Inventory inventory;
    float championGoldFromMinions;
-   int64 championHitFlagTimer = 0;
+   int64 championHitFlagTimer;
    
 public:
    Spell* getSpell(int index){ return spells[index]; }

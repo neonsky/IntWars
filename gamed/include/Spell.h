@@ -87,7 +87,7 @@ protected:
    float coefficient;
    std::vector< std::vector<float> > effects;
    
-   float range = 0;
+   float range;
    
    SpellState state;
    float currentCooldown;

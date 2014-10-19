@@ -7,7 +7,7 @@
 #include <sstream>
 #include <algorithm>
 
-Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats(), 30, 0, 0, 1200), type(type), skillPoints(0), respawnTimer(0), playerId(playerId), championGoldFromMinions(0)  {
+Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId) : Unit(map, id, type, new Stats(), 30, 0, 0, 1200), type(type), skillPoints(0), respawnTimer(0), playerId(playerId), championHitFlagTimer(0), championGoldFromMinions(0)  {
    stats->setGold(475.0f);
    stats->setAttackSpeedMultiplier(1.0f);
    stats->setGoldPerSecond(map->getGoldPerSecond());
