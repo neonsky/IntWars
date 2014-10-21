@@ -636,8 +636,8 @@ struct ChatMessage {
     uint32 botNetId;
     uint8 isBotMessage;
 
-    uint32 unk1; // playerNo?
     ChatType type;
+    uint32 unk1; // playerNo?
     uint32 length;
     uint8 unk2[32];
     int8 msg;
@@ -777,6 +777,13 @@ struct GameTimerUpdate {
     PacketHeader header;
     float fTime;
 };
+
+struct HeartBeat {
+   PacketHeader header;
+   float receiveTime;
+   float ackTime;
+};
+
 struct SpellSet {
     SpellSet(uint32 netID, uint32 _spellID, uint32 _level) {
         memset(this, 0, sizeof(SpellSet));

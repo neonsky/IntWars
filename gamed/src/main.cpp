@@ -54,7 +54,10 @@ int main(int argc, char ** argv)
 	address.host = SERVER_HOST;
 	address.port = SERVER_PORT;
 
-	g.initialize(&address, SERVER_KEY);
+   if (!g.initialize(&address, SERVER_KEY)) {
+      printf("ERR : Couldn't listen on port %d, or invalid key", SERVER_PORT);
+      return EXIT_FAILURE;
+   }
 
 	g.netLoop();
    

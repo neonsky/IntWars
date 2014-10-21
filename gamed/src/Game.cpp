@@ -43,7 +43,9 @@ Game::~Game()
 	_isAlive = false;
 
 	delete _blowfish;
-	enet_host_destroy(_server);
+
+   if (_server != NULL)
+	   enet_host_destroy(_server);
 }
 
 uint32 Game::strToId(std::string str){
@@ -204,6 +206,7 @@ void Game::netLoop()
             break;
 
          case ENET_EVENT_TYPE_DISCONNECT:
+            handleDisconnect(event.peer);
             delete (ClientInfo*)event.peer->data;
             break;
          }

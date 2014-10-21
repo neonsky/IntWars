@@ -47,6 +47,7 @@ void Game::initHandlers()
    registerHandler(&Game::handleNull,            PKT_C2S_LockCamera, CHL_C2S);
    registerHandler(&Game::handleNull,            PKT_C2S_StatsConfirm, CHL_C2S);
    registerHandler(&Game::handleClick,           PKT_C2S_Click, CHL_C2S);
+   registerHandler(&Game::handleHeartBeat,       PKT_C2S_HeartBeat, CHL_GAMEPLAY);
 }
 
 void Game::registerHandler(bool (Game::*handler)(HANDLE_ARGS), PacketCmd pktcmd,Channel c)

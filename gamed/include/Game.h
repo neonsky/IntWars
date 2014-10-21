@@ -50,6 +50,7 @@ class Game
       
    
 		bool handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID);
+      bool handleDisconnect(ENetPeer* peer);
 
 		// Handlers
 		bool handleNull(HANDLE_ARGS);
@@ -72,6 +73,7 @@ class Game
       bool handleCastSpell(HANDLE_ARGS);
       bool handleClick(HANDLE_ARGS);
       bool handleSwapItems(HANDLE_ARGS);
+      bool handleHeartBeat(HANDLE_ARGS);
       
       // Notifiers
       void notifyMinionSpawned(Minion* m, int side);

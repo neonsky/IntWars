@@ -44,6 +44,12 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
 
    for(ClientInfo* player : players) {
       if(player->userId == userId) {
+
+         if (player->getPeer() != NULL) {
+            printf("WARN: Ignoring new player %d, already connected!\n", userId);
+            return false;
+         }
+
          peer->data = player;
          player->setPeer(peer);
          KeyCheck response;
@@ -732,4 +738,27 @@ bool Game::handleEmotion(HANDLE_ARGS) {
     response.header.netId = emotion->header.netId;
     response.id = emotion->id;
     return broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
+}
+
+bool Game::handleDisconnect(ENetPeer* peer) {
+   if (peerInfo(peer)) {
+      // TODO: Handle disconnect
+      ClientInfo* clientInfo = peerInfo(peer);
+
+      printf("Player %d disconnected\n", clientInfo->userId);
+   }
+   return true;
+}
+
+bool Game::handleHeartBeat(HANDLE_ARGS) {
+   HeartBeat *heartbeat = reinterpret_cast<HeartBeat *>(packet->data);
+
+   float diff = heartbeat->ackTime - heartbeat->receiveTime;
+   if (heartbeat->receiveTime > heartbeat->ackTime) {
+      printf("Player %d sent an invalid heartbeat - Timestamp error (diff: %.f)\n", peerInfo(peer)->userId, diff);
+   } else {
+      printf("Player %d sent heartbeat (diff: %.f)\n", peerInfo(peer)->userId, diff);
+   }
+
+   return true;
 }

@@ -122,12 +122,12 @@ void Game::notifyItemBought(Champion* c, const ItemInstance* i) {
    response.slotId = i->getSlot();
    response.stack = i->getStacks();
    
-   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
+   broadcastPacketVision(c, reinterpret_cast<uint8 *>(&response), sizeof(response), CHL_S2C);
 }
 
 void Game::notifyItemsSwapped(Champion* c, uint8 fromSlot, uint8 toSlot) {
    SwapItemsAns sia(c, fromSlot, toSlot);
-   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, sia, CHL_S2C);
+   broadcastPacketVision(c, sia, CHL_S2C);
 }
 
 void Game::notifyLevelUp(Champion* c) {
@@ -137,7 +137,7 @@ void Game::notifyLevelUp(Champion* c) {
 
 void Game::notifyRemoveItem(Champion* c, uint8 slot) {
    RemoveItem ri(c, slot);
-   broadcastPacketTeam(c->getSide() == 0 ? TEAM_BLUE : TEAM_PURPLE, ri, CHL_S2C);
+   broadcastPacketVision(c, ri, CHL_S2C);
 }
 
 void Game::notifySetTarget(Unit* attacker, Unit* target) {
