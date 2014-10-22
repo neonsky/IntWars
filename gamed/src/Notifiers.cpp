@@ -95,6 +95,11 @@ void Game::notifyNextAutoAttack(Unit* attacker, Unit* target, uint32 futureProjN
    broadcastPacket(aa, CHL_S2C);
 }
 
+void Game::notifyOnAttack(Unit* attacker, Unit* attacked, AttackType attackType) {
+   OnAttack oa(attacker, attacked, attackType);
+   broadcastPacket(oa, CHL_S2C);
+}
+
 void Game::notifyProjectileSpawn(Projectile* p) {
    SpawnProjectile sp(p);
    broadcastPacket(sp, CHL_S2C);
@@ -151,6 +156,13 @@ void Game::notifySetTarget(Unit* attacker, Unit* target) {
 void Game::notifyChampionDie(Champion* die, Unit* killer, uint32 goldFromKill) {
    ChampionDie cd(die, killer, goldFromKill);
    broadcastPacket(cd, CHL_S2C);
+
+   notifyChampionDeathTimer(die);
+}
+
+void Game::notifyChampionDeathTimer(Champion* die) {
+   ChampionDeathTimer cdt(die);
+   broadcastPacket(cdt, CHL_S2C);
 }
 
 void Game::notifyChampionRespawn(Champion* c) {

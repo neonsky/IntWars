@@ -33,7 +33,7 @@ class Packet;
 #define PEER_MTU 996
 #define RELIABLE ENET_PACKET_FLAG_RELIABLE
 #define UNRELIABLE 0
-#define GAME_VERSION "Version 4.18.0.274 [PUBLIC]"
+#define GAME_VERSION "Version 4.18.0.282 [PUBLIC]"
 
 #define peerInfo(p) ((ClientInfo*)p->data)
 
@@ -93,10 +93,12 @@ class Game
       void notifyRemoveItem(Champion* c, uint8 slot);
       void notifySetTarget(Unit* attacker, Unit* target);
       void notifyChampionDie(Champion* die, Unit* killer, uint32 goldFromKill);
+      void notifyChampionDeathTimer(Champion* die);
       void notifyChampionRespawn(Champion* c);
       void notifyShowProjectile(Projectile* p);
       void notifyNpcDie(Unit* die, Unit* killer);
       void notifyNextAutoAttack(Unit* attacker, Unit* target, uint32 futureProjNetId, bool isCritical, bool nextAttackFlag);
+      void notifyOnAttack(Unit* attacker, Unit* attacked, AttackType attackType);
       void notifyAddBuff(Unit* u, Unit* source, std::string buffName);
       void notifyRemoveBuff(Unit* u, std::string buffName);
       void notifyAddGold(Champion* c, Unit* died, float gold);

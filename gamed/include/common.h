@@ -106,7 +106,6 @@ enum PacketCmd : uint8
    PKT_C2S_CastSpell = 0x9A,
    PKT_S2C_TurretSpawn = 0x9D,
    PKT_S2C_NPC_Hide = 0x9E, // (4.18) not sure what this became
-   PKT_S2C_NPC_Die = 0xFE,
 
    PKT_C2S_Surrender = 0xA4,
    PKT_C2S_StatsConfirm = 0xA8, 
@@ -125,9 +124,16 @@ enum PacketCmd : uint8
    PKT_S2C_LevelPropSpawn = 0xD0,
 
    PKT_S2C_DebugMessage = 0xF7,
-   PKT_S2C_UNK          = 0xFE, // Change target ??
+   PKT_S2C_Extended = 0xFE,
 
    PKT_Batch = 0xFF
+};
+
+enum ExtendedPacketCmd : uint8
+{
+   EPKT_S2C_OnAttack = 0x0F,
+   EPKT_S2C_ChampionDeathTimer = 0x17,
+   EPKT_S2C_NPC_Die = 0x26,
 };
 
 enum MoveType : uint8

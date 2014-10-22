@@ -86,6 +86,9 @@ void Unit::update(int64 diff) {
             nextAttackFlag = !nextAttackFlag; // The first auto attack frame has occurred
             map->getGame()->notifyNextAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
          }
+
+         AttackType attackType = isMelee() ? ATTACK_TYPE_MELEE : ATTACK_TYPE_TARGETED;
+         map->getGame()->notifyOnAttack(this, unitTarget, attackType);
       }
    } else {
       refreshWaypoints();

@@ -70,6 +70,14 @@ public:
 
 };
 
+class ExtendedPacket : public BasePacket {
+public:
+   ExtendedPacket(uint8 ecmd = 0, uint32 netId = 0) : BasePacket(PKT_S2C_Extended, netId) {
+      buffer << ecmd;
+      buffer << (uint8)1;
+   }
+};
+
 /* Old Packet Architecture & Packets */
 
 struct PacketHeader {
@@ -272,22 +280,6 @@ struct CameraLock {
     uint32 unk2;	//Unk
     uint8 requestNo;
 } ViewReq;*/
-
-/**
- * Change Target ??
- */
-struct Unk {
-   Unk(uint32 netId, float x, float y, uint32 targetNetId = 0) : unk1(0x0F), unk2(1), unk3(2), x(x), unk4(55), y(y), targetNetId(targetNetId) {
-      header.cmd = PKT_S2C_UNK;
-      header.netId = netId;
-   }
-
-   PacketHeader header;
-   uint8 unk1, unk2, unk3;
-
-   float x, unk4, y;
-   uint32 targetNetId;
-};
 
 class MinionSpawn : public BasePacket {
 public:
@@ -921,16 +913,15 @@ public:
    }
 };
 
-class NpcDie : public BasePacket {
+class NpcDie : public ExtendedPacket {
 public:
-   NpcDie(Unit* die, Unit* killer) : BasePacket(PKT_S2C_NPC_Die, die->getNetId()) {
-      buffer << (uint8)0x26;
-      buffer << (uint32)1;
-      buffer << (uint16)0;
+   NpcDie(Unit* die, Unit* killer) : ExtendedPacket(EPKT_S2C_NPC_Die, die->getNetId()) {
+      buffer << (uint32)0;
+      buffer << (uint8)0;
       buffer << killer->getNetId();
       buffer << (uint8)0; // unk
-      buffer << (uint32)7; // unk
-      buffer << (uint8)3; // unk
+      buffer << (uint8)7; // unk
+      buffer << (uint32)0; // Flags?
    }
 };
 
@@ -1080,6 +1071,17 @@ public:
    }
 };
 
+class OnAttack : public ExtendedPacket {
+public:
+   OnAttack(Unit* attacker, Unit* attacked, AttackType attackType) : ExtendedPacket(EPKT_S2C_OnAttack, attacker->getNetId()) {
+      buffer << (uint8)attackType;
+      buffer << attacked->getX();
+      buffer << attacked->getZ();
+      buffer << attacked->getY();
+      buffer << attacked->getNetId();
+   }
+};
+
 class SetTarget : public BasePacket {
 public:
    SetTarget(Unit* attacker, Unit* attacked) : BasePacket(PKT_S2C_SetTarget, attacker->getNetId()) {
@@ -1117,6 +1119,13 @@ public:
 
       buffer << (uint8)0;
       buffer << (uint8)7;
+      buffer << die->getRespawnTimer() / 1000000.f; // Respawn timer, float
+   }
+};
+
+class ChampionDeathTimer : public ExtendedPacket {
+public:
+   ChampionDeathTimer(Champion* die) : ExtendedPacket(EPKT_S2C_ChampionDeathTimer, die->getNetId()) {
       buffer << die->getRespawnTimer() / 1000000.f; // Respawn timer, float
    }
 };

@@ -7,7 +7,7 @@
 #include "Buff.h"
 #include "LuaScript.h"
 
-#define DETECT_RANGE 400.f
+#define DETECT_RANGE 475.f
 
 enum DamageType : uint8 {
    DAMAGE_TYPE_PHYSICAL = 0,
@@ -20,6 +20,12 @@ enum DamageSource {
    DAMAGE_SOURCE_SPELL,
    DAMAGE_SOURCE_SUMMONER_SPELL, //Ignite shouldn't destroy Banshee's
    DAMAGE_SOURCE_PASSIVE //Red/Thornmail shouldn't as well
+};
+
+enum AttackType : uint8 {
+   ATTACK_TYPE_RADIAL,
+   ATTACK_TYPE_MELEE,
+   ATTACK_TYPE_TARGETED
 };
 
 enum MoveOrder {
