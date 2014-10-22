@@ -30,6 +30,7 @@ enum PacketCmd : uint8
 {                                            
    PKT_KeyCheck = 0x00,
    PKT_C2S_HeartBeat = 0x08,
+   PKT_C2S_SellItem = 0x09,
    PKT_S2C_RemoveItem = 0x0B,
    PKT_S2C_NextAutoAttack = 0x0C,
 

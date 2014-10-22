@@ -21,6 +21,7 @@ public:
    void swapItems(uint8 slotFrom, uint8 slotTo);
    const std::vector<ItemInstance*>& getItems() const { return items; }
    void removeItem(uint8 slot);
+   ItemInstance* getItemSlot(uint8 slot);
    
    std::vector<ItemInstance*> getAvailableRecipeParts(const ItemTemplate* recipe);
     

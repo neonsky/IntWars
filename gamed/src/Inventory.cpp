@@ -107,3 +107,11 @@ void Inventory::removeItem(uint8 slot) {
    delete items[slot];
    items[slot] = 0;
 }
+
+ItemInstance* Inventory::getItemSlot(uint8 slot) {
+   if(items[slot] == 0) {
+      return NULL;
+   }
+   
+   return items[slot];
+}

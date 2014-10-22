@@ -686,7 +686,7 @@ bool Game::handleBuyItem(HANDLE_ARGS) {
    
       for(ItemInstance* instance : recipeParts) {
          peerInfo(peer)->getChampion()->getStats().unapplyStatMods(instance->getTemplate()->getStatMods());
-         notifyRemoveItem(peerInfo(peer)->getChampion(), instance->getSlot());
+         notifyRemoveItem(peerInfo(peer)->getChampion(), instance->getSlot(), 0);
          peerInfo(peer)->getChampion()->getInventory().removeItem(instance->getSlot());
       }
       
@@ -697,6 +697,35 @@ bool Game::handleBuyItem(HANDLE_ARGS) {
    peerInfo(peer)->getChampion()->getStats().applyStatMods(itemTemplate->getStatMods());
    notifyItemBought(peerInfo(peer)->getChampion(), i);
    
+   return true;
+}
+
+bool Game::handleSellItem(HANDLE_ARGS) {
+   SellItem *sell = reinterpret_cast<SellItem *>(packet->data);
+   
+   ItemInstance* i;
+   i = peerInfo(peer)->getChampion()->getInventory().getItemSlot(sell->slotId);
+   if(!i)
+   {
+      return false;
+   }
+	
+   float sellPrice = i->getTemplate()->getTotalPrice() * i->getTemplate()->getSellBackModifier();
+   peerInfo(peer)->getChampion()->getStats().setGold(peerInfo(peer)->getChampion()->getStats().getGold()+sellPrice);
+
+   if(i->getTemplate()->getMaxStack() > 1) {
+      i->decrementStacks();
+      notifyRemoveItem(peerInfo(peer)->getChampion(), sell->slotId, i->getStacks());
+		
+      if(i->getStacks() == 0) {
+         peerInfo(peer)->getChampion()->getInventory().removeItem(sell->slotId);
+      }
+   }
+   else {
+      notifyRemoveItem(peerInfo(peer)->getChampion(), sell->slotId, 0);
+      peerInfo(peer)->getChampion()->getInventory().removeItem(sell->slotId);
+   }
+
    return true;
 }
 

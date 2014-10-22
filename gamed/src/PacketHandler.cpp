@@ -43,6 +43,7 @@ void Game::initHandlers()
    registerHandler(&Game::handleSkillUp,		    PKT_C2S_SkillUp, CHL_C2S);
    registerHandler(&Game::handleEmotion,		    PKT_C2S_Emotion, CHL_C2S);
    registerHandler(&Game::handleBuyItem,		    PKT_C2S_BuyItemReq, CHL_C2S);
+   registerHandler(&Game::handleSellItem,		    PKT_C2S_SellItem, CHL_C2S);
    registerHandler(&Game::handleSwapItems,		 PKT_C2S_SwapItems, CHL_C2S);
    registerHandler(&Game::handleNull,            PKT_C2S_LockCamera, CHL_C2S);
    registerHandler(&Game::handleNull,            PKT_C2S_StatsConfirm, CHL_C2S);
@@ -198,7 +199,7 @@ bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 	}
 	else
 	{
-      printf("Unhandled OpCode %02X\n", header->cmd);
+		printf("Unhandled OpCode %02X\n", header->cmd);
 		printPacket(packet->data, packet->dataLength);
 	}
 	return false;	
