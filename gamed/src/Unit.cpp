@@ -36,7 +36,9 @@ void Unit::update(int64 diff) {
       return;
    }
 
-   if (unitTarget && unitTarget->isDead()) {
+   Turret* selfTurret = dynamic_cast<Turret*>(this);
+   Turret* turretTarget = dynamic_cast<Turret*>(unitTarget);
+   if (unitTarget && unitTarget->isDead() || unitTarget && !getMap()->teamHasVisionOn(getSide(), unitTarget) && !turretTarget && !selfTurret) {
       setUnitTarget(0);
       isAttacking = false;
       map->getGame()->notifySetTarget(this, 0);
@@ -44,7 +46,8 @@ void Unit::update(int64 diff) {
    }
 
    if (!unitTarget && isAttacking) {
-      if (!lastTarget || lastTarget && lastTarget->isDead()) {
+      Turret* lastTurretTarget = dynamic_cast<Turret*>(lastTarget);
+      if (!lastTarget || lastTarget && lastTarget->isDead() || lastTarget && !getMap()->teamHasVisionOn(getSide(), lastTarget) && !lastTurretTarget && !selfTurret) {
          isAttacking = false;
          initialAttackDone = false;
          lastTarget = 0;
