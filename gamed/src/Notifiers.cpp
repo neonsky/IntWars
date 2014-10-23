@@ -140,8 +140,8 @@ void Game::notifyLevelUp(Champion* c) {
    broadcastPacket(lu, CHL_S2C);
 }
 
-void Game::notifyRemoveItem(Champion* c, uint8 slot) {
-   RemoveItem ri(c, slot);
+void Game::notifyRemoveItem(Champion* c, uint8 slot, uint8 remaining) {
+   RemoveItem ri(c, slot, remaining);
    broadcastPacketVision(c, ri, CHL_S2C);
 }
 

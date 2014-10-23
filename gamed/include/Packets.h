@@ -813,11 +813,16 @@ typedef struct _BuyItemAns {
     uint8 unk3;
 } BuyItemAns;
 
+typedef struct _SellItem {
+    PacketHeader header;
+    uint8 slotId;
+} SellItem;
+
 class RemoveItem : public BasePacket {
 public:
-   RemoveItem(Unit* u, uint8 slot) : BasePacket(PKT_S2C_RemoveItem, u->getNetId()) {
+   RemoveItem(Unit* u, uint8 slot, uint8 remaining) : BasePacket(PKT_S2C_RemoveItem, u->getNetId()) {
       buffer << slot;
-      buffer << (uint8)0; // unk
+      buffer << remaining;
    }
 };
 

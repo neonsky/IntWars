@@ -55,6 +55,7 @@ public:
    uint8 getSlot() const { return slot; }
    uint8 getStacks() const { return stacks; }
    void incrementStacks() { ++stacks; }
+   void decrementStacks() { --stacks; }
    
    bool getRecipeSearchFlag() const { return recipeSearchFlag; }
    void setRecipeSearchFlag(bool flag) { recipeSearchFlag = flag; }

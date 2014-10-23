@@ -70,6 +70,7 @@ class Game
 		bool handleSkillUp(HANDLE_ARGS);
 		bool handleEmotion(HANDLE_ARGS);
 		bool handleBuyItem(HANDLE_ARGS);
+		bool handleSellItem(HANDLE_ARGS);
       bool handleCastSpell(HANDLE_ARGS);
       bool handleClick(HANDLE_ARGS);
       bool handleSwapItems(HANDLE_ARGS);
@@ -90,7 +91,7 @@ class Game
       void notifyLevelUp(Champion* c);
       void notifyItemBought(Champion* c, const ItemInstance* i);
       void notifyItemsSwapped(Champion* c, uint8 fromSlot, uint8 toSlot);
-      void notifyRemoveItem(Champion* c, uint8 slot);
+      void notifyRemoveItem(Champion* c, uint8 slot, uint8 remaining);
       void notifySetTarget(Unit* attacker, Unit* target);
       void notifyChampionDie(Champion* die, Unit* killer, uint32 goldFromKill);
       void notifyChampionDeathTimer(Champion* die);
