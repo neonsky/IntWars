@@ -187,7 +187,7 @@ void Map::stopTargeting(Unit* target) {
    }
 }
 
-std::vector<Champion*> Map::getChampionsInRange(Target* t, float range) {
+std::vector<Champion*> Map::getChampionsInRange(Target* t, float range, bool isAlive) {
 	std::vector<Champion*> champs;
 	for (auto kv = objects.begin(); kv != objects.end(); ++kv) {
 		Champion* u = dynamic_cast<Champion*>(kv->second);
@@ -197,7 +197,9 @@ std::vector<Champion*> Map::getChampionsInRange(Target* t, float range) {
 		}
 
 		if (t->distanceWith(u)<=range) {
-			champs.push_back(u);
+			if(isAlive && !u->isDead() || !isAlive) {
+				champs.push_back(u);
+			}
 		}
 	}
 	return champs;

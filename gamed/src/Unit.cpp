@@ -197,7 +197,7 @@ void Unit::die(Unit* killer) {
    map->getGame()->notifyNpcDie(this, killer);
 
 	float exp = map->getExpFor(this);
-	auto champs = map->getChampionsInRange(this, EXP_RANGE);
+	auto champs = map->getChampionsInRange(this, EXP_RANGE, true);
 	//Cull allied champions
 	champs.erase(std::remove_if(champs.begin(), 
 								champs.end(), 
