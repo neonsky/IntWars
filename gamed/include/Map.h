@@ -8,9 +8,11 @@
 #include "Object.h"
 #include "AIMesh.h"
 #include "Champion.h"
+#include "Fountain.h"
 
 class Game;
 class CollisionHandler;
+class Fountain;
 
 class Map {
 
@@ -29,13 +31,15 @@ protected:
    Game* game;
    bool firstBlood;
    bool killReduction;
+   bool hasFountainHeal;
    AIMesh mesh;
 
    CollisionHandler *collisionHandler;
+   Fountain *fountain;
    
 public:
    CollisionHandler *getCollisionHandler() { return collisionHandler; }
-   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime);
+   Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime, bool hasFountainHeal);
    virtual ~Map();// { delete collisionHandler; }
    virtual void update(long long diff);
    virtual float getGoldPerSecond() = 0;

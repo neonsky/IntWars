@@ -75,7 +75,7 @@ const static vector<vector<MovementVector> > ConstWaypoints =
    },
 };
 
-SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000) 
+SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000, true) 
 {
    mesh.load("LEVELS/Map1/AIPath.aimesh");
    collisionHandler->init(3); // Needs to be initialised after AIMesh
@@ -118,6 +118,8 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1
    if (firstSpawnTime - 30 * 1000000 >= 0.0f) announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime - 30 * 1000000, 120, true))); // 30 seconds until minions spawn
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 127, false))); // Minions have spawned (90 * 1000000)
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 118, false))); // Minions have spawned [2] (90 * 1000000)
+   
+   fountain->setHealLocations(this);
 }
 
 void SummonersRift::update(long long diff) {

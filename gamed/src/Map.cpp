@@ -4,14 +4,16 @@
 #include "CollisionHandler.h"
 #include "Minion.h"
 
-Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(0), firstBlood(true), killReduction(true)
+Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime, bool hasFountainHeal = false) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(10 * 1000000), firstBlood(true), killReduction(true), hasFountainHeal(hasFountainHeal)
 {
    collisionHandler = new CollisionHandler(this);
+   fountain = new Fountain();
 }
 
 Map::~Map()
 { 
    delete collisionHandler; 
+   delete fountain;
 }
 
 void Map::update(int64 diff) {
@@ -131,6 +133,9 @@ void Map::update(int64 diff) {
       spawn();
       ++waveNumber;
    }
+   
+   if (hasFountainHeal)
+      fountain->healChampions(this, diff);
 }
 
 Object* Map::getObjectById(uint32 id) {
