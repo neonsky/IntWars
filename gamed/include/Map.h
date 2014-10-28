@@ -18,6 +18,7 @@ class Map {
 
 protected:
    std::map<uint32, Object*> objects;
+   std::map<uint32, Champion*> champions;
    std::map<uint32, Unit*> visionUnits[3];
    std::vector<uint32> expToLevelUp;
    int waveNumber;

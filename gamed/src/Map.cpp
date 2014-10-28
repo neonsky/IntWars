@@ -167,11 +167,18 @@ void Map::addObject(Object* o) {
    Champion* c = dynamic_cast<Champion*>(o);
    
    if(c) {
+      champions[c->getNetId()] = c;
       game->notifyChampionSpawned(c, c->getSide());
    }
 }
 
 void Map::removeObject(Object* o) {
+   Champion * c = dynamic_cast<Champion*>(o);
+   
+   if (c) {
+      champions.erase(c->getNetId());
+   }
+   
    objects.erase(o->getNetId());
    visionUnits[o->getSide()].erase(o->getNetId());
 }
@@ -194,16 +201,11 @@ void Map::stopTargeting(Unit* target) {
 
 std::vector<Champion*> Map::getChampionsInRange(Target* t, float range, bool isAlive) {
 	std::vector<Champion*> champs;
-	for (auto kv = objects.begin(); kv != objects.end(); ++kv) {
-		Champion* u = dynamic_cast<Champion*>(kv->second);
-
-		if (!u) {
-			continue;
-		}
-
-		if (t->distanceWith(u)<=range) {
-			if(isAlive && !u->isDead() || !isAlive) {
-				champs.push_back(u);
+	for (auto kv = champions.begin(); kv != champions.end(); ++kv) {
+		Champion* c = kv->second;
+		if (t->distanceWith(c)<=range) {
+			if(isAlive && !c->isDead() || !isAlive) {
+				champs.push_back(c);
 			}
 		}
 	}
