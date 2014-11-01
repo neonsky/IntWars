@@ -19,7 +19,6 @@ void Fountain::healChampions(Map* map, long long diff) {
                float HP = c->getStats().getCurrentHealth(), MaxHP = c->getStats().getMaxHealth();
                if (HP + MaxHP * PERCENT_MAX_HEALTH_HEAL < MaxHP) {
                   c->getStats().setCurrentHealth(HP + MaxHP * PERCENT_MAX_HEALTH_HEAL);
-                  puts("Healed at fountain");
                }
                else if (HP < MaxHP) {
                   c->getStats().setCurrentHealth(MaxHP);
