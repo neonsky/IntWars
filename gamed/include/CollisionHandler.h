@@ -22,6 +22,9 @@ public:
    void init(int divisionsOverWidth);
    ~CollisionHandler(){ /*std::free(managedDivisions);*/ }
 
+	void stackChanged(Object *object);// { dirty = true; }
+	void redoDatabase();// { dirty = true; }
+
    void addObject(Object *object);
    void removeObject(Object* object);
    void getDivisions(Object *object, CollisionDivision *divisionArray[], int &a_DivisionCount);
@@ -41,6 +44,8 @@ private:
    CollisionDivision unmanagedDivision;
    int divisionCount;
    Map* chart;
+   bool dirty = true;
+	unsigned int cleaned = 0;
 };
 
 #endif
