@@ -233,5 +233,6 @@ bool Map::teamHasVisionOn(int side, Object* o) {
 }
 
 MovementVector Map::toMovementVector(float x, float y) {
-   return MovementVector((int16)((x-mesh->getWidth()/2)/2), (int16)((y-mesh.getHeight()/2)/2));
+   // TODO : do NOT hardcode the width, but for now the AIMesh module reports a bad width (14440)
+   return MovementVector((int16)((x-13982/2)/2), (int16)((y-mesh.getHeight()/2)/2));
 }
