@@ -18,7 +18,7 @@ struct CollisionDivision
 
 	int find(Object* a)
 	{
-		for (int i = 0; i < objectCount; i++)
+		for (int i = 0; i < objectCount && i < MAX_COLLISION_OBJECTS; i++)
 		{
 			if (a == objects[i])
 				return i;

@@ -70,7 +70,7 @@ void CollisionHandler::checkForCollisions(int pos)
 void CollisionHandler::update(float deltatime)
 {
 	// If we added or removed a minion or champion.
-	if (dirty) redoDatabase();
+	//if (dirty) redoDatabase();
 
 	// Correct the unmanaged division (minions outside the map)
 	//correctUnmanagedDivision();
