@@ -37,22 +37,25 @@ void CollisionHandler::init(int divisionsOverWidth)
 
          managedDivisions[y*divisionsOverWidth + x].max.X = (x + 1)*(width / divisionsOverWidth);
          managedDivisions[y*divisionsOverWidth + x].max.Y = (y + 1)*(height / divisionsOverWidth);
+
+			managedDivisions[y*divisionsOverWidth + x].objectCount = 0;
       }
    }
 }
 
 void CollisionHandler::checkForCollisions(int pos)
 {
+	return;
 	// Check for collisions in the managed division
    auto curDiv = managedDivisions[pos];
 
-   for (int i = 0; i < curDiv.objects.size(); i++) // for each object in the current division
+   for (int i = 0; i < curDiv.objectCount; i++) // for each object in the current division
    {
-      auto o1 = curDiv.objects.at(i);
+      auto o1 = curDiv.objects[i];
 
-      for (int j = 0; j < curDiv.objects.size(); j++) if (j != i)
+      for (int j = 0; j < curDiv.objectCount; j++) if (j != i)
       {
-         auto o2 = curDiv.objects.at(j);
+         auto o2 = curDiv.objects[j];
 
          auto displ = (o2->getPosition() - o1->getPosition());
          if (displ.SqrLength() < (o1->getCollisionRadius() + o2->getCollisionRadius())*(o1->getCollisionRadius() + o2->getCollisionRadius()))
@@ -70,7 +73,7 @@ void CollisionHandler::update(float deltatime)
 	if (dirty) redoDatabase();
 
 	// Correct the unmanaged division (minions outside the map)
-	correctUnmanagedDivision();
+	//correctUnmanagedDivision();
 
 	// For every managed division
    for (int i = 0; i < divisionCount*divisionCount; i++)
@@ -86,9 +89,9 @@ void CollisionHandler::update(float deltatime)
 void CollisionHandler::correctDivisions(int pos)
 {
    CollisionDivision curDiv = managedDivisions[pos];
-   for (int j = 0; j < curDiv.objects.size(); j++) // For all objects inside this division
+   for (int j = 0; j < curDiv.objectCount; j++) // For all objects inside this division
    {
-      Object* o = (curDiv.objects.at(j));
+      Object* o = curDiv.objects[j];
 
 		//if (o->isMovementUpdated())  // Only check if they moved around.
       {
@@ -113,9 +116,9 @@ void CollisionHandler::correctDivisions(int pos)
 void CollisionHandler::correctUnmanagedDivision()
 {
    CollisionDivision curDiv = unmanagedDivision;
-	for (int j = 0; j < curDiv.objects.size(); j++) // For everything outside the map
+	for (int j = 0; j < curDiv.objectCount; j++) // For everything outside the map
    {
-      Object* o = (curDiv.objects.at(j));
+      Object* o = (curDiv.objects[j]);
 
       Vector2 center = curDiv.min + ((curDiv.max - curDiv.min)*0.5f);
 
@@ -148,7 +151,8 @@ void CollisionHandler::redoDatabase()
 		if (i == -1) curDiv = &unmanagedDivision;
 		else curDiv = &managedDivisions[i];
 
-		curDiv->objects.clear();
+		for (int i = 0; i < curDiv->objectCount; i++) curDiv->objects[i] = 0;
+		curDiv->clear();
 	}
 	
 	for (auto& it : chart->getObjects())
@@ -158,15 +162,10 @@ void CollisionHandler::redoDatabase()
 			addObject(object);
 	}
 	dirty = false;
-	cleaned++;
 }
 
 void CollisionHandler::addObject(Object *object)
 {
-	// Only add minions and champions.
-   if (dynamic_cast<Minion*>(object) == 0 && dynamic_cast<Champion*>(object) == 0)//&& dynamic_cast<Turret*>(object) == 0 && dynamic_cast<LevelProp*>(object) == 0)
-      return;
-
 	if (divisionCount == -1) // If we have not initialised..
    {
       //printf("Added an object before we initialised the CollisionHandler!");
@@ -262,9 +261,9 @@ void CollisionHandler::addToDivision(Object* object, int x, int y)
    if (y >= 0 && y < divisionCount && x >= 0 && x < divisionCount)
    {
       int pos = y*divisionCount + x; // get the division position
-      if (std::find(managedDivisions[pos].objects.begin(), managedDivisions[pos].objects.end(), object) == managedDivisions[pos].objects.end()) // Are we not in this division?
+      if (managedDivisions[pos].find(object)==-1) // Are we not in this division?
       {
-         managedDivisions[pos].objects.push_back(object); // Add it
+         managedDivisions[pos].push(object); // Add it
       }
    }
 }
@@ -273,9 +272,9 @@ void CollisionHandler::addUnmanagedObject(Object* object)
 {
    //if(y < 0 || y >= divisionCount || x < 0 || x >= divisionCount))
    {
-      if (std::find(unmanagedDivision.objects.begin(), unmanagedDivision.objects.end(), object) == unmanagedDivision.objects.end())
+		if (unmanagedDivision.find(object)==-1)
       {
-         unmanagedDivision.objects.push_back(object);
+         unmanagedDivision.push(object);
       }
    }
 }
@@ -289,11 +288,11 @@ void CollisionHandler::removeObject(Object* object)
       if (i == -1) curDiv = &unmanagedDivision;
       else curDiv = &managedDivisions[i];
 
-      auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
-      while (j != curDiv->objects.end())
-      {
-         curDiv->objects.erase(j);
-         j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
+      auto j = curDiv->find(object);
+      while (j != -1)
+		{
+			curDiv->remove(j);
+			j = curDiv->find(object);
       }
    }
 }
@@ -304,10 +303,11 @@ void CollisionHandler::removeFromDivision(Object* object, int i)
    if (i == -1) curDiv = &unmanagedDivision;
    else curDiv = &managedDivisions[i];
 
-   auto j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
-   while (j != curDiv->objects.end())
-   {
-      curDiv->objects.erase(j);
-      j = std::find(curDiv->objects.begin(), curDiv->objects.end(), object);
+	auto j = curDiv->find(object);
+   while (j != -1)
+	{
+		curDiv->remove(j);
+
+		j = curDiv->find(object);
    }
 }
