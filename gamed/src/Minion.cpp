@@ -188,7 +188,6 @@ void Minion::onCollision(Object * a_Collider)
 {
    if (a_Collider == 0) return;
 
-   if((lastCollisionPosition-getPosition()).SqrLength()>getCollisionRadius()*getCollisionRadius())
    {
       Target *t = getTarget();
       Vector2 targetpos;
@@ -205,6 +204,7 @@ void Minion::onCollision(Object * a_Collider)
          //CORE_WARNING("Pathing away from minion. (%f,%f)->(%f,%f)", getPosition().X, getPosition().Y, targetpos.X, targetpos.Y);
       }
 
-      //Path new_path = Pathfinder::getPath(getPosition(), targetpos);
+      /*Path new_path = Pathfinder::getPath(getPosition(), targetpos);
+		setWaypoints(new_path.getWaypoints());*/
    }
 }

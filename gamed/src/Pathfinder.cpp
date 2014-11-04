@@ -114,6 +114,17 @@ bool PathJob::traverseOpenList(bool first)
    return atDestination;
 }
 
+std::vector<MovementVector> Path::getWaypoints()
+{
+	std::vector<MovementVector> ret;
+	for (Vector2 waypoint : waypoints)
+	{
+		ret.push_back(waypoint);
+	}
+
+	return ret;
+}
+
 std::vector<Vector2> PathJob::reconstructPath( ) // Make a std::vector of the waypoints
 {
    std::vector<Vector2> ret;

@@ -2,6 +2,12 @@
 
 #include "stdafx.h"
 #include "Vector2.h"
+#include "Object.h"
+
+Vector2::operator MovementVector()
+{
+	return MovementVector(X, Y);
+}
 
 // Returns the length of the vector
 float Vector2::Length(){

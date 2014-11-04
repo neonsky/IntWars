@@ -8,6 +8,7 @@
 
 #include <math.h>
 
+struct MovementVector;
 class Vector2
 {
 public:
@@ -19,6 +20,8 @@ public:
    float SqrLength();
    Vector2 Normalize();
    float X, Y;
+
+	operator MovementVector();
 
    void operator += (const Vector2& a_V) { X += a_V.X; Y += a_V.Y; }
    void operator += (Vector2* a_V) { X += a_V->X; Y += a_V->Y; }

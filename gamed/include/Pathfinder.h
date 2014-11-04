@@ -78,7 +78,8 @@ public:
 
    bool isPathed() { return error == PATH_ERROR_NONE; }
    PathError getError() { return error; }
-   std::vector<Vector2> getWaypoints() { return waypoints; }
+   //std::vector<Vector2> getWaypoints() { return waypoints; }
+	std::vector<MovementVector> getWaypoints();
 };
 
 class PathJob

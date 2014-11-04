@@ -11,6 +11,7 @@
 
 #include "Target.h"
 #include "stdafx.h"
+#include "Vector2.h"
 
 class Map;
 
@@ -24,7 +25,8 @@ struct MovementVector {
     MovementVector() : x(0), y(0){ }
     MovementVector(int16 x, int16 y) : x(x), y(y) { }
     MovementVector(float x, float y) : x(targetXToNormalFormat(x)), y(targetYToNormalFormat(y)) { }
-    Target* toTarget() { return new Target(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
+	 Target* toTarget() { return new Target(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
+	 operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
     
     static int16 targetXToNormalFormat(float _x){
         return (int16)((_x) - MAP_WIDTH)/2;
@@ -95,8 +97,8 @@ public:
    virtual bool isSimpleTarget() { return false; }
 
    Target* getTarget() { return target; }
-   void setTarget(Target* target);
-   void setWaypoints(const std::vector<MovementVector>& waypoints);
+	void setTarget(Target* target);
+	void setWaypoints(const std::vector<MovementVector>& waypoints);
 
    const std::vector<MovementVector>& getWaypoints() const { return waypoints; }
    uint32 getCurWaypoint() const { return curWaypoint; }

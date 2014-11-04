@@ -31,7 +31,6 @@ protected:
     */
    const std::vector<MovementVector> constWaypoints;
    int curConstWaypoint;
-   Vector2 lastCollisionPosition;
 public:
    Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const std::vector<MovementVector>& constWaypoints = std::vector<MovementVector>());
    uint32 getSpawnPosition() const { return spawnPosition; }
