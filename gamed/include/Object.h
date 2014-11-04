@@ -33,10 +33,10 @@ struct MovementVector {
 	 operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
     
     static int16 targetXToNormalFormat(float _x){
-		 return (int16)(round(_x) - MAP_WIDTH) / 2;
+		 return (int16)((round(_x) - MAP_WIDTH )/2.0f);
     }
     static int16 targetYToNormalFormat(float _y){
-		 return (int16)(round(_y) - MAP_HEIGHT)/2;
+		 return (int16)((round(_y) - MAP_HEIGHT)/2.0f);
     }
     
 };

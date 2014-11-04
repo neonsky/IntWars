@@ -73,7 +73,7 @@ void Game::notifyMovement(Object* o) {
    answer->netId = o->getNetId();
    for(size_t i = 0; i < waypoints.size(); i++) {
 		answer->getVector(i)->x = MovementVector::targetXToNormalFormat(waypoints[i].X);
-		answer->getVector(i)->y = MovementVector::targetXToNormalFormat(waypoints[i].Y);
+		answer->getVector(i)->y = MovementVector::targetYToNormalFormat(waypoints[i].Y);
    }
    
    broadcastPacketVision(o, reinterpret_cast<uint8 *>(answer), answer->size(), 4);
