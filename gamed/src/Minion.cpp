@@ -193,7 +193,7 @@ void Minion::onCollision(Object * a_Collider)
       Vector2 targetpos;
       if (t)
       {
-         CORE_INFO("Pathing to target. (%f,%f)->(%f,%f)", getPosition().x, getPosition().y, t->getPosition().x, t->getPosition().y);
+         //CORE_WARNING("Pathing to target. (%f,%f)->(%f,%f)", getPosition().X, getPosition().Y, t->getPosition().X, t->getPosition().Y);
          targetpos = t->getPosition();
       }
       else
@@ -201,10 +201,10 @@ void Minion::onCollision(Object * a_Collider)
          targetpos = (a_Collider->getPosition() - getPosition()).Normalize(); // direction
          targetpos *= a_Collider->getCollisionRadius() + getCollisionRadius(); // direction with length, displacement
          targetpos = getPosition() - targetpos; // position + difference = endpos, but we need to go the exact other way
-         CORE_INFO("Pathing away from minion. (%f,%f)->(%f,%f)", getPosition().x, getPosition().y, targetpos.x, targetpos.y);
+         //CORE_WARNING("Pathing away from minion. (%f,%f)->(%f,%f)", getPosition().X, getPosition().Y, targetpos.X, targetpos.Y);
       }
 
-      Path new_path = Pathfinder::getPath(getPosition(), targetpos);
-		setWaypoints(new_path.getWaypoints());
+      /*Path new_path = Pathfinder::getPath(getPosition(), targetpos);
+		setWaypoints(new_path.getWaypoints());*/
    }
 }

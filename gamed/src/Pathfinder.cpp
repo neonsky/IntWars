@@ -79,7 +79,7 @@ bool PathJob::traverseOpenList(bool first)
    PathNode * currentNode = openList.back();
    openList.pop_back();
 
-   bool atDestination = (currentNode->x == (int)destination.x && currentNode->y == (int)destination.y);
+   bool atDestination = (currentNode->x == (int)destination.X && currentNode->y == (int)destination.Y);
 
    if (!atDestination) // While we're not there
    {      
@@ -101,7 +101,7 @@ bool PathJob::traverseOpenList(bool first)
                      else if (conflictingNode->g > CALC_G(currentNode->g)) // I found a shorter route to this node.
                      {
                         conflictingNode->setParent(currentNode); // Give it a new parent
-                        conflictingNode->setScore((int)CALC_H(conflictingNode->x, conflictingNode->y, destination.x, destination.y), CALC_G(currentNode->g)); // set the new score.
+                        conflictingNode->setScore((int)CALC_H(conflictingNode->x, conflictingNode->y, destination.X, destination.Y), CALC_G(currentNode->g)); // set the new score.
                      }
                   }
                }
@@ -171,16 +171,16 @@ void PathJob::cleanPath(Path &path)
    auto prevPoint = path.waypoints.begin();
    for (auto i = path.waypoints.begin()+1; i!=path.waypoints.end(); i++)
    {
-      if (((*i).x - (*prevPoint).x == dirX) &&
-         ((*i).y - (*prevPoint).y == dirY))
+      if (((*i).X - (*prevPoint).X == dirX) &&
+         ((*i).Y - (*prevPoint).Y == dirY))
       {
          path.waypoints.erase(prevPoint);
          CORE_WARNING("Erased a waypoint");
       }
       else
       {
-         dirX = ((*i).x - (*prevPoint).x);
-         dirY = ((*i).y - (*prevPoint).y);
+         dirX = ((*i).X - (*prevPoint).X);
+         dirY = ((*i).Y - (*prevPoint).Y);
       }
 
       prevPoint = i;
@@ -251,10 +251,10 @@ void PathJob::insertObstructions(Map * chart, AIMesh *mesh) // insert all object
       int radius = ((int)(i->second->getCollisionRadius() / gridNodeSize)) / 2; // How many boxes does the radius of this object cover?
       
       for (int dx = -radius; dx < radius; dx++) // For the whole radius in the width
-         if (gridPos.x + dx >= 0 && gridPos.x + dx <GRID_WIDTH) // As long as we're in the map (x)
+         if (gridPos.X + dx >= 0 && gridPos.X + dx <GRID_WIDTH) // As long as we're in the map (x)
             for (int dy = -radius; dy < radius; dy++) // for the whole radius in the y
-               if (gridPos.y + dy >= 0 && gridPos.y + dy < GRID_HEIGHT) // As long as we're in the map (y)
-                  map[(int)gridPos.x + dx][(int)gridPos.y + dy].occupied = true; // Occupy this piece of the map.
+               if (gridPos.Y + dy >= 0 && gridPos.Y + dy < GRID_HEIGHT) // As long as we're in the map (y)
+                  map[(int)gridPos.X + dx][(int)gridPos.Y + dy].occupied = true; // Occupy this piece of the map.
    }
 
    if (mesh == NULL) return;
@@ -265,7 +265,7 @@ void PathJob::insertObstructions(Map * chart, AIMesh *mesh) // insert all object
          for (int y = 0; y < GRID_WIDTH; y++)
          {
             Vector2 translated = fromGridToPosition(Vector2((float)x, (float)y));
-            if (mesh->getY(translated.x, translated.y) < 0.1f) // If there's nothing at this position
+            if (mesh->getY(translated.X, translated.Y) < 0.1f) // If there's nothing at this position
                map[x][y].occupied = true; // This is obstructed
          }
 

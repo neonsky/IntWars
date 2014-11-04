@@ -78,7 +78,7 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 	for (unsigned i = 0; i < fileStream->triangle_count; i++) 
    // Need to find the absolute values.. So we can map it to AIMESH_TEXTURE_SIZExAIMESH_TEXTURE_SIZE instead of 13000x15000
 	{
-      // Triangle low x check
+      // Triangle low X check
 		if (fileStream->triangles[i].Face.v1[0] < lowX)
 			lowX = fileStream->triangles[i].Face.v1[0];
 		if (fileStream->triangles[i].Face.v2[0] < lowX)
@@ -86,7 +86,7 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 		if (fileStream->triangles[i].Face.v3[0] < lowX)
 			lowX = fileStream->triangles[i].Face.v3[0];		
 
-      // Triangle low y check
+      // Triangle low Y check
 		if (fileStream->triangles[i].Face.v1[2] < lowY)
 			lowY = fileStream->triangles[i].Face.v1[2];
 		if (fileStream->triangles[i].Face.v2[2] < lowY)
@@ -94,7 +94,7 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 		if (fileStream->triangles[i].Face.v3[2] < lowY)
 			lowY = fileStream->triangles[i].Face.v3[2];
 
-      // Triangle high x check
+      // Triangle high X check
 		if (fileStream->triangles[i].Face.v1[0] > highX)
 			highX = fileStream->triangles[i].Face.v1[0];
 		if (fileStream->triangles[i].Face.v2[0] > highX)
@@ -102,7 +102,7 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 		if (fileStream->triangles[i].Face.v3[0] > highX)
 			highX = fileStream->triangles[i].Face.v3[0];
 		
-      // Triangle high y check
+      // Triangle high Y check
 		if (fileStream->triangles[i].Face.v1[2] > highY)
 			highY = fileStream->triangles[i].Face.v1[2];
 		if (fileStream->triangles[i].Face.v2[2] > highY)
@@ -125,7 +125,7 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
    {
       highY = 1.0f / (highY - lowY)*height; // We're higher than we're wide, map on width
       highX = highY; // Keep aspect ratio Basically, 1 x should be 1 y.
-      // lowX = 0; // x is already in the middle? ??????
+      // lowX = 0; // X is already in the middle? ??????
    }
 
    for (unsigned i = 0; i <fileStream->triangle_count; i++) // For every triangle
@@ -178,8 +178,8 @@ Vector2 AIMesh::TranslateToTextureCoordinate(Vector2 vector)
 {
    if (loaded)
    {
-      vector.x = (int)((vector.x - lowX)*highX);
-      vector.y = (int)((vector.y - lowY)*highY);
+      vector.X = (int)((vector.X - lowX)*highX);
+      vector.Y = (int)((vector.Y - lowY)*highY);
    }
    return vector;
 }
@@ -188,8 +188,8 @@ Vector2 AIMesh::TranslateToRealCoordinate(Vector2 vector)
 {
    if (loaded)
    {
-      vector.x = (vector.x/highX)+lowX;
-      vector.y = (vector.y/highY)+lowY;
+      vector.X = (vector.X/highX)+lowX;
+      vector.Y = (vector.Y/highY)+lowY;
    }
    return vector;
 }
@@ -197,10 +197,10 @@ Vector2 AIMesh::TranslateToRealCoordinate(Vector2 vector)
 // Blatantly copy the line function
 float AIMesh::castRaySqr(Vector2 origin, Vector2 destination, bool inverseRay)
 {
-   float x1 = origin.x;
-   float y1 = origin.y;
-   float x2 = destination.x;
-   float y2 = destination.y;
+   float x1 = origin.X;
+   float y1 = origin.Y;
+   float x2 = destination.X;
+   float y2 = destination.Y;
 
    if ((x1 < 0) || (y1 < 0) || (x1 >= mapWidth) || (y1 >= mapHeight))
    {
@@ -249,7 +249,7 @@ bool AIMesh::isAnythingBetween(Vector2 a, Vector2 b)
 Vector2 AIMesh::getClosestTerrainExit(Object* a, Vector2 location, bool noForward)
 {
    Vector2 dir = (location - a->getPosition());
-   if (isWalkable(location.x, location.y))
+   if (isWalkable(location.X, location.Y))
       return location;
 
    float distBackwards = castInfiniteRay(location, -dir, true); // Find the first opening firing backwards
@@ -351,13 +351,13 @@ void AIMesh::drawTriangle(Triangle triangle, unsigned width, unsigned height)
          // The start of the Z, U, and V coordinate.
 
          float deltaX = 1.f / (scanlineHighest[y].x - scanlineLowest[y].x);
-         // Interpolation over x (change in x between the two, then reverse it so it's usable as multiplication
+         // Interpolation over X (change in X between the two, then reverse it so it's usable as multiplication
          // in divisions
 
          float deltaZ = (scanlineHighest[y].z - scanlineLowest[y].z) * deltaX;
          float deltaU = (scanlineHighest[y].u - scanlineLowest[y].u) * deltaX;
          float deltaV = (scanlineHighest[y].v - scanlineLowest[y].v) * deltaX;
-         // The interpolation in Z, U and V in respect to the interpolation of x	
+         // The interpolation in Z, U and V in respect to the interpolation of X	
 
          // Sub-texel correction
          int x = (int)scanlineLowest[y].x;

@@ -266,7 +266,7 @@ std::pair<float, float> Champion::getRespawnPosition() {
    }
    
    teamSizeSpawners = teamSpawners.get<sol::table>(to_string(teamSize));
-   return std::make_pair(teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "x"), teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "y"));
+   return std::make_pair(teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "X"), teamSizeSpawners.get<float>("player" + to_string(spawnNumber) + "Y"));
 }
 void Champion::die(Unit* killer) {
    respawnTimer = 5000000 + getStats().getLevel()*2500000;

@@ -32,11 +32,11 @@ void CollisionHandler::init(int divisionsOverWidth)
    {
       for (int x = 0; x < divisionsOverWidth; x++)
       {
-         managedDivisions[y*divisionsOverWidth + x].min.x = x*(width / divisionsOverWidth);
-         managedDivisions[y*divisionsOverWidth + x].min.y = y*(height / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].min.X = x*(width / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].min.Y = y*(height / divisionsOverWidth);
 
-         managedDivisions[y*divisionsOverWidth + x].max.x = (x + 1)*(width / divisionsOverWidth);
-         managedDivisions[y*divisionsOverWidth + x].max.y = (y + 1)*(height / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].max.X = (x + 1)*(width / divisionsOverWidth);
+         managedDivisions[y*divisionsOverWidth + x].max.Y = (y + 1)*(height / divisionsOverWidth);
 
 			managedDivisions[y*divisionsOverWidth + x].objectCount = 0;
       }
@@ -96,16 +96,16 @@ void CollisionHandler::correctDivisions(int pos)
 		//if (o->isMovementUpdated())  // Only check if they moved around.
       {
 			// If they are no longer in this division..
-         if ((o->getPosition().x - o->getCollisionRadius() > curDiv.max.x || o->getPosition().y - o->getCollisionRadius() > curDiv.max.y ||
-            o->getPosition().x + o->getCollisionRadius() < curDiv.min.x || o->getPosition().y + o->getCollisionRadius() < curDiv.min.y))
+         if ((o->getPosition().X - o->getCollisionRadius() > curDiv.max.X || o->getPosition().Y - o->getCollisionRadius() > curDiv.max.Y ||
+            o->getPosition().X + o->getCollisionRadius() < curDiv.min.X || o->getPosition().Y + o->getCollisionRadius() < curDiv.min.Y))
          {
             removeFromDivision(o, pos); // Remove them from it.
             addObject(o); // Reset in what divisions this object is. Probably a useless call as it's being caught by this else if statement below.
          }
 
 			// If they've entered another division, but not left this one yet..
-         else if ((o->getPosition().x + o->getCollisionRadius() > curDiv.max.x || o->getPosition().y + o->getCollisionRadius() > curDiv.max.y ||
-            o->getPosition().x - o->getCollisionRadius() < curDiv.min.x || o->getPosition().y - o->getCollisionRadius() < curDiv.min.y))
+         else if ((o->getPosition().X + o->getCollisionRadius() > curDiv.max.X || o->getPosition().Y + o->getCollisionRadius() > curDiv.max.Y ||
+            o->getPosition().X - o->getCollisionRadius() < curDiv.min.X || o->getPosition().Y - o->getCollisionRadius() < curDiv.min.Y))
          {
             addObject(o); // Reset in what divisions this object is.
          }
@@ -125,8 +125,8 @@ void CollisionHandler::correctUnmanagedDivision()
       //if (o->isMovementUpdated()) // if they moved
       {
 			// If they're inside the map.
-         if ((o->getPosition().x - o->getCollisionRadius() > width || o->getPosition().y - o->getCollisionRadius() > height ||
-            o->getPosition().x + o->getCollisionRadius() < 0 || o->getPosition().y + o->getCollisionRadius() < 0))
+         if ((o->getPosition().X - o->getCollisionRadius() > width || o->getPosition().Y - o->getCollisionRadius() > height ||
+            o->getPosition().X + o->getCollisionRadius() < 0 || o->getPosition().Y + o->getCollisionRadius() < 0))
          {
             removeFromDivision(o, -1);
             addObject(o);
@@ -172,14 +172,14 @@ void CollisionHandler::addObject(Object *object)
       //addUnmanagedObject(object);
    }
 
-   float divX = object->getPosition().x / (float)(width / divisionCount); // Get the division position.
-   float divY = object->getPosition().y / (float)(height / divisionCount);
+   float divX = object->getPosition().X / (float)(width / divisionCount); // Get the division position.
+   float divY = object->getPosition().Y / (float)(height / divisionCount);
 
    int divi = (int)divY*divisionCount + (int)divX;
 
    if (divX < 0 || divX > divisionCount || divY < 0 || divY > divisionCount)  // We're not inside the map! Add to the unmanaged objects.
    {
-      //CORE_ERROR("Object spawned outside of map. (%f, %f)", object->getPosition().x, object->getPosition().y);
+      //CORE_ERROR("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
       //addUnmanagedObject(object);
    }
    else
@@ -188,14 +188,14 @@ void CollisionHandler::addObject(Object *object)
       CollisionDivision curDiv = managedDivisions[divi];
 
       bool a = false, b = false;
-		if (abs(object->getPosition().x - curDiv.max.x) < object->getCollisionRadius()) // Are we in the one to the right?
+		if (abs(object->getPosition().X - curDiv.max.X) < object->getCollisionRadius()) // Are we in the one to the right?
 			addToDivision(object, (int)divX + 1, (int)divY);									  // Add it there too.
-      if (abs(object->getPosition().x - curDiv.min.x) < object->getCollisionRadius()) // Maybe on the left?
+      if (abs(object->getPosition().X - curDiv.min.X) < object->getCollisionRadius()) // Maybe on the left?
          a = true, addToDivision(object, (int)divX - 1, (int)divY);
 
-      if (abs(object->getPosition().y - curDiv.max.y) < object->getCollisionRadius()) // Are we touching below us?
+      if (abs(object->getPosition().Y - curDiv.max.Y) < object->getCollisionRadius()) // Are we touching below us?
          addToDivision(object, (int)divX, (int)divY + 1);									  
-      if (abs(object->getPosition().y - curDiv.min.y) < object->getCollisionRadius()) // Or above?
+      if (abs(object->getPosition().Y - curDiv.min.Y) < object->getCollisionRadius()) // Or above?
          b = true, addToDivision(object, (int)divX, (int)divY - 1);
 
       if (a && b)																			// If we are touching all four, add the left-upper one.
@@ -211,8 +211,8 @@ void CollisionHandler::getDivisions(Object *object, CollisionDivision *divs[], i
    }
 
    divCount = 0; // How many divisions the object is in.
-   float divX = object->getPosition().x / (float)(width / divisionCount);
-   float divY = object->getPosition().y / (float)(height / divisionCount);
+   float divX = object->getPosition().X / (float)(width / divisionCount);
+   float divY = object->getPosition().Y / (float)(height / divisionCount);
 
 	int divi = (int)divY*divisionCount + (int)divX; // Current division index
 
@@ -225,23 +225,23 @@ void CollisionHandler::getDivisions(Object *object, CollisionDivision *divs[], i
 	// Below is same principle from addObject.
    bool a = false, b = false;
    auto curDiv = managedDivisions[divi];
-   if (abs(object->getPosition().x - curDiv.max.x) < object->getCollisionRadius() && divX + 1 >= 0 && divX + 1 < divisionCount)
+   if (abs(object->getPosition().X - curDiv.max.X) < object->getCollisionRadius() && divX + 1 >= 0 && divX + 1 < divisionCount)
    {
       divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
       divCount++;
    }
-   else if (abs(object->getPosition().x - curDiv.min.x) < object->getCollisionRadius() && divX - 1 >= 0 && divX - 1 < divisionCount)
+   else if (abs(object->getPosition().X - curDiv.min.X) < object->getCollisionRadius() && divX - 1 >= 0 && divX - 1 < divisionCount)
    {
       divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX - 1];
       divCount++;
       a = true;
    }
-   if (abs(object->getPosition().y - curDiv.max.y) < object->getCollisionRadius() && divY + 1 >= 0 && divY + 1 < divisionCount)
+   if (abs(object->getPosition().Y - curDiv.max.Y) < object->getCollisionRadius() && divY + 1 >= 0 && divY + 1 < divisionCount)
    {
       divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
       divCount++;
    }
-   else if (abs(object->getPosition().y - curDiv.min.y) < object->getCollisionRadius() && divY - 1 >= 0 && divY - 1 < divisionCount)
+   else if (abs(object->getPosition().Y - curDiv.min.Y) < object->getCollisionRadius() && divY - 1 >= 0 && divY - 1 < divisionCount)
    {
       divs[divCount] = &managedDivisions[(int)divY*divisionCount + (int)divX + 1];
       divCount++;

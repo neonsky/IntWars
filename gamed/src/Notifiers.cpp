@@ -49,8 +49,8 @@ void Game::notifyRemoveBuff(Unit* u, std::string buffName) {
 void Game::notifyTeleport(Unit* u, float _x, float _y) {
    // Can't teleport to this point of the map
    if (!map->isWalkable(_x, _y)) {
-      _x = MovementVector::targetXToNormalFormat(u->getPosition().x);
-      _y = MovementVector::targetYToNormalFormat(u->getPosition().y);
+      _x = MovementVector::targetXToNormalFormat(u->getPosition().X);
+      _y = MovementVector::targetYToNormalFormat(u->getPosition().Y);
    } else {
       u->setPosition(_x, _y);
 
@@ -281,16 +281,16 @@ void Game::notifyDash(Unit* u, float _x, float _y, float dashSpeed) {
    float _z = u->getZ();
 
    /*if (!map->isWalkable(_x, _y)) {
-      _x = u->getPosition().x;
-      _y = u->getPosition().y;
+      _x = u->getPosition().X;
+      _y = u->getPosition().Y;
    }
    else {
       // Relative coordinates to dash towards
       float newX = _x;
       float newY = _y;
       _z -= map->getHeightAtLocation(_x, _y);
-      _x = u->getPosition().x - _x;
-      _y = u->getPosition().y - _y;
+      _x = u->getPosition().X - _x;
+      _y = u->getPosition().Y - _y;
 
       u->setPosition(newX, newY);
    }*/

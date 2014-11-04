@@ -1410,7 +1410,7 @@ class LevelPropSpawn : public BasePacket {
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
             buffer << lp->getX() << lp->getZ() << lp->getY();
-            buffer << 0.f; // Rotation y
+            buffer << 0.f; // Rotation Y
             
             buffer << lp->getDirectionX() << lp->getDirectionZ() << lp->getDirectionY();
             buffer << lp->getUnk1() << lp->getUnk2();
@@ -1431,7 +1431,7 @@ class LevelPropSpawn : public BasePacket {
             buffer << (uint32)0x00000040; // unk
             buffer << (uint8)0; // unk
             buffer << x << z << y;
-            buffer << 0.f; // Rotation y
+            buffer << 0.f; // Rotation Y
             buffer << dirX << dirZ << dirY; // Direction
             buffer << unk1 << unk2;
             buffer << 1.0f << 1.0f << 1.0f; // Scaling
