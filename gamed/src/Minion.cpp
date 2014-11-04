@@ -178,7 +178,7 @@ void Minion::update(int64 diff) {
    
    // Minion reached its temporary destination
    if((waypoints.size() == 1) || (curWaypoint == 2 && ++curConstWaypoint < constWaypoints.size())) {
-      //printf("Minion reached ! Going to %d;%d\n", constWaypoints[curConstWaypoint].x, constWaypoints[curConstWaypoint].y);
+      //CORE_INFO("Minion reached ! Going to %d;%d", constWaypoints[curConstWaypoint].x, constWaypoints[curConstWaypoint].y);
       vector<MovementVector> newWaypoints = { MovementVector(x, y), constWaypoints[curConstWaypoint] };
       setWaypoints(newWaypoints);
    }

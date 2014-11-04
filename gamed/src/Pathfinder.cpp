@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <chrono>
+#include "Logger.h"
 
 Map * Pathfinder::chart = 0;
 auto g_Clock = std::clock();
@@ -20,7 +21,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 
    if ((std::clock() - g_Clock) > 10000 && (successes + oot + empties)>0)
    {
-      std::cout << "Pathfinding successrate: " << (((float)successes / (float)(successes + oot + empties))*(100.0f)) << std::endl;
+		CORE_INFO("Pathfinding successrate: %f", (((float)successes / (float)(successes + oot + empties))*(100.0f)));
    } 
 
    if (chart == 0) CORE_FATAL("Tried to find a path without setting the map.");

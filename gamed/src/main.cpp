@@ -32,22 +32,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, char ** argv) 
 {
-   printf("Yorick %s\n", SERVER_VERSION);
-   puts("Loading RAF files in filearchives/ ..");
+	printf("Yorick %s\n", SERVER_VERSION);
 
-   Logger::instance().setLogFile("../../log.txt");
+	Logger::instance().setLogFile("../../log.html", false, true);
+	CORE_INFO("Loading RAF files in filearchives/.");
    
    std::string basePath = RAFManager::getInstance()->findGameBasePath();
 
    if(!RAFManager::getInstance()->init(basePath + "filearchives")) {
-      puts("ERR : Couldn't load RAF files. Make sure you have a 'filearchives' directory in the server's root directory");
-      puts("This directory is to be taken from RADS/projects/lol_game_client/");
+      CORE_ERROR("Couldn't load RAF files. Make sure you have a 'filearchives' directory in the server's root directory. This directory is to be taken from RADS/projects/lol_game_client/");
       return EXIT_FAILURE;
    }
    
    ItemManager::getInstance()->init();
    
-   puts("Game started");
+   CORE_INFO("Game started");
 
 	Game g;
 	ENetAddress address;
@@ -55,7 +54,7 @@ int main(int argc, char ** argv)
 	address.port = SERVER_PORT;
 
    if (!g.initialize(&address, SERVER_KEY)) {
-      printf("ERR : Couldn't listen on port %d, or invalid key", SERVER_PORT);
+      CORE_ERROR("Couldn't listen on port %d, or invalid key", SERVER_PORT);
       return EXIT_FAILURE;
    }
 

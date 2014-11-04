@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Game.h"
 #include "Packets.h"
+#include "Logger.h"
+#include <stdio.h>
 //#undef min // No, do NOT do this.
 //#define min(a, b)       ((a) < (b) ? (a) : (b))
 
@@ -59,45 +61,49 @@ void Game::registerHandler(bool (Game::*handler)(HANDLE_ARGS), PacketCmd pktcmd,
 void Game::printPacket(const uint8 *buffer, uint32 size)
 {
 #define ppMIN(a, b)       ((a) < (b) ? (a) : (b))
+	char* stringbuffer = new char[size+256]; // 256 bytes for the message around it.
+	memset(stringbuffer, 0, (size + 256 )* sizeof(char));
+
    unsigned int i;
-   printf("Printing with size %u\n", size);
+	sprintf(stringbuffer + strlen(stringbuffer), "Printing packet with size %u\n", size);
    
    for(i = 0; i < size; ++i) {
       if(i != 0&& i%16 == 0) {
          for(unsigned int j = i-16; j < i; ++j) {
          
             if(buffer[j] >= 32 && buffer[j] <= 126)
-               printf("%c", buffer[j]);
-            else
-               printf(".");
+					sprintf(stringbuffer + strlen(stringbuffer), "%c", buffer[j]);
+				else sprintf(stringbuffer + strlen(stringbuffer), ".");
          }
          
-         puts("");
-      
+			sprintf(stringbuffer + strlen(stringbuffer), "");
       }
       
       if(i%16 == 0) {
-         printf("%04d-%04d ", i, ppMIN(i + 15, size - 1));
+			sprintf(stringbuffer + strlen(stringbuffer), "%04d-%04d ", i, ppMIN(i + 15, size - 1));
       }
 
-      printf("%02x ", buffer[i]);
+		sprintf(stringbuffer + strlen(stringbuffer), "%02x ", buffer[i]);
    }
    
    for(i = ((16-i%16)%16); i > 0; --i)
-      printf("   ");
+		sprintf(stringbuffer + strlen(stringbuffer), "   ");
    
    for(i = size- (size%16 == 0 ? 16 : size%16); i < size; ++i) {
       if(buffer[i] >= 32 && buffer[i] <= 126)
-         printf("%c", buffer[i]);
+			sprintf(stringbuffer + strlen(stringbuffer), "%c", buffer[i]);
       else
-         printf(".");
+			sprintf(stringbuffer + strlen(stringbuffer), ".");
    }
    
-   puts("\n");
+	sprintf(stringbuffer + strlen(stringbuffer), "\n");
    for(i = 0; i < size; ++i) {
-      printf("\\x%02x", buffer[i]);
+		sprintf(stringbuffer + strlen(stringbuffer), "\\x%02x", buffer[i]);
    }
-   puts("\n");
+	sprintf(stringbuffer + strlen(stringbuffer), "\n");
+
+	CORE_INFO("%s", stringbuffer);
+	delete[] stringbuffer;
 }
 
 void Game::printLine(uint8 *buf, uint32 len)
@@ -199,7 +205,7 @@ bool Game::handlePacket(ENetPeer *peer, ENetPacket *packet, uint8 channelID)
 	}
 	else
 	{
-		printf("Unhandled OpCode %02X\n", header->cmd);
+		CORE_WARNING("Unhandled OpCode %02X", header->cmd);
 		printPacket(packet->data, packet->dataLength);
 	}
 	return false;	

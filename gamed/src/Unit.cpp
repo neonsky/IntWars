@@ -2,6 +2,7 @@
 #include "Map.h"
 #include "Game.h"
 #include "Turret.h"
+#include "Logger.h"
 #include "Minion.h"
 
 #include <algorithm>
@@ -21,7 +22,7 @@ void Unit::update(int64 diff) {
       try {
          unitScript.lua.get <sol::function> ("onUpdate").call <void> (diff);
       } catch (sol::error e) {
-         printf("%s", e.what());
+         CORE_ERROR("%s", e.what());
       }
    }
 
@@ -117,7 +118,7 @@ void Unit::autoAttackHit(Unit* target) {
       try{
          unitScript.lua.get <sol::function> ("onAutoAttack").call <void> (target);
       }catch(sol::error e){
-         printf("Error callback ondealdamage: \n%s", e.what());
+         CORE_ERROR("Error callback ondealdamage: %s", e.what());
       }
    }
 }
@@ -126,13 +127,13 @@ void Unit::autoAttackHit(Unit* target) {
  * TODO : handle armor, magic resistance [...]
  */
 void Unit::dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source) {
-    //printf("0x%08X deals %f damage to 0x%08X !\n", getNetId(), damage, target->getNetId());
+    //CORE_INFO("0x%08X deals %f damage to 0x%08X !", getNetId(), damage, target->getNetId());
     
    if(unitScript.isLoaded()){
       try{
          /*damage = */ unitScript.lua.get <sol::function> ("onDealDamage").call <void> (target, damage, type, source);
       }catch(sol::error e){
-         printf("Error callback ondealdamage: \n%s", e.what());
+         CORE_ERROR("Error callback ondealdamage: %s", e.what());
       }
    }
     
@@ -229,7 +230,7 @@ void Unit::die(Unit* killer) {
 
       if (cKiller->killDeathCounter < 0){
          cKiller->setChampionGoldFromMinions(cKiller->getChampionGoldFromMinions() + gold);
-         printf("Adding gold form minions to reduce death spree: %f\n", cKiller->getChampionGoldFromMinions());
+         CORE_INFO("Adding gold form minions to reduce death spree: %f", cKiller->getChampionGoldFromMinions());
       }
 
       if (cKiller->getChampionGoldFromMinions() >= 50 && cKiller->killDeathCounter < 0){

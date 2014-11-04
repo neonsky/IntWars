@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "Map.h"
 #include "Vector2.h"
-/*#include <cstdlib>*/
+#include "Logger.h"
 
 #define MANAGED_DIVISION_COUNT 3*3
 #define MAX_COLLISION_OBJECTS 256
@@ -29,7 +29,7 @@ struct CollisionDivision
 	
 	void clear()
 	{
-		for (int i = 0; i < objectCount; i++)
+		for (int i = 0; i < objectCount && i < MAX_COLLISION_OBJECTS; i++)
 		{
 			objects[i] = 0;
 		}

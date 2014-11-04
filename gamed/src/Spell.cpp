@@ -5,6 +5,7 @@
 #include "Champion.h"
 #include "Inibin.h"
 #include "LuaScript.h"
+#include "Logger.h"
 
 
 using namespace std;
@@ -18,7 +19,7 @@ Spell::Spell(Champion* owner, const std::string& spellName, uint8 slot) : owner(
    if(!RAFManager::getInstance()->readFile("DATA/Spells/"+spellName+".inibin", iniFile)) {
       if(!RAFManager::getInstance()->readFile("DATA/Characters/"+owner->getType()+"/Spells/"+spellName+".inibin", iniFile)) {
          if(!RAFManager::getInstance()->readFile("DATA/Characters/"+owner->getType()+"/"+spellName+".inibin", iniFile)) {
-            printf("ERR : couldn't find spell stats for %s\n", spellName.c_str());
+            CORE_ERROR("Couldn't find spell stats for %s", spellName.c_str());
             return;
          }
       }
@@ -142,7 +143,7 @@ void Spell::loadLua(LuaScript& script){
 
    std::string scriptloc = "../../lua/champions/" + owner->getType() + "/" + getStringForSlot() + ".lua"; //lua/championname/(q/w/e/r), example: /lua/Ezreal/q, also for stuff like nidalee cougar they will have diff folders!
 
-   printf("Spell script loc is: %s \n" , scriptloc.c_str());
+   CORE_INFO("Spell script loc is: %s" , scriptloc.c_str());
    
    script.lua.script("package.path = '../../lua/lib/?.lua;' .. package.path"); //automatically load vector lib so scripters dont have to worry about path
    script.lua.set_function("getOwnerX", [this]() { return owner->getX(); });
@@ -262,7 +263,7 @@ void Spell::loadLua(LuaScript& script){
    try{
       script.loadScript(scriptloc); //todo: abstract class that loads a lua file for any lua
      }catch(sol::error e){//lua error? don't crash the whole server
-       printf("Error in spell script:\n%s \n", e.what());
+       CORE_ERROR("Error in spell script: %s", e.what());
    }
 }
 
@@ -272,12 +273,12 @@ void Spell::doLua(){
     
    loadLua(script); //comment this line for no reload on the fly, better performance
 
-   printf("Spell from slot %i\n", getSlot());
+   CORE_INFO("Spell from slot %i", getSlot());
 
    try{
       script.lua.script("finishCasting()");
    }catch(sol::error e){//lua error? don't crash the whole server
-      printf("%s", e.what());
+      CORE_ERROR("%s", e.what());
    }
 }
 
@@ -344,6 +345,6 @@ void Spell::applyEffects(Unit* u, Projectile* p) {
    try{
       script.lua.script("applyEffects()");
    }catch(sol::error e){//lua error? don't crash the whole server
-      printf("%s\n", e.what());
+      CORE_ERROR("%s", e.what());
    }
 }

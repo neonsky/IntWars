@@ -168,7 +168,7 @@ void CollisionHandler::addObject(Object *object)
 {
 	if (divisionCount == -1) // If we have not initialised..
    {
-      //printf("Added an object before we initialised the CollisionHandler!");
+      //CORE_ERROR("Added an object before we initialised the CollisionHandler!");
       //addUnmanagedObject(object);
    }
 
@@ -179,7 +179,7 @@ void CollisionHandler::addObject(Object *object)
 
    if (divX < 0 || divX > divisionCount || divY < 0 || divY > divisionCount)  // We're not inside the map! Add to the unmanaged objects.
    {
-      //printf("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
+      //CORE_ERROR("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
       //addUnmanagedObject(object);
    }
    else

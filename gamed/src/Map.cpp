@@ -3,6 +3,7 @@
 #include "Unit.h"
 #include "CollisionHandler.h"
 #include "Minion.h"
+#include "Logger.h"
 
 Map::Map(Game* game, uint64 firstSpawnTime, uint64 spawnInterval, uint64 firstGoldTime, bool hasFountainHeal = false) : game(game), waveNumber(0), firstSpawnTime(firstSpawnTime), firstGoldTime(firstGoldTime), spawnInterval(spawnInterval), gameTime(0), nextSpawnTime(firstSpawnTime), nextSyncTime(10 * 1000000), firstBlood(true), killReduction(true), hasFountainHeal(hasFountainHeal)
 {
@@ -17,7 +18,7 @@ Map::~Map()
 }
 
 void Map::update(int64 diff) {
-   //collisionHandler->update(diff);
+   collisionHandler->update(diff);
 
    for(auto kv = objects.begin(); kv != objects.end();) {
 	   if (kv->second->isToRemove() && kv->second->getAttackerCount() == 0) 

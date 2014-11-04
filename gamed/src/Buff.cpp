@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Buff.h"
 #include "LuaScript.h"
+#include "Logger.h"
 
 
 void Buff::update(int64 diff){
@@ -26,7 +27,7 @@ Buff::Buff(std::string buffName, float dur, BuffType type, Unit* u, Unit* uu)  :
    //init();
    if(name != ""){ // empty name = no buff icon
    std::string scriptloc = "../../lua/buffs/" + name + ".lua";
-	printf("Loading %s\n", scriptloc.c_str());
+	CORE_INFO("Loading %s", scriptloc.c_str());
    try{
    
     buffScript = new LuaScript(true);//fix
@@ -34,17 +35,17 @@ Buff::Buff(std::string buffName, float dur, BuffType type, Unit* u, Unit* uu)  :
     buffScript->loadScript(scriptloc);
     buffScript->setLoaded(true);
     
-    printf("Loaded buff lua script\n");
+    CORE_INFO("Loaded buff lua script");
     buffScript->lua.set_function("getAttachedUnit", [this]() { 
       return attachedTo;
    });
    
    buffScript->lua.set_function("dealMagicDamage", [this](Unit* target, float amount) { attacker->dealDamageTo(target,amount,DAMAGE_TYPE_MAGICAL,DAMAGE_SOURCE_SPELL); });
 
-    printf("added lua buff script functions\n");
+    CORE_INFO("added lua buff script functions");
    }catch(sol::error e){//lua error? don't crash the whole server
       buffScript->setLoaded(false);
-      printf("Lua buff load error: \n%s\n", e.what());
+      CORE_ERROR("Lua buff load error: %s", e.what());
    }
    
    

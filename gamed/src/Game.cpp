@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Game.h"
 #include "LuaScript.h"
 #include "SummonersRift.h"
+#include "Logger.h"
 
 #define REFRESH_RATE 16666 // 60 fps
 
@@ -151,7 +152,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
            players.push_back(player);
    
         } catch(sol::error e) {
-            //printf("Error loading champion: \n%s", e.what());
+            //CORE_ERROR("Error loading champion: %s", e.what());
             break;  
         }
     }
@@ -186,7 +187,7 @@ void Game::netLoop()
          switch (event.type)
          {
          case ENET_EVENT_TYPE_CONNECT:
-            //Logging->writeLine("A new client connected: %i.%i.%i.%i:%i \n", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
+            //Logging->writeLine("A new client connected: %i.%i.%i.%i:%i", event.peer->address.host & 0xFF, (event.peer->address.host >> 8) & 0xFF, (event.peer->address.host >> 16) & 0xFF, (event.peer->address.host >> 24) & 0xFF, event.peer->address.port);
 
             /* Set some defaults */
             event.peer->mtu = PEER_MTU;

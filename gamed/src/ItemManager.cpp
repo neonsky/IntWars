@@ -1,6 +1,7 @@
 #include "ItemManager.h"
 #include "RAFManager.h"
 #include "Inibin.h"
+#include "Logger.h"
 
 #include <string>
 
@@ -60,7 +61,7 @@ void ItemManager::init() {
       itemTemplates[i] = new ItemTemplate(i, maxStack, price, sellBack, trinket, statMods, recipes);
    }
    
-   printf("Loaded %lu items\n", itemTemplates.size());
+   CORE_INFO("Loaded %lu items", itemTemplates.size());
 }
 
 const ItemTemplate* ItemManager::getItemTemplateById(uint32 id) {

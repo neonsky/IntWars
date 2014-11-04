@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ItemManager.h"
 #include "ChatBox.h"
 #include "LuaScript.h"
+#include "Logger.h"
 
 #include <vector>
 #include <string>
@@ -46,7 +47,7 @@ bool Game::handleKeyCheck(ENetPeer *peer, ENetPacket *packet) {
       if(player->userId == userId) {
 
          if (player->getPeer() != NULL) {
-            printf("WARN: Ignoring new player %d, already connected!\n", userId);
+            CORE_WARNING("Ignoring new player %d, already connected!", userId);
             return false;
          }
 
@@ -75,21 +76,21 @@ bool Game::handleGameNumber(ENetPeer *peer, ENetPacket *packet) {
 
 bool Game::handleSynch(ENetPeer *peer, ENetPacket *packet) {
    SynchVersion *version = reinterpret_cast<SynchVersion *>(packet->data);
-   //Logging->writeLine("Client version: %s\n", version->version);
+   //Logging->writeLine("Client version: %s", version->version);
    //Gets the map from the lua configuration file.
    LuaScript script(false);
    script.loadScript("../../lua/config.lua");
    sol::table config = script.getTable("game");
    int mapId = config.get<int>("map");
-   printf("Current map: %i\n", mapId);
+   CORE_INFO("Current map: %i", mapId);
    
    bool versionMatch = true;
    // Version might be an invalid value, currently it trusts the client
    if (strncmp(version->getVersion(), GAME_VERSION, 256) != 0) {
       versionMatch = false;
-      printf("Client %s does not match Server %s\n", version->getVersion(), GAME_VERSION);
+      CORE_WARNING("Client %s does not match Server %s", version->getVersion(), GAME_VERSION);
    } else {
-      printf("Accepted client version (%s)\n", version->getVersion());
+      CORE_INFO("Accepted client version (%s)", version->getVersion());
    }
    
    for(ClientInfo* player : players) {
@@ -130,7 +131,7 @@ bool Game::handleMap(ENetPeer *peer, ENetPacket *packet) {
 bool Game::handleSpawn(ENetPeer *peer, ENetPacket *packet) {
    StatePacket2 start(PKT_S2C_StartSpawn);
    bool p1 = sendPacket(peer, reinterpret_cast<uint8 *>(&start), sizeof(StatePacket2), CHL_S2C);
-   printf("Spawning map\r\n");
+   CORE_INFO("Spawning map");
 
    int playerId = 0;
    ClientInfo* playerInfo = 0;
@@ -364,11 +365,11 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
           vMoves.at(i).y = y;
       }
 
-      printf("Stopped at x:%f , y: %f\n", x,y);
+      CORE_INFO("Stopped at x:%f , y: %f", x,y);
       break;
    }
    case EMOTE:
-      //Logging->writeLine("Emotion\n");
+      //Logging->writeLine("Emotion");
       return true;
    case ATTACKMOVE:
       peerInfo(peer)->getChampion()->setMoveOrder(MOVE_ORDER_ATTACKMOVE);
@@ -398,7 +399,7 @@ bool Game::handleLoadPing(ENetPeer *peer, ENetPacket *packet) {
    memcpy(&response, packet->data, sizeof(PingLoadInfo));
    response.header.cmd = PKT_S2C_Ping_Load_Info;
    response.userId = peerInfo(peer)->userId;
-   //Logging->writeLine("loaded: %f, ping: %f, %f\n", loadInfo->loaded, loadInfo->ping, loadInfo->f3);
+   //Logging->writeLine("loaded: %f, ping: %f, %f", loadInfo->loaded, loadInfo->ping, loadInfo->f3);
    return broadcastPacket(reinterpret_cast<uint8 *>(&response), sizeof(PingLoadInfo), CHL_LOW_PRIORITY, UNRELIABLE);
 }
 
@@ -409,7 +410,7 @@ bool Game::handleQueryStatus(HANDLE_ARGS) {
 
 bool Game::handleClick(HANDLE_ARGS) {
    Click *click = reinterpret_cast<Click *>(packet->data);
-   printf("Object %X clicked on %X\n", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
+   CORE_INFO("Object %X clicked on %X", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
 
    return true;
 }
@@ -419,12 +420,12 @@ bool Game::handleCastSpell(HANDLE_ARGS) {
 
    // There are some bits triggering this
    if (spell->spellSlotType & 0x0F > 0) {
-      printf("Summoner Spell Cast\n");
-      printf("Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+      CORE_INFO("Summoner Spell Cast");
+      CORE_INFO("Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
       return true;
    }
 
-   printf("Spell Cast : Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X\n", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   CORE_INFO("Spell Cast : Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    uint32 futureProjNetId = GetNewNetID();
    uint32 spellNetId = GetNewNetID();
@@ -481,7 +482,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[2])+1]);
 
-         printf("Setting speed to %f\n", data);
+         CORE_INFO("Setting speed to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setMovementSpeed(data);
          return true;
@@ -505,7 +506,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
 
-         printf("Setting experience to %f\n", data);
+         CORE_INFO("Setting experience to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setExp(data);
          return true;
@@ -516,7 +517,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
 
-         printf("Setting AP to %f\n", data);
+         CORE_INFO("Setting AP to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setBonusApFlat(data);
          return true;
@@ -527,7 +528,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[5])+1]);
 
-         printf("Setting AD to %f\n", data);
+         CORE_INFO("Setting AD to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setBonusAdFlat(data);
          return true;
@@ -538,7 +539,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[7])+1]);
 
-         printf("Setting Mana to %f\n", data);
+         CORE_INFO("Setting Mana to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setCurrentMana(data);
          peerInfo(peer)->getChampion()->getStats().setMaxMana(data);
@@ -556,7 +557,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       if(strncmp(message->getMessage(), cmd[11], strlen(cmd[11])) == 0) {
          float data = (float)atoi(&message->getMessage()[strlen(cmd[11])+1]);
 
-         printf("Setting size to %f\n", data);
+         CORE_INFO("Setting size to %f", data);
 
          peerInfo(peer)->getChampion()->getStats().setSize(data);
          return true;
@@ -596,7 +597,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
       
        // coords
       if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
-         printf("At %f;%f\n", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
+         CORE_INFO("At %f;%f", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
          debugMsg << "At Coords - X:" << peerInfo(peer)->getChampion()->getX() << " Y:" << peerInfo(peer)->getChampion()->getY() << " Z:" << peerInfo(peer)->getChampion()->getZ();
          notifyDebugMessage(debugMsg.str());
          return true;
@@ -627,7 +628,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
    case CMT_TEAM:
       return broadcastPacketTeam(peerInfo(peer)->getTeam(), packet->data, packet->dataLength, CHL_COMMUNICATION);
    default:
-      //Logging->errorLine("Unknown ChatMessageType\n");
+      //Logging->errorLine("Unknown ChatMessageType");
       return sendPacket(peer, packet->data, packet->dataLength, CHL_COMMUNICATION); 
    }
    
@@ -774,7 +775,7 @@ bool Game::handleDisconnect(ENetPeer* peer) {
       // TODO: Handle disconnect
       ClientInfo* clientInfo = peerInfo(peer);
 
-      printf("Player %d disconnected\n", clientInfo->userId);
+      CORE_INFO("Player %d disconnected", clientInfo->userId);
    }
    return true;
 }
@@ -784,9 +785,9 @@ bool Game::handleHeartBeat(HANDLE_ARGS) {
 
    float diff = heartbeat->ackTime - heartbeat->receiveTime;
    if (heartbeat->receiveTime > heartbeat->ackTime) {
-      printf("Player %d sent an invalid heartbeat - Timestamp error (diff: %.f)\n", peerInfo(peer)->userId, diff);
+      CORE_WARNING("Player %d sent an invalid heartbeat - Timestamp error (diff: %.f)", peerInfo(peer)->userId, diff);
    } else {
-      printf("Player %d sent heartbeat (diff: %.f)\n", peerInfo(peer)->userId, diff);
+      CORE_INFO("Player %d sent heartbeat (diff: %.f)", peerInfo(peer)->userId, diff);
    }
 
    return true;

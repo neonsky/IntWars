@@ -49,7 +49,7 @@ bool RAFManager::init(const string& rootDirectory) {
       tinydir_close(&subDir);
    }
    
-   printf("Loaded %lu RAF files\n", files.size());
+   CORE_INFO("Loaded %lu RAF files", files.size());
 
    tinydir_close(&dir);
    
@@ -68,7 +68,7 @@ bool RAFManager::readFile(const std::string& path, vector<unsigned char>& toFill
 }
 std::string RAFManager::findGameBasePath()
 {
-	printf("Searching for LoL base path...\n");
+	//CORE_INFO("Searching for LoL base path...");
 #ifdef _WIN32
 	HKEY hKey;
 	std::vector<string> strKeyPathCU, strKeyPathLM;
@@ -91,19 +91,19 @@ std::string RAFManager::findGameBasePath()
    {
       if (RegOpenKeyExA(HKEY_CLASSES_ROOT, strKeyPathCU[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot open key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot open key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
       if (RegQueryValueExA(hKey, strKeyName.c_str(), NULL, &dwValueType, (LPBYTE)byteValue, &dwValueSize) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot read key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot read key HKEY_CLASSES_ROOT '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
       string sValue(byteValue);
       sValue += "/projects/lol_game_client/";
-      printf("Found base path in %s\n", sValue.c_str());
+      CORE_INFO("Found base path in %s", sValue.c_str());
 
       return sValue;
    }
@@ -113,19 +113,19 @@ std::string RAFManager::findGameBasePath()
    {
       if (RegOpenKeyExA(HKEY_CURRENT_USER, strKeyPathCU[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot open key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot open key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
       if (RegQueryValueExA(hKey, strKeyName.c_str(), NULL, &dwValueType, (LPBYTE)byteValue, &dwValueSize) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot read key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot read key HKEY_CURRENT_USER '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
       string sValue(byteValue);
       sValue += "/projects/lol_game_client/";
-      printf("Found base path in %s\n", sValue.c_str());
+      CORE_INFO("Found base path in %s", sValue.c_str());
 
       return sValue;
    }
@@ -136,24 +136,24 @@ std::string RAFManager::findGameBasePath()
    {
       if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, strKeyPathLM[i].c_str(), 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS)
       {
-         CORE_WARNING("Cannot open key HKEY_LOCAL_MACHINE '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot open key HKEY_LOCAL_MACHINE '%s'", strKeyPathCU[i].c_str());
          continue;
       }
 
 		if( RegQueryValueExA(hKey, strKeyName.c_str(), NULL, &dwValueType, (LPBYTE)byteValue, &dwValueSize) != ERROR_SUCCESS )
       {
-         CORE_WARNING("Cannot read key HKEY_LOCAL_MACHINE '%s'", strKeyPathCU[i].c_str());
+         //CORE_WARNING("Cannot read key HKEY_LOCAL_MACHINE '%s'", strKeyPathCU[i].c_str());
 			continue;
 		}
 
 		std::string sValue(byteValue);
 		sValue += "/projects/lol_game_client/";
 
-		printf("Found base path in %s\n",sValue.c_str());
+		CORE_INFO("Found base path in %s",sValue.c_str());
 		return sValue;
 	}
 
-	printf("Couldnt find League of Legends game path or unable to read Registry keys\n");
+	CORE_ERROR("Couldnt find League of Legends game path or unable to read Registry keys");
 	return "";
 
 #else

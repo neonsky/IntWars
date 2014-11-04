@@ -1,5 +1,6 @@
 #include "Fountain.h"
 #include "Map.h"
+#include "Logger.h"
 
 void Fountain::setHealLocations(Map* map){
    for (int i = 0; i < NUM_SIDES; i++)
@@ -22,7 +23,7 @@ void Fountain::healChampions(Map* map, long long diff) {
                }
                else if (HP < MaxHP) {
                   c->getStats().setCurrentHealth(MaxHP);
-                  puts("Fully healed at fountain");
+                  CORE_INFO("Fully healed at fountain");
                }
             }
          }

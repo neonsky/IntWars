@@ -14,8 +14,10 @@ public:
     }
 
     ~Logger();
-
-    void setLogFile(const char* filename);
+	 
+	 static const std::string CurrentDateTime();
+	 static const std::string CurrentTime();
+	 void setLogFile(const char* filename, bool isPlainText = false, bool showOnScreen = false);
 
     void log(const std::string& tag, const char* funcName, const char* sourceFile, 
         unsigned int lineNum, const std::string& fmt, ...);
@@ -36,13 +38,18 @@ private:
     Logger(const Logger&);
     Logger& operator=(const Logger&);
 
-    void fillOutputBuffer(std::string& outputBuffer,
-            const std::string& tag, const std::string& msg,
-          const char* funcName, const char* sourceFile, unsigned int lineNum);
+	 void fillOutputBuffer(std::string& outputBuffer,
+		 const std::string& tag, const std::string& msg,
+		 const char* funcName, const char* sourceFile, unsigned int lineNum);
+	 void fillFileBuffer(std::string& outputBuffer,
+		 const std::string& tag, const std::string& msg,
+		 const char* funcName, const char* sourceFile, unsigned int lineNum);
 
     inline FILE* loadFileStream(FILE* stream, const char* filename);
 
     FILE* m_pLogFile;
+	 bool isHTML = false;
+	 bool printToScreen = false;
 };
 
 
@@ -112,16 +119,16 @@ private:
 
 #define CORE_DEBUG(...) \
     do \
-    { \
-        Logger::instance().log("DEBUG", NULL, NULL, 0, __VA_ARGS__); \
+	 { \
+        Logger::instance().log("DEBUG", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
 
 #define CORE_LOG(tag, ...) \
     do \
-    { \
-        Logger::instance().log(tag, NULL, NULL, 0, __VA_ARGS__); \
+	 { \
+        Logger::instance().log(tag, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); \
         Logger::instance().flush(); \
     } \
     while(0) \
@@ -174,8 +181,8 @@ private:
 
 #define CORE_INFO(...) \
     do \
-    { \
-        Logger::instance().log("INFO", NULL, NULL, 0, __VA_ARGS__); \
+	 { \
+        Logger::instance().log("INFO", __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); \
     } \
     while(0) \
 

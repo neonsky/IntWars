@@ -60,11 +60,11 @@ bool AIMesh::load(std::string inputFile)
 
       //writeFile(AIMESH_TEXTURE_SIZE, AIMESH_TEXTURE_SIZE);
 
-      std::cout << "Opened AIMesh file for this map." << std::endl;
+		CORE_INFO("Opened AIMesh file for this map.");
       loaded = true;
       return true;
    }
-   std::cout << "Failed opening AIMesh file for this map." << std::endl;
+   CORE_INFO("Failed opening AIMesh file for this map.");
    return false;
 }
 

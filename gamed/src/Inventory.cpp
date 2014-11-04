@@ -1,6 +1,7 @@
 #include "Inventory.h"
 #include "stdafx.h"
 #include "ItemManager.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ const ItemInstance* Inventory::addItem(const ItemTemplate* itemTemplate) {
       return 0;
    }
    
-   printf("Adding item %d to slot %d\n", itemTemplate->getId(), slot);
+   CORE_INFO("Adding item %d to slot %d", itemTemplate->getId(), slot);
    items[slot] = new ItemInstance(itemTemplate, slot, 1);
    
    return items[slot];

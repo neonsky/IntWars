@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Game.h"
 #include "LuaScript.h"
+#include "Logger.h"
 #include <sstream>
 #include <algorithm>
 
@@ -15,7 +16,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
 
    std::vector<unsigned char> iniFile;
    if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/"+type+".inibin", iniFile)) {
-      printf("ERR : couldn't find champion stats for %s\n", type.c_str());
+      CORE_ERROR("couldn't find champion stats for %s", type.c_str());
       return;
    }
    
@@ -53,7 +54,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
    iniFile.clear();
    if(!RAFManager::getInstance()->readFile("DATA/Characters/"+type+"/Spells/"+type+"BasicAttack.inibin", iniFile)) {
       if(!RAFManager::getInstance()->readFile("DATA/Spells/"+type+"BasicAttack.inibin", iniFile)) {
-         printf("ERR : couldn't find champion auto-attack data for %s\n", type.c_str());
+         CORE_ERROR("Couldn't find champion auto-attack data for %s", type.c_str());
          return;
       }
    }
@@ -64,7 +65,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
    autoAttackProjectileSpeed = autoAttack.getFloatValue("SpellData", "MissileSpeed");
    
    std::string scriptloc = "../../lua/champions/" + this->getType() + "/Passive.lua";
-	printf("Loading %s\n", scriptloc.c_str());
+	CORE_INFO("Loading %s", scriptloc.c_str());
    try{
     unitScript = LuaScript(true);//fix
     
@@ -85,7 +86,7 @@ Champion::Champion(const std::string& type, Map* map, uint32 id, uint32 playerId
 
    // unitScript.lua.set ("me", this);
    }catch(sol::error e){//lua error? don't crash the whole server
-      printf("Champion passive load error: \n%s\n", e.what());
+      CORE_ERROR("Champion passive load error: %s", e.what());
    }
 }
 
@@ -152,7 +153,7 @@ void Champion::update(int64 diff) {
 
    if(!stats->isGeneratingGold() && map->getGameTime() >= map->getFirstGoldTime()) {
    		stats->setGeneratingGold(true);
-   		puts("Generating Gold!");
+   		CORE_INFO("Generating Gold!");
    }
 
    if (respawnTimer > 0) {
@@ -209,7 +210,7 @@ uint32 Champion::getChampionHash() {
 }
 
 void Champion::levelUp() {
-   printf("Champion %s Levelup to %d\n", getType().c_str(), getStats().getLevel()+1);
+   CORE_INFO("Champion %s Levelup to %d", getType().c_str(), getStats().getLevel()+1);
    getStats().levelUp();
    ++skillPoints;
 }
@@ -245,13 +246,13 @@ std::pair<float, float> Champion::getRespawnPosition() {
 
    }
 
-   //printf("player position in spawn list: %s", to_string(spawnNumber).c_str());
+   //CORE_INFO("player position in spawn list: %s", to_string(spawnNumber).c_str());
    LuaScript mapScript(false);
    std::ostringstream mapPath;
    mapPath << "../../lua/maps/map" << mapId << ".lua";
    mapScript.loadScript(mapPath.str());
-   //printf("Map script: %s \n", mapPath.str().c_str());
-   //printf(playerTeam.c_str());
+   //CORE_INFO("Map script: %s", mapPath.str().c_str());
+   //CORE_INFO(playerTeam.c_str());
    sol::table teamSizeSpawners;
    sol::table teamSpawners;
    int teamSize = getTeamSize();
@@ -261,7 +262,7 @@ std::pair<float, float> Champion::getRespawnPosition() {
 
    }
    catch (sol::error e) {
-      printf("Error loading champion for \n%s\n", e.what());
+      CORE_INFO("Error loading champion for %s", e.what());
    }
    
    teamSizeSpawners = teamSpawners.get<sol::table>(to_string(teamSize));
@@ -275,7 +276,7 @@ void Champion::die(Unit* killer) {
    
 	if(!cKiller && this->championHitFlagTimer > 0){
       cKiller = dynamic_cast<Champion*>(map->getObjectById(this->playerHitId));
-      printf("Killed by turret, minion or monster, but still  give gold to the enemy.\n");
+      CORE_INFO("Killed by turret, minion or monster, but still  give gold to the enemy.");
    }
    
    if (!cKiller) {
@@ -286,7 +287,7 @@ void Champion::die(Unit* killer) {
    cKiller->setChampionGoldFromMinions(0);
    
    float gold = map->getGoldFor(this);
-   printf("Before: getGoldFromChamp: %f\n Killer: %i\n Victim: %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
+   CORE_INFO("Before: getGoldFromChamp: %f Killer: %i Victim: %i", gold, cKiller->killDeathCounter,this->killDeathCounter);
    
    if(cKiller->killDeathCounter < 0){
       cKiller->killDeathCounter = 0;
@@ -311,7 +312,7 @@ void Champion::die(Unit* killer) {
     
    if(map->getKillReduction() && !map->getFirstBlood()){
       gold -= gold*0.25f;
-      printf("Still some minutes for full gold reward on champion kills\n");
+      //CORE_INFO("Still some minutes for full gold reward on champion kills");
    }
    
    if(map->getFirstBlood()){
@@ -324,7 +325,7 @@ void Champion::die(Unit* killer) {
 	cKiller->getStats().setGold(cKiller->getStats().getGold() + gold);
 	map->getGame()->notifyAddGold(cKiller, this, gold);
    
-   printf("After: getGoldFromChamp: %f\n Killer: %i\n Victim: %i\n", gold, cKiller->killDeathCounter,this->killDeathCounter);
+   //CORE_INFO("After: getGoldFromChamp: %f Killer: %i Victim: %i", gold, cKiller->killDeathCounter,this->killDeathCounter);
    
    map->stopTargeting(this);
 }
@@ -340,7 +341,7 @@ void Champion::dealDamageTo(Unit* target, float damage, DamageType type, DamageS
    
    cTarget->setChampionHitFlagTimer(15*1000000); //15 seconds timer, so when you get executed the last enemy champion who hit you gets the gold
    cTarget->playerHitId = this->id;
-   printf("15 second execution timer on you. Do not get killed by a minion, turret or monster!\n");
+   //CORE_INFO("15 second execution timer on you. Do not get killed by a minion, turret or monster!");
 }
 
 
@@ -369,7 +370,7 @@ int Champion::getTeamSize(){
          }
       }
       catch (sol::error e) {
-         // printf("Error loading champion for %i: \n%s\n", i, e.what());
+         // CORE_INFO("Error loading champion for %i: %s", i, e.what());
          break;
       }
    }
@@ -389,10 +390,10 @@ void Champion::onCollision(Object *collider)
 {
    if (collider == 0)
    {
-      //std::cout << "I bumped into a wall!\n";
+      //CORE_INFO("I bumped into a wall!");
    }
    else
    {
-      //std::cout << "I bumped into someone else!\n";
+      //CORE_INFO("I bumped into someone else!");
    }
 }

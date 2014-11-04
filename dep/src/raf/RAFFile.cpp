@@ -1,6 +1,7 @@
 #include "RAFFile.h"
 #include <stdio.h>
 #include "miniz.h"
+#include "Logger.h"
 
 #define BUF_SIZE 1024*1024
 
@@ -91,7 +92,7 @@ bool RAFFile::readFile(const std::string& path, vector<unsigned char>& toFill) {
    
    if (inflateInit(&stream))
    {
-      printf("inflateInit() failed!\n");
+      CORE_ERROR("inflateInit() failed!\n");
       return false;
    }
 
@@ -113,14 +114,14 @@ bool RAFFile::readFile(const std::string& path, vector<unsigned char>& toFill) {
       
       if (status != Z_OK)
       {
-         printf("inflate() failed with status %i!\n", status);
+         CORE_ERROR("inflate() failed with status %i!\n", status);
          return false;
       }
    }
 
     if (inflateEnd(&stream) != Z_OK)
     {
-      printf("inflateEnd() failed!\n");
+      CORE_ERROR("inflateEnd() failed!\n");
       return false;
     }
    

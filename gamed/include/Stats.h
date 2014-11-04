@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "common.h"
+#include "Logger.h"
 
 enum FieldMaskOne : uint32 {
     FM1_Gold =          0x00000001,
@@ -234,7 +235,7 @@ public:
     }
 
     virtual float getMovementSpeed() const {
-        //  printf("Movement speed with buffs %f \n", getMovementSpeedPercentageModifier() * getStat(MM_Four, FM4_Speed));
+        //  CORE_INFO("Movement speed with buffs %f", getMovementSpeedPercentageModifier() * getStat(MM_Four, FM4_Speed));
         return getStat(MM_Four, FM4_Speed);
     }
 
