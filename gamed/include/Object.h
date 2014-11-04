@@ -30,7 +30,7 @@ struct MovementVector {
     MovementVector(int16 x, int16 y) : x(x), y(y) { }
     MovementVector(float x, float y) : x(targetXToNormalFormat(x)), y(targetYToNormalFormat(y)) { }
 	 Target* toTarget() { return new Target(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
-	 //operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
+	 operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
     
     static int16 targetXToNormalFormat(float _x){
 		 return (int16)(round(_x) - MAP_WIDTH) / 2;

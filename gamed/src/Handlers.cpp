@@ -336,7 +336,7 @@ std::vector<Vector2> readWaypoints(uint8 *buffer, int coordCount) {
             lastCoord.y = *(short *)&buffer[nPos];
             nPos += 2;
         }
-        vMoves.push_back(Vector2(lastCoord.x, lastCoord.y));
+        vMoves.push_back(lastCoord);
     }
     return vMoves;
 }
@@ -357,8 +357,8 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
        //TODO anticheat, currently it trusts client 100%
        
       peerInfo(peer)->getChampion()->setPosition(request->x, request->y);
-      /*float x = ((request->x) - MAP_WIDTH)/2;
-      float y = ((request->y) - MAP_HEIGHT)/2;*/
+      float x = ((request->x) - MAP_WIDTH)/2;
+      float y = ((request->y) - MAP_HEIGHT)/2;
       
       for(int i=0;i<vMoves.size(); i++)
 		{
