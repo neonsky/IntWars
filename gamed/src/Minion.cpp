@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<MovementVector>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, 1100), type(type), spawnPosition(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
+Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const vector<Vector2>& constWaypoints) : Unit(map, id, "", new MinionStats(), 40, 0, 0, 1100), type(type), spawnPosition(position), constWaypoints(constWaypoints), curConstWaypoint(0) {
    switch (spawnPosition) {
    case SPAWN_BLUE_TOP:
       setSide(0);
@@ -89,12 +89,12 @@ Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition po
    stats->setBaseAttackSpeed(0.625f);
    stats->setAttackSpeedMultiplier(1.0f);
    
-   vector<MovementVector> newWaypoints;
+   vector<Vector2> newWaypoints;
    
    if(constWaypoints.size() > 0) {
       newWaypoints = { constWaypoints[0], constWaypoints[0] };
    } else {
-      newWaypoints = { MovementVector(x, y), MovementVector(x, y) };
+      newWaypoints = { Vector2(x, y), Vector2(x, y) };
    }
    
    setWaypoints(newWaypoints);
@@ -179,7 +179,7 @@ void Minion::update(int64 diff) {
    // Minion reached its temporary destination
    if((waypoints.size() == 1) || (curWaypoint == 2 && ++curConstWaypoint < constWaypoints.size())) {
       //CORE_INFO("Minion reached ! Going to %d;%d", constWaypoints[curConstWaypoint].x, constWaypoints[curConstWaypoint].y);
-      vector<MovementVector> newWaypoints = { MovementVector(x, y), constWaypoints[curConstWaypoint] };
+      vector<Vector2> newWaypoints = { Vector2(x, y), constWaypoints[curConstWaypoint] };
       setWaypoints(newWaypoints);
    }
 }

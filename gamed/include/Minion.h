@@ -29,10 +29,10 @@ protected:
    /**
     * Const waypoints that define the minion's route
     */
-   const std::vector<MovementVector> constWaypoints;
+   const std::vector<Vector2> constWaypoints;
    int curConstWaypoint;
 public:
-   Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const std::vector<MovementVector>& constWaypoints = std::vector<MovementVector>());
+   Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition position, const std::vector<Vector2>& constWaypoints = std::vector<Vector2>());
    uint32 getSpawnPosition() const { return spawnPosition; }
    uint32 getType() const { return type; }
    

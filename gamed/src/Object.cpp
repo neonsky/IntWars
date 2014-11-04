@@ -72,7 +72,7 @@ void Object::Move(int64 diff) {
       } else if(++curWaypoint >= waypoints.size()) {
          setTarget(0);
       } else {
-         setTarget(waypoints[curWaypoint].toTarget());
+         setTarget(new Target(waypoints[curWaypoint]));
       }
    }
 }
@@ -81,17 +81,17 @@ void Object::update(int64 diff) {
    Move(diff);
 }
 
-void Object::setWaypoints(const std::vector<MovementVector>& newWaypoints) {
+void Object::setWaypoints(const std::vector<Vector2>& newWaypoints) {
    waypoints = newWaypoints;
    
-   setPosition(2.0f * waypoints[0].x + MAP_WIDTH, 2.0f * waypoints[0].y + MAP_HEIGHT);
+   setPosition(waypoints[0].X, waypoints[0].Y);
    movementUpdated = true;
    if(waypoints.size() == 1) {
       setTarget(0);
       return;
    }
    
-   setTarget(waypoints[1].toTarget());
+   setTarget(new Target(waypoints[1]));
    curWaypoint = 1;
 }
 

@@ -316,12 +316,12 @@ inline bool GetBitmaskValue(uint8 mask[], int pos) {
 
 #include <vector>
 
-std::vector<MovementVector> readWaypoints(uint8 *buffer, int coordCount) {
+std::vector<Vector2> readWaypoints(uint8 *buffer, int coordCount) {
     unsigned int nPos = (coordCount + 5) / 8;
     if(coordCount % 2)
     { nPos++; }
     int vectorCount = coordCount / 2;
-    std::vector<MovementVector> vMoves;
+    std::vector<Vector2> vMoves;
     MovementVector lastCoord;
     for(int i = 0; i < vectorCount; i++) {
         if(GetBitmaskValue(buffer, (i - 1) * 2)) {
@@ -336,7 +336,7 @@ std::vector<MovementVector> readWaypoints(uint8 *buffer, int coordCount) {
             lastCoord.y = *(short *)&buffer[nPos];
             nPos += 2;
         }
-        vMoves.push_back(lastCoord);
+        vMoves.push_back(Vector2(lastCoord.x, lastCoord.y));
     }
     return vMoves;
 }
@@ -348,7 +348,7 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
    }
    
    MovementReq *request = reinterpret_cast<MovementReq *>(packet->data);
-   std::vector<MovementVector> vMoves = readWaypoints(&request->moveData, request->vectorNo);
+   std::vector<Vector2> vMoves = readWaypoints(&request->moveData, request->vectorNo);
     
    switch(request->type) {
    //TODO, Implement stop commands
@@ -357,15 +357,16 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
        //TODO anticheat, currently it trusts client 100%
        
       peerInfo(peer)->getChampion()->setPosition(request->x, request->y);
-      float x = ((request->x) - MAP_WIDTH)/2;
-      float y = ((request->y) - MAP_HEIGHT)/2;
+      /*float x = ((request->x) - MAP_WIDTH)/2;
+      float y = ((request->y) - MAP_HEIGHT)/2;*/
       
-      for(int i=0;i<vMoves.size(); i++){
-          vMoves.at(i).x = x;
-          vMoves.at(i).y = y;
+      for(int i=0;i<vMoves.size(); i++)
+		{
+			vMoves.at(i).X = request->x;
+			vMoves.at(i).Y = request->y;
       }
 
-      CORE_INFO("Stopped at x:%f , y: %f", x,y);
+		CORE_INFO("Stopped at x: %f, y: %f", request->x, request->y);
       break;
    }
    case EMOTE:
@@ -380,7 +381,7 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
    }
    
    // Sometimes the client will send a wrong position as the first one, override it with server data
-   vMoves[0] = MovementVector(peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
+   vMoves[0] = Vector2(peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
    peerInfo(peer)->getChampion()->setWaypoints(vMoves);
    Unit* u = dynamic_cast<Unit*>(map->getObjectById(request->targetNetId));
    if(!u) {

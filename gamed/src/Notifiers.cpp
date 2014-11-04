@@ -66,14 +66,14 @@ void Game::notifyTeleport(Unit* u, float _x, float _y) {
 }
 
 void Game::notifyMovement(Object* o) {
-   const std::vector<MovementVector>& waypoints = o->getWaypoints();
+   const std::vector<Vector2>& waypoints = o->getWaypoints();
    MovementAns *answer = MovementAns::create(waypoints.size()*2);
    
    answer->nbUpdates = 1;
    answer->netId = o->getNetId();
    for(size_t i = 0; i < waypoints.size(); i++) {
-      answer->getVector(i)->x = waypoints[i].x;
-      answer->getVector(i)->y = waypoints[i].y;
+		answer->getVector(i)->x = MovementVector::targetXToNormalFormat(waypoints[i].X);
+		answer->getVector(i)->y = MovementVector::targetXToNormalFormat(waypoints[i].Y);
    }
    
    broadcastPacketVision(o, reinterpret_cast<uint8 *>(answer), answer->size(), 4);

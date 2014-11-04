@@ -255,11 +255,11 @@ void Unit::refreshWaypoints() {
    }
 
    if (distanceWith(unitTarget) <= stats->getRange()-2.f) {
-      setWaypoints({MovementVector(x, y)});
+      setWaypoints({Vector2(x, y)});
    } else {
-      Target* t = waypoints[waypoints.size()-1].toTarget();
+      Target* t = new Target(waypoints[waypoints.size()-1]);
       if(t->distanceWith(unitTarget) >= 25.f) {
-         setWaypoints({MovementVector(x, y), MovementVector(unitTarget->getX(), unitTarget->getY())});
+			setWaypoints({ Vector2(x, y), Vector2(unitTarget->getX(), unitTarget->getY()) });
       }
       delete t;
    }

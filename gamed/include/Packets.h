@@ -320,7 +320,7 @@ public:
       buffer << (uint16)0x0200; // unk
       buffer << (uint32)clock(); // unk
       
-      const std::vector<MovementVector>& waypoints = m->getWaypoints();
+      const std::vector<Vector2>& waypoints = m->getWaypoints();
       
       buffer << (uint8)((waypoints.size()-m->getCurWaypoint()+1)*2); // coordCount
       buffer << m->getNetId();
@@ -328,8 +328,8 @@ public:
       buffer << MovementVector::targetXToNormalFormat(m->getX());
       buffer << MovementVector::targetYToNormalFormat(m->getY());
       for(int i = m->getCurWaypoint(); i < waypoints.size(); ++i) {
-         buffer << waypoints[i].x;
-         buffer << waypoints[i].y;
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].X);
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].Y);
       }
    }
    
@@ -424,7 +424,7 @@ public:
       buffer << (uint8)0x02;
       buffer << (uint32)clock(); // unk
       
-      const std::vector<MovementVector>& waypoints = m->getWaypoints();
+      const std::vector<Vector2>& waypoints = m->getWaypoints();
       
       buffer << (uint8)((waypoints.size()-m->getCurWaypoint()+1)*2); // coordCount
       buffer << m->getNetId();
@@ -432,8 +432,8 @@ public:
       buffer << MovementVector::targetXToNormalFormat(m->getX());
       buffer << MovementVector::targetYToNormalFormat(m->getY());
       for(int i = m->getCurWaypoint(); i < waypoints.size(); ++i) {
-         buffer << waypoints[i].x;
-         buffer << waypoints[i].y;
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].X);
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].Y);
       }
    }
 
@@ -465,16 +465,16 @@ public:
       buffer << (uint8)2; // Type of data: Waypoints=2
       buffer << (uint32)clock(); // unk
 
-      const std::vector<MovementVector>& waypoints = c->getWaypoints();
+      const std::vector<Vector2>& waypoints = c->getWaypoints();
 
       buffer << (uint8)((waypoints.size() - c->getCurWaypoint() + 1) * 2); // coordCount
       buffer << c->getNetId();
       buffer << (uint8)0; // movement mask; 1=KeepMoving?
       buffer << MovementVector::targetXToNormalFormat(c->getX());
       buffer << MovementVector::targetYToNormalFormat(c->getY());
-      for (int i = c->getCurWaypoint(); i < waypoints.size(); ++i) {
-         buffer << waypoints[i].x;
-         buffer << waypoints[i].y;
+		for (int i = c->getCurWaypoint(); i < waypoints.size(); ++i) {
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].X);
+			buffer << MovementVector::targetXToNormalFormat(waypoints[i].Y);
       }
    }
 };

@@ -8,7 +8,8 @@ class Target {
 public:
    
    virtual ~Target() { }
-   Target(float x, float y) : x(x), y(y) { }
+	Target(float x, float y) : x(x), y(y) { }
+	Target(Vector2 vec) : x(vec.X), y(vec.Y) { }
 
    float distanceWith(Target* target);
    float distanceWith(float xtarget, float ytarget);

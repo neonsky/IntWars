@@ -12,6 +12,10 @@
 #include "Target.h"
 #include "stdafx.h"
 #include "Vector2.h"
+#include <cfenv>
+#include <climits>
+
+#pragma STDC FENV_ACCESS ON
 
 class Map;
 
@@ -26,13 +30,13 @@ struct MovementVector {
     MovementVector(int16 x, int16 y) : x(x), y(y) { }
     MovementVector(float x, float y) : x(targetXToNormalFormat(x)), y(targetYToNormalFormat(y)) { }
 	 Target* toTarget() { return new Target(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
-	 operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
+	 //operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
     
     static int16 targetXToNormalFormat(float _x){
-        return (int16)((_x) - MAP_WIDTH)/2;
+		 return (int16)(round(_x) - MAP_WIDTH) / 2;
     }
     static int16 targetYToNormalFormat(float _y){
-        return (int16)((_y) - MAP_HEIGHT)/2;
+		 return (int16)(round(_y) - MAP_HEIGHT)/2;
     }
     
 };
@@ -50,7 +54,7 @@ protected:
     */
 	Target* target;
 
-   std::vector<MovementVector> waypoints;
+   std::vector<Vector2> waypoints;
    uint32 curWaypoint;
    Map* map;
 
@@ -98,9 +102,9 @@ public:
 
    Target* getTarget() { return target; }
 	void setTarget(Target* target);
-	void setWaypoints(const std::vector<MovementVector>& waypoints);
+	void setWaypoints(const std::vector<Vector2>& waypoints);
 
-   const std::vector<MovementVector>& getWaypoints() const { return waypoints; }
+   const std::vector<Vector2>& getWaypoints() const { return waypoints; }
    uint32 getCurWaypoint() const { return curWaypoint; }
    bool isMovementUpdated() { return movementUpdated; }
    void clearMovementUpdated() { movementUpdated = false; }

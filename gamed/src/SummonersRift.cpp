@@ -7,71 +7,71 @@
 
 using namespace std;
 
-const static vector<vector<MovementVector> > ConstWaypoints = 
+const static vector<vector<Vector2> > ConstWaypoints = 
 {
    { // blue top
-      MovementVector(917.f, 1725.f),
-      MovementVector(1170.f, 4041.f),
-      MovementVector(861.f, 6459.f),
-      MovementVector(880.f, 10180.f),
-      MovementVector(1268.f, 11675.f),
-      MovementVector(2806.f, 13075.f),
-      MovementVector(3907.f, 13243.f),
-      MovementVector(7550.f, 13407.f),
-      MovementVector(10244.f, 13238.f),
-      MovementVector(10947.f, 13135.f),
-      MovementVector(12511.f, 12776.f)
+      Vector2(917.f, 1725.f),
+      Vector2(1170.f, 4041.f),
+      Vector2(861.f, 6459.f),
+      Vector2(880.f, 10180.f),
+      Vector2(1268.f, 11675.f),
+      Vector2(2806.f, 13075.f),
+      Vector2(3907.f, 13243.f),
+      Vector2(7550.f, 13407.f),
+      Vector2(10244.f, 13238.f),
+      Vector2(10947.f, 13135.f),
+      Vector2(12511.f, 12776.f)
    },
    { // blue bot
-      MovementVector(1487.f, 1302.f),
-      MovementVector(3789.f, 1346.f),
-      MovementVector(6430.f, 1005.f),
-      MovementVector(10995.f, 1234.f),
-      MovementVector(12841.f, 3051.f),
-      MovementVector(13148.f, 4202.f),
-      MovementVector(13249.f, 7884.f),
-      MovementVector(12886.f, 10356.f),
-      MovementVector(12511.f, 12776.f)
+      Vector2(1487.f, 1302.f),
+      Vector2(3789.f, 1346.f),
+      Vector2(6430.f, 1005.f),
+      Vector2(10995.f, 1234.f),
+      Vector2(12841.f, 3051.f),
+      Vector2(13148.f, 4202.f),
+      Vector2(13249.f, 7884.f),
+      Vector2(12886.f, 10356.f),
+      Vector2(12511.f, 12776.f)
    },
    { // blue mid
-      MovementVector(1418.f, 1686.f),
-      MovementVector(2997.f, 2781.f),
-      MovementVector(4472.f, 4727.f),
-      MovementVector(8375.f, 8366.f),
-      MovementVector(10948.f, 10821.f),
-      MovementVector(12511.f, 12776.f)
+      Vector2(1418.f, 1686.f),
+      Vector2(2997.f, 2781.f),
+      Vector2(4472.f, 4727.f),
+      Vector2(8375.f, 8366.f),
+      Vector2(10948.f, 10821.f),
+      Vector2(12511.f, 12776.f)
    },
    { // red top
-      MovementVector(12451.f, 13217.f),
-      MovementVector(10947.f, 13135.f),
-      MovementVector(10244.f, 13238.f),
-      MovementVector(7550.f, 13407.f),
-      MovementVector(3907.f, 13243.f),
-      MovementVector(2806.f, 13075.f),
-      MovementVector(1268.f, 11675.f),
-      MovementVector(880.f, 10180.f),
-      MovementVector(861.f, 6459.f),
-      MovementVector(1170.f, 4041.f),
-      MovementVector(1418.f, 1686.f)
+      Vector2(12451.f, 13217.f),
+      Vector2(10947.f, 13135.f),
+      Vector2(10244.f, 13238.f),
+      Vector2(7550.f, 13407.f),
+      Vector2(3907.f, 13243.f),
+      Vector2(2806.f, 13075.f),
+      Vector2(1268.f, 11675.f),
+      Vector2(880.f, 10180.f),
+      Vector2(861.f, 6459.f),
+      Vector2(1170.f, 4041.f),
+      Vector2(1418.f, 1686.f)
    },
    { // red bot
-      MovementVector(13062.f, 12760.f),
-      MovementVector(12886.f, 10356.f),
-      MovementVector(13249.f, 7884.f),
-      MovementVector(13148.f, 4202.f),
-      MovementVector(12841.f, 3051.f),
-      MovementVector(10995.f, 1234.f),
-      MovementVector(6430.f, 1005.f),
-      MovementVector(3789.f, 1346.f),
-      MovementVector(1418.f, 1686.f)
+      Vector2(13062.f, 12760.f),
+      Vector2(12886.f, 10356.f),
+      Vector2(13249.f, 7884.f),
+      Vector2(13148.f, 4202.f),
+      Vector2(12841.f, 3051.f),
+      Vector2(10995.f, 1234.f),
+      Vector2(6430.f, 1005.f),
+      Vector2(3789.f, 1346.f),
+      Vector2(1418.f, 1686.f)
    },
    { // red mid
-      MovementVector(12511.f, 12776.f),
-      MovementVector(10948.f, 10821.f),
-      MovementVector(8375.f, 8366.f),
-      MovementVector(4472.f, 4727.f),
-      MovementVector(2997.f, 2781.f),
-      MovementVector(1418.f, 1686.f)
+      Vector2(12511.f, 12776.f),
+      Vector2(10948.f, 10821.f),
+      Vector2(8375.f, 8366.f),
+      Vector2(4472.f, 4727.f),
+      Vector2(2997.f, 2781.f),
+      Vector2(1418.f, 1686.f)
    },
 };
 
