@@ -410,7 +410,7 @@ bool Game::handleQueryStatus(HANDLE_ARGS) {
 
 bool Game::handleClick(HANDLE_ARGS) {
    Click *click = reinterpret_cast<Click *>(packet->data);
-   CORE_INFO("Object %X clicked on %X", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
+   CORE_INFO("Object %x clicked on %x", peerInfo(peer)->getChampion()->getNetId(),click->targetNetId);
 
    return true;
 }
@@ -421,11 +421,11 @@ bool Game::handleCastSpell(HANDLE_ARGS) {
    // There are some bits triggering this
    if (spell->spellSlotType & 0x0F > 0) {
       CORE_INFO("Summoner Spell Cast");
-      CORE_INFO("Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+      CORE_INFO("Type: 0x%x, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
       return true;
    }
 
-   CORE_INFO("Spell Cast : Type: 0x%X, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
+   CORE_INFO("Spell Cast : Type: 0x%x, Slot %d, coord %f ; %f, coord2 %f, %f, target NetId %08X", spell->spellSlotType, spell->spellSlot, spell->x, spell->y, spell->x2, spell->y2, spell->targetNetId);
 
    uint32 futureProjNetId = GetNewNetID();
    uint32 spellNetId = GetNewNetID();
@@ -598,7 +598,7 @@ bool Game::handleChatBoxMessage(HANDLE_ARGS) {
        // coords
       if(strncmp(message->getMessage(), cmd[16], strlen(cmd[16])) == 0) {
          CORE_INFO("At %f;%f", peerInfo(peer)->getChampion()->getX(), peerInfo(peer)->getChampion()->getY());
-         debugMsg << "At Coords - X:" << peerInfo(peer)->getChampion()->getX() << " Y:" << peerInfo(peer)->getChampion()->getY() << " Z:" << peerInfo(peer)->getChampion()->getZ();
+         debugMsg << "At Coords - x:" << peerInfo(peer)->getChampion()->getX() << " y:" << peerInfo(peer)->getChampion()->getY() << " Z:" << peerInfo(peer)->getChampion()->getZ();
          notifyDebugMessage(debugMsg.str());
          return true;
       }

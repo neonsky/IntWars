@@ -58,8 +58,8 @@ void Object::Move(int64 diff) {
    float moveSpeed = dashing ? dashSpeed : getMoveSpeed();
    double deltaMovement = (double)(moveSpeed) * 0.000001f*diff;
 
-   float xx = direction.X * deltaMovement;
-   float yy = direction.Y * deltaMovement;
+   float xx = direction.x * deltaMovement;
+   float yy = direction.y * deltaMovement;
 
    x+= xx;
    y+= yy;

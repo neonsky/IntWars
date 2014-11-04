@@ -28,7 +28,7 @@ class PathNode
 public:
    PathNode(){ InitTable(); }
    PathNode(int ax, int ay, int ag, int ah, PathNode *p){ Init(ax, ay, ag, ah, p); }
-   PathNode(Vector2 pos, int ag, int ah, PathNode *p){ Init((int)pos.X, (int)pos.Y, ag, ah, p); }
+   PathNode(Vector2 pos, int ag, int ah, PathNode *p){ Init((int)pos.x, (int)pos.y, ag, ah, p); }
    void Init(int ax, int ay, int ag, int ah, PathNode *p) { InitTable(); x = ax; y = ay; h = ah; g = ag; parent = p; }
    void setScore(int ah, int ag) { g = ag, h = ah; }
    void setParent(PathNode* p) { parent = p; }
@@ -101,7 +101,7 @@ protected:
 
    void addGridPosToOpenList(Vector2 position, PathNode* parent)
    {
-      openList.push_back(new PathNode(position, (int)CALC_G((parent) ? (parent->g) : (0)), (int)CALC_H(position.X, position.Y, destination.X, destination.Y), parent));
+      openList.push_back(new PathNode(position, (int)CALC_G((parent) ? (parent->g) : (0)), (int)CALC_H(position.x, position.y, destination.x, destination.y), parent));
    }
 
    void addToOpenList(Vector2 position, PathNode* parent)
@@ -109,7 +109,7 @@ protected:
       addGridPosToOpenList(position, parent);
    }
 
-   bool isGridNodeOccupied(Vector2 pos) { isGridNodeOccupied((int)pos.X, (int)pos.Y); }
+   bool isGridNodeOccupied(Vector2 pos) { isGridNodeOccupied((int)pos.x, (int)pos.y); }
    bool isGridNodeOccupied(int x, int y);
    PathNode* isNodeOpen(int x, int y);
 

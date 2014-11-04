@@ -6,17 +6,17 @@
 
 Vector2::operator MovementVector()
 {
-	return MovementVector(X, Y);
+	return MovementVector(x, y);
 }
 
 // Returns the length of the vector
 float Vector2::Length(){
-   return sqrt(X * X + Y * Y);
+   return sqrt(x * x + y * y);
 }
 
 // Returns the length of the vector
 float Vector2::SqrLength(){
-   return (X * X + Y * Y);
+   return (x * x + y * y);
 }
 
 // Normalizes the vector
@@ -25,8 +25,8 @@ Vector2 Vector2::Normalize(){
    float length = this->Length();
 
    if (length != 0){
-      vector.X = X / length;
-      vector.Y = Y / length;
+      vector.x = x / length;
+      vector.y = y / length;
    }
 
    return vector;
