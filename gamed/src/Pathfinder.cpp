@@ -40,7 +40,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       {
          path.error = PATH_ERROR_OUT_OF_TRIES;
          oot++;
-         CORE_WARNING("PATH_ERROR_OUT_OF_TRIES");
+			//CORE_WARNING("PATH_ERROR_OUT_OF_TRIES");
          path.waypoints = job.reconstructUnfinishedPath();
          job.cleanPath(path);
          job.cleanLists();
@@ -50,7 +50,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       {
          path.error = PATH_ERROR_NONE;
          successes++;
-         CORE_WARNING("We finished a path.");
+         //CORE_INFO("We finished a path.");
          path.waypoints = job.reconstructPath();
          job.cleanPath(path);
          job.cleanLists();
@@ -58,7 +58,7 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       }
    }
 
-   CORE_WARNING("PATH_ERROR_OPENLIST_EMPTY");
+	//CORE_WARNING("PATH_ERROR_OPENLIST_EMPTY");
    path.error = PATH_ERROR_OPENLIST_EMPTY;
    empties++;
    path.waypoints.push_back(from);
@@ -114,15 +114,9 @@ bool PathJob::traverseOpenList(bool first)
    return atDestination;
 }
 
-std::vector<MovementVector> Path::getWaypoints()
+std::vector<Vector2> Path::getWaypoints()
 {
-	std::vector<MovementVector> ret;
-	for (Vector2 waypoint : waypoints)
-	{
-		ret.push_back(waypoint);
-	}
-
-	return ret;
+	return waypoints;
 }
 
 std::vector<Vector2> PathJob::reconstructPath( ) // Make a std::vector of the waypoints

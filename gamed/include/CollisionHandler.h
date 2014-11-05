@@ -7,7 +7,7 @@
 #include "Logger.h"
 
 #define MANAGED_DIVISION_COUNT 3*3
-#define MAX_COLLISION_OBJECTS 256
+#define MAX_COLLISION_OBJECTS 1024
 
 class Object;
 struct CollisionDivision
@@ -39,13 +39,14 @@ struct CollisionDivision
 
 	void push(Object * a)
 	{
+		CORE_ASSERT(objectCount < MAX_COLLISION_OBJECTS);
 		objects[objectCount] = a;
 		objectCount++;
 	}
 
 	void remove(unsigned int i)
 	{
-		if (i < objectCount)
+		//if (i < objectCount)
 		{
 			objects[i] = 0;
 			for (; i!=objectCount; i++)

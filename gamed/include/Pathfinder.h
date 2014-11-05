@@ -10,7 +10,7 @@
 #define MAX_PATHFIND_TRIES 1000
 
 #define TABLE_SIZE (2<<15)
-#define GRID_SIZE 512
+#define GRID_SIZE 256
 #define GRID_WIDTH GRID_SIZE
 #define GRID_HEIGHT GRID_SIZE
 
@@ -79,7 +79,7 @@ public:
    bool isPathed() { return error == PATH_ERROR_NONE; }
    PathError getError() { return error; }
    //std::vector<Vector2> getWaypoints() { return waypoints; }
-	std::vector<MovementVector> getWaypoints();
+	std::vector<Vector2> getWaypoints();
 };
 
 class PathJob

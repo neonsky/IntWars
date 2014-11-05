@@ -111,8 +111,8 @@ bool AIMesh::outputMesh(unsigned width, unsigned height)
 			highY = fileStream->triangles[i].Face.v3[2];
 	}
 
-   mapWidth = (highX - lowX);
-   mapHeight = (highY - lowY);
+   mapWidth = (highX + lowX);
+   mapHeight = (highY + lowY);
    
    // If the width or width larger?
    if ((highY - lowY) < (highX - lowX))
