@@ -13,12 +13,12 @@ class Object;
 struct CollisionDivision
 {
    Vector2 min, max;
-	Object* objects[MAX_COLLISION_OBJECTS];
-	unsigned int objectCount;
+	vector<Object*> objects;
+	unsigned int objectCount = 0;
 
 	int find(Object* a)
 	{
-		for (int i = 0; i < objectCount && i < MAX_COLLISION_OBJECTS; i++)
+		for (int i = 0; i < objectCount; i++)
 		{
 			if (a == objects[i])
 				return i;
@@ -29,7 +29,7 @@ struct CollisionDivision
 	
 	void clear()
 	{
-		for (int i = 0; i < objectCount && i < MAX_COLLISION_OBJECTS; i++)
+		for (int i = 0; i < objectCount; i++)
 		{
 			objects[i] = 0;
 		}
@@ -39,22 +39,23 @@ struct CollisionDivision
 
 	void push(Object * a)
 	{
-		CORE_ASSERT(objectCount < MAX_COLLISION_OBJECTS);
-		objects[objectCount] = a;
+		objects.push_back(a);
 		objectCount++;
 	}
 
 	void remove(unsigned int i)
 	{
+		objects.erase(objects.begin()+i);
+		objectCount--;
 		//if (i < objectCount)
-		{
-			objects[i] = 0;
-			for (; i!=objectCount; i++)
-			{
-				objects[i] = (i + 1 >= MAX_COLLISION_OBJECTS) ? (0) : (objects[i + 1]);
-			}
-			objectCount--;
-		}
+//		{
+//			objects[i] = 0;
+//			for (; i!=objectCount; i++)
+//			{
+//				objects[i] = (i + 1 >= MAX_COLLISION_OBJECTS) ? (0) : (objects[i + 1]);
+//			}
+//			objectCount--;
+//		}
 	}
 };
 

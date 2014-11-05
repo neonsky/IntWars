@@ -100,7 +100,7 @@ void CollisionHandler::correctDivisions(int pos)
             o->getPosition().X + o->getCollisionRadius() < curDiv.min.X || o->getPosition().Y + o->getCollisionRadius() < curDiv.min.Y))
          {
             removeFromDivision(o, pos); // Remove them from it.
-            addObject(o); // Reset in what divisions this object is. Probably a useless call as it's being caught by this else if statement below.
+            addObject(o); // Reset in what divisions this object is. 
          }
 
 			// If they've entered another division, but not left this one yet..
@@ -303,11 +303,12 @@ void CollisionHandler::removeFromDivision(Object* object, int i)
    if (i == -1) curDiv = &unmanagedDivision;
    else curDiv = &managedDivisions[i];
 
-	auto j = curDiv->find(object);
-   while (j != -1)
-	{
-		curDiv->remove(j);
-
-		j = curDiv->find(object);
-   }
+   curDiv->remove(curDiv->find(object));
+//	auto j = curDiv->find(object);
+//   while (j != -1)
+//	{
+//		curDiv->remove(j);
+//
+//		j = curDiv->find(object);
+//   }
 }
