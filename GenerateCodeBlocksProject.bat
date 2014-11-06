@@ -1,7 +1,8 @@
 @echo off
+set PATH=%PATH%;C:\MinGW\bin
 echo Generate IntWars Makefiles
 echo ------------------------------
-IF EXIST .\build\ (
+IF EXIST .\codeblocksbuild\ (
 GOTO BUILDDIR
 ) ELSE (
 GOTO MAIN
@@ -9,17 +10,15 @@ GOTO MAIN
 
 :BUILDDIR
 echo Build directory exists, removing...
-rmdir /s /q build
+rmdir /s /q codeblocksbuild
 GOTO MAIN
 
 :MAIN
 echo Recreating build directory...
-mkdir build
-cd build
-echo Creating MinGW Makefiles...
+mkdir codeblocksbuild
+cd codeblocksbuild
+echo Creating CodeBlocks MinGW Makefiles...
 echo ------------------------------
-cmake .. -G "MinGW Makefiles"
+cmake .. -G "CodeBlocks - MinGW Makefiles"
 cd ..
 pause
-
-
