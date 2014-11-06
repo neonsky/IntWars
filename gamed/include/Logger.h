@@ -65,11 +65,12 @@ private:
 
 #elif defined(_MSC_VER) // Visual studio 
 
-#define DEBUG_BREAK __debugbreak()
+#define DEBUG_BREAK __debugbreak();
 
 #elif defined(__GNUG__)
-#include <csignal>
-#define DEBUG_BREAK raise(SIGINT);
+//#include <csignal>
+//#define DEBUG_BREAK raise(SIGINT);
+#define DEBUG_BREAK __debugbreak(); // This one works fine
 #else
 
 #warning "Unknown Operating System, debug break support will not be included"

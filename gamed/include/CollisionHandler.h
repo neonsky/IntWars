@@ -16,47 +16,10 @@ struct CollisionDivision
 	vector<Object*> objects;
 	unsigned int objectCount = 0;
 
-	int find(Object* a)
-	{
-		for (int i = 0; i < objectCount; i++)
-		{
-			if (a == objects[i])
-				return i;
-		}
-
-		return -1;
-	}
-	
-	void clear()
-	{
-		for (int i = 0; i < objectCount; i++)
-		{
-			objects[i] = 0;
-		}
-
-		objectCount = 0;
-	}
-
-	void push(Object * a)
-	{
-		objects.push_back(a);
-		objectCount++;
-	}
-
-	void remove(unsigned int i)
-	{
-		objects.erase(objects.begin()+i);
-		objectCount--;
-		//if (i < objectCount)
-//		{
-//			objects[i] = 0;
-//			for (; i!=objectCount; i++)
-//			{
-//				objects[i] = (i + 1 >= MAX_COLLISION_OBJECTS) ? (0) : (objects[i + 1]);
-//			}
-//			objectCount--;
-//		}
-	}
+	void push(Object * a);
+	void remove(unsigned int i);
+	int find(Object* a);
+	void clear();
 };
 
 class CollisionHandler

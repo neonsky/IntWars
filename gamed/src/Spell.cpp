@@ -189,7 +189,7 @@ void Spell::loadLua(LuaScript& script){
    
    script.lua.set_function("getOwner", [this]() { return owner; });
    
-   script.lua.set_function("getSide", [this](Object* o) { return o->getSide(); });
+   script.lua.set_function("getTeam", [this](Object* o) { return o->getTeam(); });
    script.lua.set_function("isDead", [this](Unit* u) { return u->isDead(); });
    
    script.lua.set_function("getProjectileSpeed", [this]() { return projectileSpeed; });

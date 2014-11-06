@@ -77,7 +77,7 @@ class Game
       bool handleHeartBeat(HANDLE_ARGS);
       
       // Notifiers
-      void notifyMinionSpawned(Minion* m, int side);
+      void notifyMinionSpawned(Minion* m, int team);
       void notifySetHealth(Unit* u);
       void notifyUpdatedStats(Unit* u, bool partial = true);
       void notifyMovement(Object* o);
@@ -106,9 +106,9 @@ class Game
       void notifyStopAutoAttack(Unit* attacker);
       void notifyDebugMessage(std::string htmlDebugMessage);
       void notifySpawn(Unit* u);
-      void notifyLeaveVision(Object* o, uint32 side);
-      void notifyEnterVision(Object* o, uint32 side);
-      void notifyChampionSpawned(Champion* c, uint32 side);
+      void notifyLeaveVision(Object* o, uint32 team);
+      void notifyEnterVision(Object* o, uint32 team);
+      void notifyChampionSpawned(Champion* c, uint32 team);
       void notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float totalCd = 0.0f);
       void notifyGameTimer();
       void notifyAnnounceEvent(uint8 messageId, bool isMapSpecific);

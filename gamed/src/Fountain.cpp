@@ -12,11 +12,11 @@ void Fountain::healChampions(Map* map, long long diff) {
    if (healTickTimer > 1000000) {
       healTickTimer = 0;
 
-      int side = 0;
+      int team = 0;
       for (auto f : healLocations){
             
          for ( Champion* c : map->getChampionsInRange(f, fountainSize)) {
-            if (c->getSide() == side) {
+            if (c->getTeam() == team) {
                float HP = c->getStats().getCurrentHealth(), MaxHP = c->getStats().getMaxHealth();
                if (HP + MaxHP * PERCENT_MAX_HEALTH_HEAL < MaxHP) {
                   c->getStats().setCurrentHealth(HP + MaxHP * PERCENT_MAX_HEALTH_HEAL);
@@ -28,7 +28,7 @@ void Fountain::healChampions(Map* map, long long diff) {
             }
          }
          
-      side++;
+      team++;
       }
 
    }

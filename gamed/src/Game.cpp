@@ -140,7 +140,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
 		   float respawnX, respawnY;
 		   std::tie(respawnX, respawnY) = c->getRespawnPosition();
            c->setPosition(respawnX, respawnY);
-           c->setSide((team == "BLUE") ? 0 : 1);
+           c->setTeam((team == "BLUE") ? 0 : 1);
            c->levelUp();
 
 
@@ -162,7 +162,7 @@ bool Game::initialize(ENetAddress *address, const char *baseKey){
    player2->setName("tseT");
    Champion* c2 = ChampionFactory::getChampionFromType("Ezreal", map, GetNewNetID());
    c2->setPosition(100.f, 273.55f);
-   c2->setSide(1);
+   c2->setTeam(1);
    map->addObject(c2);
    player2->setChampion(c2);
    player2->setSkinNo(4);

@@ -39,7 +39,7 @@ void Unit::update(int64 diff) {
 
    Turret* selfTurret = dynamic_cast<Turret*>(this);
    Turret* turretTarget = dynamic_cast<Turret*>(unitTarget);
-   if (unitTarget && unitTarget->isDead() || unitTarget && !getMap()->teamHasVisionOn(getSide(), unitTarget) && !turretTarget && !selfTurret) {
+   if (unitTarget && unitTarget->isDead() || unitTarget && !getMap()->teamHasVisionOn(getTeam(), unitTarget) && !turretTarget && !selfTurret) {
       setUnitTarget(0);
       isAttacking = false;
       map->getGame()->notifySetTarget(this, 0);
@@ -48,7 +48,7 @@ void Unit::update(int64 diff) {
 
    if (!unitTarget && isAttacking) {
       Turret* lastTurretTarget = dynamic_cast<Turret*>(lastTarget);
-      if (!lastTarget || lastTarget && lastTarget->isDead() || lastTarget && !getMap()->teamHasVisionOn(getSide(), lastTarget) && !lastTurretTarget && !selfTurret) {
+      if (!lastTarget || lastTarget && lastTarget->isDead() || lastTarget && !getMap()->teamHasVisionOn(getTeam(), lastTarget) && !lastTurretTarget && !selfTurret) {
          isAttacking = false;
          initialAttackDone = false;
          lastTarget = 0;
@@ -202,7 +202,7 @@ void Unit::die(Unit* killer) {
 	//Cull allied champions
 	champs.erase(std::remove_if(champs.begin(), 
 								champs.end(), 
-								[this](Champion * l) { return l->getSide() == getSide(); }),
+								[this](Champion * l) { return l->getTeam() == getTeam(); }),
 				champs.end());
 	if (champs.size() > 0) {
 		float expPerChamp = exp / champs.size();

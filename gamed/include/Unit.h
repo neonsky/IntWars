@@ -33,8 +33,60 @@ enum MoveOrder {
    MOVE_ORDER_ATTACKMOVE
 };
 
-class Unit : public Object {
+class Unit : public Object 
+{
+public:
+	Unit(Map* map, uint32 id, std::string model, Stats* stats, uint32 collisionRadius = 40, float x = 0, float y = 0, uint32 visionRadius = 0) : Object(map, id, x, y, collisionRadius, visionRadius), stats(stats),
+		statUpdateTimer(0), model(model), autoAttackDelay(0), autoAttackProjectileSpeed(0), isAttacking(false),
+		autoAttackCurrentCooldown(0), autoAttackCurrentDelay(0), modelUpdated(false), moveOrder(MOVE_ORDER_MOVE), deathFlag(false),
+		unitTarget(0), lastTarget(0), melee(false), autoAttackFlag(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
+	{ }
+	virtual ~Unit();
+	Stats& getStats() { return *stats; }
+	virtual void update(int64 diff) override;
+	virtual float getMoveSpeed() const { return stats->getMovementSpeed(); }
+	int getKillDeathCounter() { return killDeathCounter; }
 
+	std::vector<Buff*> buffs;
+
+	std::vector<Buff*>& getBuffs() { return buffs; }
+
+	/**
+	* This is called by the AA projectile when it hits its target
+	*/
+	virtual void autoAttackHit(Unit* target);
+
+	virtual void dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source);
+
+	bool isDead() const;
+	virtual void die(Unit* killer);
+
+	void setAutoAttackDelay(float newDelay) { autoAttackDelay = newDelay; }
+	void setAutoAttackProjectileSpeed(float newSpeed) { autoAttackProjectileSpeed = newSpeed; }
+	void setModel(const std::string& newModel);
+	const std::string& getModel();
+	bool isModelUpdated() { return modelUpdated; }
+	void clearModelUpdated() { modelUpdated = false; }
+	void addBuff(Buff* b){
+		if (getBuff(b->getName()) == 0) {
+			buffs.push_back(b);
+			getStats().addMovementSpeedPercentageModifier(b->getMovementSpeedPercentModifier());
+		}
+		else {
+			getBuff(b->getName())->setTimeElapsed(0); // if buff already exists, just restart its timer
+		}
+	}
+
+	//todo: use statmods
+	Buff* getBuff(std::string name);
+	void setMoveOrder(MoveOrder moveOrder) { this->moveOrder = moveOrder; }
+	void setUnitTarget(Unit* target);
+	void setLastTarget(Unit* target);
+	Unit* getUnitTarget() const { return unitTarget; }
+	virtual void refreshWaypoints();
+	bool isMelee() const { return melee; }
+	void setMelee(bool melee) { this->melee = melee; }
+	unsigned int classifyTarget(Unit* target);
 protected:
    Stats* stats;
 
@@ -60,55 +112,6 @@ protected:
    LuaScript unitScript = LuaScript(true);
    
    int killDeathCounter;
-public:
-   Unit(Map* map, uint32 id, std::string model, Stats* stats, uint32 collisionRadius = 40, float x = 0, float y = 0, uint32 visionRadius = 0) : Object(map, id, x, y, collisionRadius, visionRadius), stats(stats),
-                                                                                 statUpdateTimer(0), model(model), autoAttackDelay(0), autoAttackProjectileSpeed(0), isAttacking(false),
-                                                                                 autoAttackCurrentCooldown(0), autoAttackCurrentDelay(0), modelUpdated(false), moveOrder(MOVE_ORDER_MOVE), deathFlag(false),
-                                                                                 unitTarget(0), lastTarget(0), melee(false), autoAttackFlag(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
-                                                                                 { }
-   virtual ~Unit();
-   Stats& getStats() { return *stats; }
-   virtual void update(int64 diff) override;
-   virtual float getMoveSpeed() const { return stats->getMovementSpeed(); }
-   int getKillDeathCounter() { return killDeathCounter; }
-   
-   std::vector<Buff*> buffs;  
-   
-   std::vector<Buff*>& getBuffs() { return buffs;}
-   
-   /**
-    * This is called by the AA projectile when it hits its target
-    */
-   virtual void autoAttackHit(Unit* target);
-   
-   virtual void dealDamageTo(Unit* target, float damage, DamageType type, DamageSource source);
-   
-   bool isDead() const;
-   virtual void die(Unit* killer);
-      
-   void setModel(const std::string& newModel);
-   const std::string& getModel();
-   bool isModelUpdated() { return modelUpdated; }
-   void clearModelUpdated() { modelUpdated = false; }
-   void addBuff(Buff* b){
-      if(getBuff(b->getName()) == 0) {
-         buffs.push_back(b);
-         getStats().addMovementSpeedPercentageModifier(b->getMovementSpeedPercentModifier()); 
-      } else {
-         getBuff(b->getName())->setTimeElapsed(0); // if buff already exists, just restart its timer
-      }
-   }
-   
-   //todo: use statmods
-   Buff* getBuff(std::string name);
-   void setMoveOrder(MoveOrder moveOrder) { this->moveOrder = moveOrder; }
-   void setUnitTarget(Unit* target);
-   void setLastTarget(Unit* target);
-   Unit* getUnitTarget() const { return unitTarget; }
-   virtual void refreshWaypoints();
-   bool isMelee() const { return melee; }
-   void setMelee(bool melee) { this->melee = melee; }
-   unsigned int classifyTarget(Unit* target);
 };
 
 #endif

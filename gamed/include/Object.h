@@ -58,7 +58,7 @@ protected:
    uint32 curWaypoint;
    Map* map;
 
-   unsigned int side;
+   unsigned int team;
    bool movementUpdated;
    bool toRemove;
    uint32 attackerCount;
@@ -89,11 +89,11 @@ public:
    void calculateVector(float xtarget, float ytarget);
 
    /**
-   * Sets the side (= team) of the object
-   * @param side the new side
+   * Sets the team of the object
+   * @param team the new team
    */
-   void setSide(unsigned int side) { this->side = side; }
-   unsigned int getSide() { return side; }
+	void setTeam(unsigned int team) { this->team = team; }
+	unsigned int getTeam() { return team; }
 
    virtual void update(int64 diff);
    virtual float getMoveSpeed() const = 0;
@@ -129,8 +129,8 @@ public:
    void incrementAttackerCount() { ++attackerCount; }
    void decrementAttackerCount() { --attackerCount; }
 
-   bool isVisibleByTeam(uint32 side);
-   void setVisibleByTeam(uint32 side, bool visible);
+   bool isVisibleByTeam(uint32 team);
+   void setVisibleByTeam(uint32 team, bool visible);
    
    void dashTo(float x, float y, float dashSpeed);
    bool isDashing() const { return dashing; }

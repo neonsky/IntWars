@@ -99,6 +99,7 @@ cmake_install.cmake
 *.lnk
 
 build/
+cbbuild/
 vsbuild/
 win/NetBeans/IntWars/nbproject/*
 win/NetBeans/IntWars/nbproject/private/* 

@@ -44,14 +44,14 @@ void Map::update(int64 diff) {
       }
       
       for(uint32 i = 0; i < 2; ++i) {
-         if(u->getSide() == i) {
+         if(u->getTeam() == i) {
             continue;
          }
          
-         if(visionUnits[u->getSide()].find(u->getNetId()) != visionUnits[u->getSide()].end() && teamHasVisionOn(i, u)) {
+         if(visionUnits[u->getTeam()].find(u->getNetId()) != visionUnits[u->getTeam()].end() && teamHasVisionOn(i, u)) {
             u->setVisibleByTeam(i, true);
             game->notifySpawn(u);
-            visionUnits[u->getSide()].erase(u->getNetId());
+            visionUnits[u->getTeam()].erase(u->getNetId());
             game->notifyUpdatedStats(u, false);
             continue;
          }
@@ -161,19 +161,19 @@ void Map::addObject(Object* o) {
       return;
    }
    
-   visionUnits[o->getSide()][o->getNetId()] = u;
+   visionUnits[o->getTeam()][o->getNetId()] = u;
    
    Minion* m = dynamic_cast<Minion*>(u);
    
    if(m) {
-      game->notifyMinionSpawned(m, m->getSide());
+      game->notifyMinionSpawned(m, m->getTeam());
    }
    
    Champion* c = dynamic_cast<Champion*>(o);
    
    if(c) {
       champions[c->getNetId()] = c;
-      game->notifyChampionSpawned(c, c->getSide());
+      game->notifyChampionSpawned(c, c->getTeam());
    }
 }
 
@@ -185,7 +185,7 @@ void Map::removeObject(Object* o) {
    }
    
    objects.erase(o->getNetId());
-   visionUnits[o->getSide()].erase(o->getNetId());
+   visionUnits[o->getTeam()].erase(o->getNetId());
 }
 
 void Map::stopTargeting(Unit* target) {
@@ -217,16 +217,16 @@ std::vector<Champion*> Map::getChampionsInRange(Target* t, float range, bool isA
 	return champs;
 }
 
-bool Map::teamHasVisionOn(int side, Object* o) {
+bool Map::teamHasVisionOn(int team, Object* o) {
    
 
-   if(o->getSide() == side) {
+   if(o->getTeam() == team) {
       return true;
    }
 
    for(auto kv : objects) 
    {
-      if (kv.second->getSide() == side && kv.second->distanceWith(o) < kv.second->getVisionRadius() && !mesh.isAnythingBetween(kv.second, o))
+      if (kv.second->getTeam() == team && kv.second->distanceWith(o) < kv.second->getVisionRadius() && !mesh.isAnythingBetween(kv.second, o))
       {
          Unit * unit = dynamic_cast<Unit*>(kv.second);
          if ((unit) && unit->isDead()) continue;

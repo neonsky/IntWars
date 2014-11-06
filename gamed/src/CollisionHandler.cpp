@@ -312,3 +312,31 @@ void CollisionHandler::removeFromDivision(Object* object, int i)
 //		j = curDiv->find(object);
 //   }
 }
+
+int CollisionDivision::find(Object* a)
+{
+	for (int i = 0; i < objectCount; i++)
+		if (a == objects[i])
+			return i;
+
+	return -1;
+}
+
+void CollisionDivision::clear()
+{
+	for (int i = 0; i < objectCount; i++)
+		objects[i] = 0;
+	objectCount = 0;
+}
+
+void CollisionDivision::push(Object * a)
+{
+	objects.push_back(a);
+	objectCount++;
+}
+
+void CollisionDivision::remove(unsigned int i)
+{
+	objects.erase(objects.begin() + i);
+	objectCount--;
+}

@@ -22,8 +22,8 @@ void LuaScript::addUnit() {
     /*sol::constructors <sol::types < Map*, uint32, float, float, uint32>> objCtr;
     sol::userdata <Object> objUserData(
             "Object", objCtr,
-            "setSide", &Object::setSide,
-            "getSide", &Object::getSide,
+            "setTeam", &Object::setTeam,
+            "setTeam", &Object::setTeam,
             "getTarget", &Object::getTarget,
             "setTarget", &Object::setTarget,
             //"setUnitTarget", &Object::setUnitTarget, //not in Object anymore
@@ -54,8 +54,8 @@ void LuaScript::addUnit() {
             "dealDamageTo", &Unit::dealDamageTo,
             "getTarget", &Unit::getTarget, //some Object methods
             "setTarget", &Unit::setTarget,
-            "getSide", &Unit::getSide,
-            "setSide", &Unit::setSide,
+            "setTeam", &Unit::setTeam,
+            "setTeam", &Unit::setTeam,
             "setUnitTarget", &Unit::setUnitTarget,
             "isToRemove", &Unit::isToRemove,
             "setToRemove", &Unit::setToRemove,

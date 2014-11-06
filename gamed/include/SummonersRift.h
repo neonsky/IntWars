@@ -3,9 +3,8 @@
 
 #include "Map.h"
 
-class SummonersRift : public Map {
-
-
+class SummonersRift : public Map 
+{
 public:
    SummonersRift(Game* game);
    
@@ -13,10 +12,13 @@ public:
    virtual void update(long long diff) override;
    float getGoldPerSecond() override { return 1.9f; }
    
-   const Target getRespawnLoc(int side) const override;
+   const Target getRespawnLoc(int team) const override;
    float getGoldFor(Unit* u) const override;
    float getExpFor(Unit* u) const override;
-   
+
+	virtual std::pair<int, Vector2> getMinionSpawnPosition(uint32 spawnPosition) const override;
+	virtual void setMinionStats(Minion* minion) const override;
+
    bool spawn() override;
 
    const int getMapId() const override { return 1; }

@@ -35,11 +35,11 @@ void Projectile::update(int64 diff) {
                continue;
             }
             
-            if(u->getSide() == owner->getSide() && !(flags & SPELL_FLAG_AffectFriends)) {
+            if(u->getTeam() == owner->getTeam() && !(flags & SPELL_FLAG_AffectFriends)) {
                continue;
             }
             
-            if(u->getSide() != owner->getSide() && !(flags & SPELL_FLAG_AffectEnemies)) {
+            if(u->getTeam() != owner->getTeam() && !(flags & SPELL_FLAG_AffectEnemies)) {
                continue;
             }
             

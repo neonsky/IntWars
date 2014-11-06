@@ -5,7 +5,7 @@
 
 #define TURRET_RANGE 905.f
 
-Turret::Turret(Map* map, uint32 id, const std::string& name, float x, float y, float hp, float ad, int side) : Unit(map, id, "", new TurretStats(), 50, x, y, 1200), name(name)  {
+Turret::Turret(Map* map, uint32 id, const std::string& name, float x, float y, float hp, float ad, int team) : Unit(map, id, "", new TurretStats(), 50, x, y, 1200), name(name)  {
    stats->setCurrentHealth(hp);
    stats->setMaxHealth(hp);
    stats->setBaseAd(ad);
@@ -14,7 +14,7 @@ Turret::Turret(Map* map, uint32 id, const std::string& name, float x, float y, f
    autoAttackDelay = 4.95f/30.f;
    autoAttackProjectileSpeed = 1200.f;
    
-   setSide(side);
+   setTeam(team);
 }
 
 void Turret::update(int64 diff)
@@ -27,7 +27,7 @@ void Turret::update(int64 diff)
       for(auto& it : objects) {
          Unit* u = dynamic_cast<Unit*>(it.second);
 
-         if(!u || u->isDead() || u->getSide() == getSide() || distanceWith(u) > TURRET_RANGE) {
+         if(!u || u->isDead() || u->getTeam() == getTeam() || distanceWith(u) > TURRET_RANGE) {
             continue;
          }
          

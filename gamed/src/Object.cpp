@@ -8,7 +8,7 @@
 using namespace std;
 
 Object::Object(Map* map, uint32 id, float x, float y, uint32 collisionRadius, uint32 visionRadius) : Target(x, y), map(map), id(id), target(0), collisionRadius(collisionRadius),
-                                                                                                     visionRadius(visionRadius), side(0), movementUpdated(false), toRemove(false), attackerCount(0),
+                                                                                                     visionRadius(visionRadius), team(0), movementUpdated(false), toRemove(false), attackerCount(0),
                                                                                                      dashing(false), visibleByTeam{false, false} 
 {
 }
@@ -107,17 +107,17 @@ bool Object::collide(Object* o) {
    return distanceWithSqr(o) < (getCollisionRadius() + o->getCollisionRadius())*(getCollisionRadius() + o->getCollisionRadius());
 }
 
-bool Object::isVisibleByTeam(uint32 side) {
-	if(side > 1) 
+bool Object::isVisibleByTeam(uint32 team) {
+	if(team > 1) 
    {
 		return false;
 	}
 
-	return (side == getSide() || visibleByTeam[side]);
+	return (team == getTeam() || visibleByTeam[team]);
 }
 
-void Object::setVisibleByTeam(uint32 side, bool visible) {
-	visibleByTeam[side] = visible;
+void Object::setVisibleByTeam(uint32 team, bool visible) {
+	visibleByTeam[team] = visible;
 }
 
 float Object::getZ() {

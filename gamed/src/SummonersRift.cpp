@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const static vector<vector<Vector2> > ConstWaypoints = 
+const static vector<vector<Vector2> > laneWaypoints =
 {
    { // blue top
       Vector2(917.f, 1725.f),
@@ -75,7 +75,8 @@ const static vector<vector<Vector2> > ConstWaypoints =
    },
 };
 
-SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000, true) 
+
+SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1000000, true)
 {
    mesh.load("LEVELS/Map1/AIPath.aimesh");
    collisionHandler->init(3); // Needs to be initialised after AIMesh
@@ -104,12 +105,12 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1
    addObject(new Turret(this, GetNewNetID(), "@Turret_T2_L_03_A", 3911.f, 13654.f, 2550, 156, 1));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T2_L_02_A", 7536.f, 13190.f, 2550, 170, 1));
    addObject(new Turret(this, GetNewNetID(), "@Turret_T2_L_01_A", 10261.f, 13465.f, 2550, 190, 1));
-   
+
    addObject(new LevelProp(this, GetNewNetID(), 12465.f, 14422.257f, 101.f, 0.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_Yonkey", "Yonkey"));
    addObject(new LevelProp(this, GetNewNetID(), -76.f, 1769.1589f, 94.f, 0.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_Yonkey1", "Yonkey"));
    addObject(new LevelProp(this, GetNewNetID(), 13374.17f, 14245.673f, 194.9741f, 224.f, 33.33f, 0.f, 0.f, -44.44f, "LevelProp_ShopMale", "ShopMale"));
    addObject(new LevelProp(this, GetNewNetID(), -99.5613f, 855.6632f, 191.4039f, 158.f, 0.f, 0.f, 0.f, 0.f, "LevelProp_ShopMale1", "ShopMale"));
-   
+
    // Start at xp to reach level 1
    expToLevelUp = { 0, 280, 660, 1140, 1720, 2400, 3180, 4060, 5040, 6120, 7300, 8580, 9960, 11440, 13020, 14700, 16480, 18360 };
 
@@ -118,117 +119,175 @@ SummonersRift::SummonersRift(Game* game) : Map(game, 5*1000000, 30*1000000, 90*1
    if (firstSpawnTime - 30 * 1000000 >= 0.0f) announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime - 30 * 1000000, 120, true))); // 30 seconds until minions spawn
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 127, false))); // Minions have spawned (90 * 1000000)
    announcerEvents.push_back(std::make_pair(false, make_tuple(firstSpawnTime, 118, false))); // Minions have spawned [2] (90 * 1000000)
-   
+
    fountain->setHealLocations(this);
 }
 
 void SummonersRift::update(long long diff) {
    Map::update(diff);
-   
+
    if(gameTime >= 120*1000000){
       setKillReduction(false);
    }
 }
 
+std::pair<int, Vector2> SummonersRift::getMinionSpawnPosition(uint32 spawnPosition) const
+{
+	switch (spawnPosition)
+	{
+	case SPAWN_BLUE_TOP:
+		return std::make_pair(0, Vector2(907, 1715));
+	case SPAWN_BLUE_BOT:
+		return std::make_pair(0, Vector2(1533, 1321));
+	case SPAWN_BLUE_MID:
+		return std::make_pair(0, Vector2(1443, 1663));
+	case SPAWN_RED_TOP:
+		return std::make_pair(1, Vector2(14455, 13159));
+	case SPAWN_RED_BOT:
+		return std::make_pair(1, Vector2(12967, 12695));
+	case SPAWN_RED_MID:
+		return std::make_pair(1, Vector2(12433, 12623));
+	}
+}
+
+void SummonersRift::setMinionStats(Minion * minion) const
+{
+	// Same for all minions
+	minion->getStats().setMovementSpeed(325.f);
+	minion->getStats().setBaseAttackSpeed(0.625f);
+	minion->getStats().setAttackSpeedMultiplier(1.0f);
+
+	switch (minion->getType())
+	{
+	case MINION_TYPE_MELEE:
+		minion->getStats().setCurrentHealth(475.0f + ((20.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setMaxHealth(475.0f + ((20.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setBaseAd(12.0f + ((1.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setRange(180.f);
+		minion->getStats().setBaseAttackSpeed(1.250f);
+		minion->setAutoAttackDelay(11.8f / 30.f);
+		minion->setMelee(true);
+		break;
+	case MINION_TYPE_CASTER:
+		minion->getStats().setCurrentHealth(279.0f + ((7.5f)*(int)(gameTime / (float)(90 * 1000000))));
+		minion->getStats().setMaxHealth(279.0f + ((7.5f)*(int)(gameTime / (float)(90 * 1000000))));
+		minion->getStats().setBaseAd(23.0f + ((1.f)*(int)(gameTime / (float)(90 * 1000000))));
+		minion->getStats().setRange(600.f);
+		minion->getStats().setBaseAttackSpeed(0.670f);
+		minion->setAutoAttackDelay(14.1f / 30.f);
+		minion->setAutoAttackProjectileSpeed(650.f);
+		break;
+	case MINION_TYPE_CANNON:
+		minion->getStats().setCurrentHealth(700.0f + ((27.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setMaxHealth(700.0f + ((27.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setBaseAd(40.0f + ((3.f)*(int)(gameTime / (float)(180 * 1000000))));
+		minion->getStats().setRange(450.f);
+		minion->getStats().setBaseAttackSpeed(1.0f);
+		minion->setAutoAttackDelay(9.f / 30.f);
+		minion->setAutoAttackProjectileSpeed(1200.f);
+		break;
+	}
+}
+
 bool SummonersRift::spawn() {
 
-   static const vector<MinionSpawnPosition> positions = {   
+   static const vector<MinionSpawnPosition> positions = {
                                                       SPAWN_BLUE_TOP,
                                                       SPAWN_BLUE_BOT,
                                                       SPAWN_BLUE_MID,
                                                       SPAWN_RED_TOP,
                                                       SPAWN_RED_BOT,
-                                                      SPAWN_RED_MID, 
+                                                      SPAWN_RED_MID,
                                                    };
 
    if(waveNumber < 3) {
       for(uint32 i = 0; i < positions.size(); ++i) {
-         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_MELEE, positions[i], ConstWaypoints[i]);
+         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_MELEE, positions[i], laneWaypoints[i]);
          addObject(m);
       }
       return false;
    }
-   
+
    if(waveNumber == 3) {
       for(uint32 i = 0; i < positions.size(); ++i) {
-         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CANNON, positions[i], ConstWaypoints[i]);
+         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CANNON, positions[i], laneWaypoints[i]);
          addObject(m);
       }
       return false;
    }
-   
+
    if(waveNumber < 7) {
       for(uint32 i = 0; i < positions.size(); ++i) {
-         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CASTER, positions[i], ConstWaypoints[i]);
+         Minion* m = new Minion(this, GetNewNetID(), MINION_TYPE_CASTER, positions[i], laneWaypoints[i]);
          addObject(m);
       }
-      
+
       return false;
    }
-   
+
    return true;
 }
 
-const Target SummonersRift::getRespawnLoc(int side) const {
-   switch(side) {
+const Target SummonersRift::getRespawnLoc(int team) const {
+   switch(team) {
    case 0:
       return Target(25.90f, 280);
    case 1:
       return Target(14119, 14063);
    }
-   
+
    return Target(25.90f, 280);
 }
 
 float SummonersRift::getGoldFor(Unit* u) const {
    Minion* m = dynamic_cast<Minion*>(u);
-   
+
   if(!m) {
       Champion* c = dynamic_cast<Champion*>(u);
-      
+
       if(!c){
          return 0.f;
       }
-      
+
       float gold = 300.f; //normal gold for a kill
-      
+
       if(c->getKillDeathCounter() < 5 && c->getKillDeathCounter() >= 0){
          if(c->getKillDeathCounter() == 0){
             return gold;
          }
-         
+
          for(int i = c->getKillDeathCounter(); i > 1; --i){
             gold += gold*0.165f;
          }
-         
+
          return gold;
       }
-      
+
       if(c->getKillDeathCounter() >= 5){
          return 500.f;
       }
-      
+
       if(c->getKillDeathCounter() < 0){
          float firstDeathGold = gold-gold*0.085f;
-         
+
          if(c->getKillDeathCounter() == -1){
             return firstDeathGold;
          }
-         
+
          for(int i = c->getKillDeathCounter(); i < -1; ++i){
             firstDeathGold -= firstDeathGold*0.2f;
          }
-         
+
          if(firstDeathGold < 50){
             firstDeathGold = 50;
          }
-         
+
          return firstDeathGold;
       }
-      
+
       return 0.f;
    }
-   
+
    switch(m->getType()) {
       case MINION_TYPE_MELEE:
          return 19.f + ((0.5f)*(int)(gameTime / (180 * 1000000)));
@@ -237,7 +296,7 @@ float SummonersRift::getGoldFor(Unit* u) const {
       case MINION_TYPE_CANNON:
          return 40.f + ((1.f)*(int)(gameTime / (180 * 1000000)));
    }
-   
+
    return 0.f;
 }
 

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <utility>
 
 #include "stdafx.h"
 #include "Object.h"
@@ -13,9 +14,10 @@
 class Game;
 class CollisionHandler;
 class Fountain;
+class Minion;
 
-class Map {
-
+class Map 
+{
 protected:
    std::map<uint32, Object*> objects;
    std::map<uint32, Champion*> champions;
@@ -45,6 +47,9 @@ public:
    virtual void update(long long diff);
    virtual float getGoldPerSecond() = 0;
    virtual bool spawn() = 0;
+
+	virtual std::pair<int, Vector2> getMinionSpawnPosition(uint32 spawnPosition) const = 0;
+	virtual void setMinionStats(Minion* minion) const = 0;
    
    Object* getObjectById(uint32 id);
    void addObject(Object* o);
@@ -52,7 +57,7 @@ public:
    const std::vector<uint32>& getExpToLevelUp() { return expToLevelUp; }
    uint64 getGameTime() { return gameTime; }
    uint64 getFirstGoldTime() { return firstGoldTime; }
-   virtual const Target getRespawnLoc(int side) const = 0;
+   virtual const Target getRespawnLoc(int team) const = 0;
    virtual float getGoldFor(Unit* u) const = 0;
    virtual float getExpFor(Unit* u) const = 0 ;
    
@@ -75,7 +80,7 @@ public:
    
    MovementVector toMovementVector(float x, float y);
    
-   bool teamHasVisionOn(int side, Object* o);
+   bool teamHasVisionOn(int team, Object* o);
 
    virtual const int getMapId() const = 0;
 };

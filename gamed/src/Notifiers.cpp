@@ -7,10 +7,10 @@
 
 using namespace std;
 
-void Game::notifyMinionSpawned(Minion* m, int side) {
+void Game::notifyMinionSpawned(Minion* m, int team) {
    MinionSpawn ms(m);
    
-   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
+   broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, ms, CHL_S2C);
    
    notifySetHealth(m);
 }
@@ -30,7 +30,7 @@ void Game::notifyUpdatedStats(Unit* u, bool partial) {
    }
    
    if(!partial) {
-      broadcastPacketTeam((1-u->getSide()) == 0 ? TEAM_BLUE : TEAM_PURPLE, us, CHL_LOW_PRIORITY, 2);
+      broadcastPacketTeam((1-u->getTeam()) == 0 ? TEAM_BLUE : TEAM_PURPLE, us, CHL_LOW_PRIORITY, 2);
    } else {
       broadcastPacketVision(u, us, CHL_LOW_PRIORITY, 2);
    }
@@ -200,36 +200,36 @@ void Game::notifySpawn(Unit* u) {
    Minion* m = dynamic_cast<Minion*>(u);
    
    if(m) {
-      notifyMinionSpawned(m, 1-m->getSide());
+      notifyMinionSpawned(m, 1-m->getTeam());
    }
    
    Champion* c = dynamic_cast<Champion*>(u);
    
    if(c) {
-      notifyChampionSpawned(c, 1-c->getSide());
+      notifyChampionSpawned(c, 1-c->getTeam());
    }
    
    notifySetHealth(u);
 }
 
-void Game::notifyLeaveVision(Object* o, uint32 side) {
+void Game::notifyLeaveVision(Object* o, uint32 team) {
    LeaveVision lv(o);
-   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, lv, CHL_S2C);
+   broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, lv, CHL_S2C);
 
    // Not exactly sure what this is yet
    Champion* c = dynamic_cast<Champion*>(o);
    if (!o) {
       DeleteObjectFromVision deleteObj(o);
-      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, deleteObj, CHL_S2C);
+      broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, deleteObj, CHL_S2C);
    }
 }
 
-void Game::notifyEnterVision(Object* o, uint32 side) {
+void Game::notifyEnterVision(Object* o, uint32 team) {
    Minion* m = dynamic_cast<Minion*>(o);
    
    if(m) {
       EnterVisionAgain eva(m);
-      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
+      broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
       notifySetHealth(m);
       return;
    }
@@ -239,15 +239,15 @@ void Game::notifyEnterVision(Object* o, uint32 side) {
    // TODO: Fix bug where enemy champion is not visible to user when vision is acquired until the enemy champion moves
    if(c) {
       EnterVisionAgain eva(c);
-      broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
+      broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, eva, CHL_S2C);
       notifySetHealth(c);
       return;
    }
 }
 
-void Game::notifyChampionSpawned(Champion* c, uint32 side) {
+void Game::notifyChampionSpawned(Champion* c, uint32 team) {
    HeroSpawn2 hs(c);
-   broadcastPacketTeam(side == 0 ? TEAM_BLUE : TEAM_PURPLE, hs, CHL_S2C);
+   broadcastPacketTeam(team == 0 ? TEAM_BLUE : TEAM_PURPLE, hs, CHL_S2C);
 }
 
 void Game::notifySetCooldown(Champion* c, uint8 slotId, float currentCd, float totalCd) {
