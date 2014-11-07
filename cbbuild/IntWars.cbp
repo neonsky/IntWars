@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="IntWars" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\dep\;CMake Files\gamed\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="Q:/Projects/IntWars/cbbuild" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_cache">
+         <Option working_dir="Q:/Projects/IntWars/cbbuild" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 edit_cache" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="Q:/Projects/IntWars/cbbuild" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="enet">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libenet.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 enet" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="enet/fast">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libenet.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 enet/fast" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="intlib">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libintlib.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 intlib" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="intlib/fast">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libintlib.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 intlib/fast" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="lua">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/liblua.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 lua" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="lua/fast">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/liblua.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 lua/fast" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="raf">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libraf.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 raf" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="raf/fast">
+         <Option output="Q:/Projects/IntWars/cbbuild/dep/libraf.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/dep" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/dep/../gamed/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include" />
+            <Add directory="Q:/Projects/IntWars/dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/dep/include/sol" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 raf/fast" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/dep/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="intwars">
+         <Option output="Q:/Projects/IntWars/cbbuild/gamed/intwars.exe" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/gamed" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/sol" />
+            <Add directory="Q:/Projects/IntWars/gamed/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 intwars" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="intwars/fast">
+         <Option output="Q:/Projects/IntWars/cbbuild/gamed/intwars.exe" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="Q:/Projects/IntWars/cbbuild/gamed" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/intlib" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/lua" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/raf" />
+            <Add directory="Q:/Projects/IntWars/gamed/../dep/include/sol" />
+            <Add directory="Q:/Projects/IntWars/gamed/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/../../../../x86_64-w64-mingw32/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include-fixed" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/backward" />
+            <Add directory="q:\mingw64\bin\../lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 intwars/fast" />
+            <CompileFile command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="Q:/mingw64/bin/mingw32-make.exe -f &quot;Q:/Projects/IntWars/cbbuild/gamed/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/callbacks.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/host.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/list.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/packet.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/peer.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/protocol.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/unix.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/enet/win32.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/intlib/base64.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/intlib/blowfish.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/intlib/general.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lapi.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lauxlib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lbaselib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lbitlib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lcode.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lcorolib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lctype.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ldblib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ldebug.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ldo.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ldump.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lfunc.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lgc.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/linit.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/liolib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/llex.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lmathlib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lmem.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/loadlib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/loadlib_rel.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lobject.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lopcodes.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/loslib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lparser.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lstate.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lstring.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lstrlib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ltable.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ltablib.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/ltm.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lua.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/luac.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lundump.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lvm.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/lua/lzio.c">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/raf/FileReader.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/raf/RAFFile.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/src/raf/RAFManager.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/AIMesh.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/AITasker.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Buff.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Champion.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/CollisionHandler.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Fountain.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Game.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Handlers.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Inventory.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Item.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/ItemManager.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Logger.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/LuaChampion.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/LuaGame.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/LuaItem.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/LuaScript.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/LuaUnit.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Map.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Minion.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Notifiers.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Object.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/PacketHandler.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Packets.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Pathfinder.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Projectile.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Spell.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Stats.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/SummonersRift.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Target.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Turret.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Unit.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/Vector2.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/src/main.cpp">
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/dep/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\dep\" />
+      </Unit>
+      <Unit filename="Q:/Projects/IntWars/gamed/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\gamed\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

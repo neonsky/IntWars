@@ -99,7 +99,7 @@ cmake_install.cmake
 *.lnk
 
 build/
-cbbuild/
+codeblocksbuild/
 vsbuild/
 win/NetBeans/IntWars/nbproject/*
 win/NetBeans/IntWars/nbproject/private/* 
@@ -128,3 +128,4 @@ win/NetBeans/IntWars/nbproject/project.xml
 StartGame.bat
 Debug.bat
 log.html
+*.exe
