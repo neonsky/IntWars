@@ -228,7 +228,7 @@ bool SummonersRift::spawn() {
    return true;
 }
 
-const Target SummonersRift::getRespawnLoc(int team) const {
+const Target SummonersRift::getRespawnLocation(int team) const {
    switch(team) {
    case 0:
       return Target(25.90f, 280);
@@ -300,7 +300,7 @@ float SummonersRift::getGoldFor(Unit* u) const {
    return 0.f;
 }
 
-float SummonersRift::getExpFor(Unit* u) const {
+float SummonersRift::getExperienceFor(Unit* u) const {
 	Minion* m = dynamic_cast<Minion*>(u);
 
 	if (!m) {

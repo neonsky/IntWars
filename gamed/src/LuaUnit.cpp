@@ -26,7 +26,7 @@ void LuaScript::addUnit() {
             "setTeam", &Object::setTeam,
             "getTarget", &Object::getTarget,
             "setTarget", &Object::setTarget,
-            //"setUnitTarget", &Object::setUnitTarget, //not in Object anymore
+            //"setTargetUnit", &Object::setTargetUnit, //not in Object anymore
             "isToRemove", &Object::isToRemove,
             "setToRemove", &Object::setToRemove,
             "getNetId", &Object::getNetId,
@@ -56,7 +56,7 @@ void LuaScript::addUnit() {
             "setTarget", &Unit::setTarget,
             "setTeam", &Unit::setTeam,
             "setTeam", &Unit::setTeam,
-            "setUnitTarget", &Unit::setUnitTarget,
+            "setTargetUnit", &Unit::setTargetUnit,
             "isToRemove", &Unit::isToRemove,
             "setToRemove", &Unit::setToRemove,
             "getNetId", &Unit::getNetId,

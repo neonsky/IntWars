@@ -255,7 +255,7 @@ void Spell::loadLua(LuaScript& script){
 
    script.lua.set_function("dashTo", [this](Unit* u, float x, float y, float dashSpeed) {
       u->dashTo(x, y, dashSpeed);
-      u->setUnitTarget(0);
+      u->setTargetUnit(0);
       owner->getMap()->getGame()->notifyDash(u, x, y, dashSpeed);
       return;
    });

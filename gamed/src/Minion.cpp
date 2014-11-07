@@ -29,13 +29,11 @@ Minion::Minion(Map* map, uint32 id, MinionSpawnType type, MinionSpawnPosition po
 	// Set model
    setModel(minionModel);
    
-   vector<Vector2> newWaypoints;
-   
-   if(mainWaypoints.size() > 0)
-      newWaypoints = { mainWaypoints[0], mainWaypoints[0] };
-	else newWaypoints = { Vector2(x, y), Vector2(x, y) };
-   
-   setWaypoints(newWaypoints);
+
+	if (mainWaypoints.size() > 0)										// If we have lane path instructions from the map
+		setWaypoints({ mainWaypoints[0], mainWaypoints[0] }); // Follow these instructions
+	else setWaypoints({ Vector2(x, y), Vector2(x, y) });		// Otherwise path to own position. (Stand still)
+
    setMoveOrder(MOVE_ORDER_ATTACKMOVE);
 }
 
@@ -45,7 +43,7 @@ void Minion::update(int64 diff)
 
 	if (!isDead())
 	{
-		if (scanForTargets())     // returns true if a target is in range
+		if (scanForTargets())     // returns true if we have a target
 			keepFocussingTarget(); // fight target
 		else walkToDestination(); // walk to destination (or target)
 	}
@@ -53,92 +51,85 @@ void Minion::update(int64 diff)
 
 bool Minion::scanForTargets()
 {
-	if (!unitTarget) // if we have got no unitTarget
-	{
+	if (!targetUnit) // if we have got no targetUnit
 		focusTargetInRange();
+	
+	focusChampionsInDistress(); 
+	// Regardless of whether we did or did not have a target, 
+	// focus a champion nearby if it's in trouble.
+
+	return targetUnit;
+}
+
+void Minion::focusChampionsInDistress()
+{
+	Unit* nextTarget = 0;
+	Champion * curTargetChampion = dynamic_cast<Champion*>(targetUnit);
+	if (curTargetChampion &&															// If we're currently targetting a champion
+		 dynamic_cast<Champion*>(curTargetChampion->getTargetUnit()) &&	// If that champ is attacking a friendly champion.
+		 curTargetChampion->getTargetUnit()->isInDistress())					// And he is in distress (attacked)
+	{ 
+		return; // Don't look for a new target. Attack this one instead.
 	}
 
-	if (unitTarget) 
+	for (Champion* u : map->getChampionsInRange(this, DETECT_RANGE, true))
 	{
-		Champion* c = dynamic_cast<Champion*>(unitTarget);
+		// Targets have to be:
+		if (u->getTeam() == getTeam() ||					// not on our team
+			!getMap()->teamHasVisionOn(getTeam(), u)) // visible to this minion
+			continue; // If not, look for something else
 
-		if (c && !autoAttackFlag) 
+		Champion* potentialTarget = dynamic_cast<Champion*>(u);
+		Champion* target = dynamic_cast<Champion*>(potentialTarget->getTargetUnit());
+
+		if (target && target->isInDistress() &&		 // If it's a champion, in distress
+			distanceWith(target) <= stats->getRange()) // and the minion is in range of him.
 		{
-			const std::map<uint32, Object*>& objects = map->getObjects();
-			Unit* nextTarget = 0;
-			unsigned int nextTargetPriority = 10;
-			for (auto& it : objects) 
-			{
-				Unit* u = dynamic_cast<Unit*>(it.second);
-
-				if (!u || u->isDead() || u->getTeam() == getTeam() || distanceWith(u) > stats->getRange()) continue;
-
-				// Find the next champion in range targeting an enemy champion who is also in range
-				Champion* nextChampion = dynamic_cast<Champion*>(u);
-				if (nextChampion && c != nextChampion && nextChampion->getUnitTarget() != 0) 
-				{
-					Champion* target = dynamic_cast<Champion*>(nextChampion->getUnitTarget());
-					if (target && nextChampion->distanceWith(target) <= nextChampion->getStats().getRange() && distanceWith(target) <= stats->getRange()) 
-					{
-						nextTarget = nextChampion; // No priority required
-						break;
-					}
-				}
-
-				auto priority = classifyTarget(u);
-				if (priority < nextTargetPriority) 
-				{
-					nextTarget = u;
-					nextTargetPriority = priority;
-				}
-			}
-			if (nextTarget) 
-			{
-				setUnitTarget(nextTarget); // Set the new target and refresh waypoints
-				map->getGame()->notifySetTarget(this, nextTarget);
-			}
+			targetUnit = potentialTarget; // Then target him next.
+			return;
 		}
-
-		return true;
 	}
-
-	return false;
 }
 
 void Minion::focusTargetInRange()
 {
 	Unit* nextTarget = 0;
-	unsigned int nextTargetPriority = 10;
+	unsigned int nextTargetPriority = 9e5;
 
 	const std::map<uint32, Object*>& objects = map->getObjects();
 	for (auto& it : objects)
 	{
 		Unit* u = dynamic_cast<Unit*> (it.second);
 
-		if (!u || u->isDead() || u->getTeam() == getTeam() || distanceWith(u) > DETECT_RANGE || !getMap()->teamHasVisionOn(getTeam(), u))
-			continue;
+		// Targets have to be:
+		if (!u ||												 // a unit
+			 u->isDead() ||									 // alive
+			 u->getTeam() == getTeam() ||					 // not on our team
+			 distanceWith(u) > DETECT_RANGE ||			 // in range
+			 !getMap()->teamHasVisionOn(getTeam(), u)) // visible to this minion
+			continue; // If not, look for something else
 
-		auto priority = classifyTarget(u);
-		if (priority < nextTargetPriority)
+		auto priority = classifyTarget(u); // get the priority.
+		if (priority < nextTargetPriority) // if the priority is lower than the target we checked previously
 		{
-			nextTarget = u;
+			nextTarget = u;					  // make him a potential target.
 			nextTargetPriority = priority;
 		}
 	}
 
-	if (nextTarget)
+	if (nextTarget) // If we have a target
 	{
-		setUnitTarget(nextTarget); // Set the new target and refresh waypoints
+		setTargetUnit(nextTarget); // Set the new target and refresh waypoints
 		map->getGame()->notifySetTarget(this, nextTarget);
 	}
 }
 
 void Minion::keepFocussingTarget()
 {
-	if (autoAttackFlag && (!unitTarget || distanceWith(unitTarget) > stats->getRange()))
+	if (isAttacking && (!targetUnit || distanceWith(targetUnit) > stats->getRange()))
 	{
 		map->getGame()->notifyStopAutoAttack(this);
-		autoAttackFlag = false;
+		isAttacking = false;
 	}
 }
 
@@ -146,12 +137,14 @@ void Minion::walkToDestination()
 { 
    if((waypoints.size() == 1) || (curWaypoint == 2 && ++curMainWaypoint < mainWaypoints.size())) 
 	{
-      //CORE_INFO("Minion reached ! Going to %d;%d", mainWaypoints[curMainWaypoint].x, mainWaypoints[curMainWaypoint].y);
+      //CORE_INFO("Minion reached a point! Going to %f; %f", mainWaypoints[curMainWaypoint].X, mainWaypoints[curMainWaypoint].Y);
       vector<Vector2> newWaypoints = { Vector2(x, y), mainWaypoints[curMainWaypoint] };
-      setWaypoints(newWaypoints);
+		setWaypoints(newWaypoints);
    }
 }
 
 void Minion::onCollision(Object * a_Collider)
 {
+	setTarget(0);
+	setTargetUnit(0);
 }

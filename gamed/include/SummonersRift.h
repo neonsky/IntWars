@@ -12,9 +12,9 @@ public:
    virtual void update(long long diff) override;
    float getGoldPerSecond() override { return 1.9f; }
    
-   const Target getRespawnLoc(int team) const override;
+   const Target getRespawnLocation(int team) const override;
    float getGoldFor(Unit* u) const override;
-   float getExpFor(Unit* u) const override;
+   float getExperienceFor(Unit* u) const override;
 
 	virtual std::pair<int, Vector2> getMinionSpawnPosition(uint32 spawnPosition) const override;
 	virtual void setMinionStats(Minion* minion) const override;

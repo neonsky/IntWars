@@ -259,7 +259,7 @@ public:
         return (uint8)floor(getStat(MM_Four, FM4_Level) + 0.5f);
     }
 
-    virtual float getExp() {
+    virtual float getExperience() {
         return getStat(MM_Four, FM4_exp);
     }
 

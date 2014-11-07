@@ -37,6 +37,7 @@ protected:
 	void walkToDestination();
 	void keepFocussingTarget();
 	void focusTargetInRange();
+	void focusChampionsInDistress();
 
 
    MinionSpawnPosition spawnPosition;

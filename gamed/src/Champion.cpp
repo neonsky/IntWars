@@ -126,7 +126,7 @@ Spell* Champion::levelUpSpell(uint8 slot) {
 void Champion::update(int64 diff) {
    Unit::update(diff);
 
-   if (!isDead() && moveOrder == MOVE_ORDER_ATTACKMOVE && !unitTarget) {
+   if (!isDead() && moveOrder == MOVE_ORDER_ATTACKMOVE && !targetUnit) {
       const std::map<uint32, Object*>& objects = map->getObjects();
       float distanceToTarget = 9000000.f;
       Unit* nextTarget = 0;
@@ -146,7 +146,7 @@ void Champion::update(int64 diff) {
       }
 
       if (nextTarget) {
-         setUnitTarget(nextTarget);
+         setTargetUnit(nextTarget);
          map->getGame()->notifySetTarget(this, nextTarget);
       }
    }
@@ -171,7 +171,7 @@ void Champion::update(int64 diff) {
 
    bool levelup = false;
 
-   while (getStats().getLevel() < map->getExpToLevelUp().size() && getStats().getExp() >= map->getExpToLevelUp()[getStats().getLevel()]) {
+   while (getStats().getLevel() < map->getExperienceToLevelUp().size() && getStats().getExp() >= map->getExperienceToLevelUp()[getStats().getLevel()]) {
       levelUp();
       levelup = true;
    }

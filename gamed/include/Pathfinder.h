@@ -10,7 +10,7 @@
 #define MAX_PATHFIND_TRIES 1000
 
 #define TABLE_SIZE (2<<15)
-#define GRID_SIZE 256
+#define GRID_SIZE 512
 #define GRID_WIDTH GRID_SIZE
 #define GRID_HEIGHT GRID_SIZE
 

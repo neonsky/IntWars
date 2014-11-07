@@ -33,7 +33,7 @@ void LuaScript::addGame() {
             "getGoldPerSecond", &Map::getGoldPerSecond,
             "getObjectById", &Map::getObjectById,
             "addObject", &Map::addObject,
-            "getExpToLevelUp", &Map::getExpToLevelUp,
+            "getExperienceToLevelUp", &Map::getExperienceToLevelUp,
             "getGame", &Map::getGame,
             "getObjects", &Map::getObjects);
     lua.set_userdata(mapUserData);*/

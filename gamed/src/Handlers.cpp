@@ -385,11 +385,11 @@ bool Game::handleMove(ENetPeer *peer, ENetPacket *packet) {
    peerInfo(peer)->getChampion()->setWaypoints(vMoves);
    Unit* u = dynamic_cast<Unit*>(map->getObjectById(request->targetNetId));
    if(!u) {
-      peerInfo(peer)->getChampion()->setUnitTarget(0);
+      peerInfo(peer)->getChampion()->setTargetUnit(0);
       return true;
    }
 
-   peerInfo(peer)->getChampion()->setUnitTarget(u);
+   peerInfo(peer)->getChampion()->setTargetUnit(u);
 
    return true;
 }

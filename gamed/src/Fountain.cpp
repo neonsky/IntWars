@@ -4,7 +4,7 @@
 
 void Fountain::setHealLocations(Map* map){
    for (int i = 0; i < NUM_SIDES; i++)
-      healLocations.insert(healLocations.begin()+i, new Target(map->getRespawnLoc(i)));
+      healLocations.insert(healLocations.begin()+i, new Target(map->getRespawnLocation(i)));
 }
 
 void Fountain::healChampions(Map* map, long long diff) {

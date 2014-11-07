@@ -196,8 +196,8 @@ void Map::stopTargeting(Unit* target) {
          continue;
       }
       
-      if(u->getUnitTarget() == target) {
-         u->setUnitTarget(0);
+      if(u->getTargetUnit() == target) {
+         u->setTargetUnit(0);
          u->setLastTarget(0);
          game->notifySetTarget(u, 0);
       }

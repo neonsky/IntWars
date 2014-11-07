@@ -31,21 +31,21 @@ void Turret::update(int64 diff)
             continue;
          }
          
-         if (!unitTarget) {
+         if (!targetUnit) {
             auto priority = classifyTarget(u);
             if (priority < nextTargetPriority) {
                nextTarget = u;
                nextTargetPriority = priority;
             }
          } else {
-            Champion* currentTarget = dynamic_cast<Champion*>(unitTarget);
+            Champion* currentTarget = dynamic_cast<Champion*>(targetUnit);
             
             // Is the current target a champion? If it is, don't do anything
             if (!currentTarget) {
                // Find the next champion in range targeting an enemy champion who is also in range
                Champion* c = dynamic_cast<Champion*>(u);
-               if (c && c->getUnitTarget() != 0) {
-                  Champion* target = dynamic_cast<Champion*>(c->getUnitTarget());
+               if (c && c->getTargetUnit() != 0) {
+                  Champion* target = dynamic_cast<Champion*>(c->getTargetUnit());
                   if (target && c->distanceWith(target) <= c->getStats().getRange() && distanceWith(target) <= TURRET_RANGE) {
                      nextTarget = c; // No priority required
                      break;
@@ -55,14 +55,14 @@ void Turret::update(int64 diff)
          }
       }
       if (nextTarget) {
-         unitTarget = nextTarget;
+         targetUnit = nextTarget;
          map->getGame()->notifySetTarget(this, nextTarget);
       }
    }
    
    // Lose focus of the unit target if the target is out of range
-   if(unitTarget && distanceWith(unitTarget) > TURRET_RANGE) {
-      setUnitTarget(0);
+   if(targetUnit && distanceWith(targetUnit) > TURRET_RANGE) {
+      setTargetUnit(0);
       map->getGame()->notifySetTarget(this, 0);
    }
 

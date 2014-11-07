@@ -27,8 +27,8 @@ void Unit::update(int64 diff) {
    }
 
    if (isDead()) {
-      if (unitTarget) {
-         setUnitTarget(0);
+      if (targetUnit) {
+         setTargetUnit(0);
          lastTarget = 0;
          isAttacking = false;
          map->getGame()->notifySetTarget(this, 0);
@@ -38,15 +38,15 @@ void Unit::update(int64 diff) {
    }
 
    Turret* selfTurret = dynamic_cast<Turret*>(this);
-   Turret* turretTarget = dynamic_cast<Turret*>(unitTarget);
-   if (unitTarget && unitTarget->isDead() || unitTarget && !getMap()->teamHasVisionOn(getTeam(), unitTarget) && !turretTarget && !selfTurret) {
-      setUnitTarget(0);
+   Turret* turretTarget = dynamic_cast<Turret*>(targetUnit);
+   if (targetUnit && targetUnit->isDead() || targetUnit && !getMap()->teamHasVisionOn(getTeam(), targetUnit) && !turretTarget && !selfTurret) {
+      setTargetUnit(0);
       isAttacking = false;
       map->getGame()->notifySetTarget(this, 0);
       initialAttackDone = false;
    }
 
-   if (!unitTarget && isAttacking) {
+   if (!targetUnit && isAttacking) {
       Turret* lastTurretTarget = dynamic_cast<Turret*>(lastTarget);
       if (!lastTarget || lastTarget && lastTarget->isDead() || lastTarget && !getMap()->teamHasVisionOn(getTeam(), lastTarget) && !lastTurretTarget && !selfTurret) {
          isAttacking = false;
@@ -68,31 +68,31 @@ void Unit::update(int64 diff) {
          autoAttackCurrentCooldown = 1.f / (stats->getTotalAttackSpeed());
          isAttacking = false;
 
-         if (!unitTarget) {
+         if (!targetUnit) {
             lastTarget = 0;
             initialAttackDone = false;
          }
       }
-   } else if (unitTarget && distanceWith(unitTarget) <= stats->getRange()) {
+   } else if (targetUnit && distanceWith(targetUnit) <= stats->getRange()) {
       refreshWaypoints();
       nextAutoIsCrit = ((rand() % 100 + 1) <= stats->getCritChance() * 100) ? true : false;
       if (autoAttackCurrentCooldown <= 0) {
          isAttacking = true;
          autoAttackCurrentDelay = 0;
          autoAttackProjId = GetNewNetID();
-         autoAttackFlag = true;
-         lastTarget = unitTarget;
+         isAttacking = true;
+         lastTarget = targetUnit;
 
          if (!initialAttackDone) {
             initialAttackDone = true;
-            map->getGame()->notifyBeginAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit);
+            map->getGame()->notifyBeginAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit);
          } else {
             nextAttackFlag = !nextAttackFlag; // The first auto attack frame has occurred
-            map->getGame()->notifyNextAutoAttack(this, unitTarget, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
+            map->getGame()->notifyNextAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
          }
 
          AttackType attackType = isMelee() ? ATTACK_TYPE_MELEE : ATTACK_TYPE_TARGETED;
-         map->getGame()->notifyOnAttack(this, unitTarget, attackType);
+         map->getGame()->notifyOnAttack(this, targetUnit, attackType);
       }
    } else {
       refreshWaypoints();
@@ -197,7 +197,7 @@ void Unit::die(Unit* killer) {
 
    map->getGame()->notifyNpcDie(this, killer);
 
-	float exp = map->getExpFor(this);
+	float exp = map->getExperienceFor(this);
 	auto champs = map->getChampionsInRange(this, EXP_RANGE, true);
 	//Cull allied champions
 	champs.erase(std::remove_if(champs.begin(), 
@@ -207,7 +207,7 @@ void Unit::die(Unit* killer) {
 	if (champs.size() > 0) {
 		float expPerChamp = exp / champs.size();
 		for (auto c = champs.begin(); c != champs.end(); ++c) {
-			(*c)->getStats().setExp((*c)->getStats().getExp() + expPerChamp);
+			(*c)->getStats().setExp((*c)->getStats().getExperience() + expPerChamp);
 		}
 	}
 
@@ -240,8 +240,16 @@ void Unit::die(Unit* killer) {
    }
 }
 
-void Unit::setUnitTarget(Unit* target) {
-   unitTarget = target;
+void Unit::setTargetUnit(Unit* target) 
+{
+	if (target == 0) // If we are unsetting the target (moving around)
+	{
+		if (targetUnit != 0) // and we had a target
+			targetUnit->setDistressCall(false);	// Unset the distress call	
+		// TODO: Replace this with a delay?
+	}
+	else target->setDistressCall(true); // Otherwise set the distress call
+	targetUnit = target;
    refreshWaypoints();
 }
 
@@ -250,16 +258,16 @@ void Unit::setLastTarget(Unit* target) {
 }
 
 void Unit::refreshWaypoints() {
-   if (!unitTarget || (distanceWith(unitTarget) <= stats->getRange() && waypoints.size() == 1)) {
+   if (!targetUnit || (distanceWith(targetUnit) <= stats->getRange() && waypoints.size() == 1)) {
       return;
    }
 
-   if (distanceWith(unitTarget) <= stats->getRange()-2.f) {
+   if (distanceWith(targetUnit) <= stats->getRange()-2.f) {
       setWaypoints({Vector2(x, y)});
    } else {
       Target* t = new Target(waypoints[waypoints.size()-1]);
-      if(t->distanceWith(unitTarget) >= 25.f) {
-			setWaypoints({ Vector2(x, y), Vector2(unitTarget->getX(), unitTarget->getY()) });
+      if(t->distanceWith(targetUnit) >= 25.f) {
+			setWaypoints({ Vector2(x, y), Vector2(targetUnit->getX(), targetUnit->getY()) });
       }
       delete t;
    }

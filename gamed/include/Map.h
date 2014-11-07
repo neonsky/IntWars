@@ -54,12 +54,12 @@ public:
    Object* getObjectById(uint32 id);
    void addObject(Object* o);
    void removeObject(Object* o);
-   const std::vector<uint32>& getExpToLevelUp() { return expToLevelUp; }
+   const std::vector<uint32>& getExperienceToLevelUp() { return expToLevelUp; }
    uint64 getGameTime() { return gameTime; }
    uint64 getFirstGoldTime() { return firstGoldTime; }
-   virtual const Target getRespawnLoc(int team) const = 0;
+   virtual const Target getRespawnLocation(int team) const = 0;
    virtual float getGoldFor(Unit* u) const = 0;
-   virtual float getExpFor(Unit* u) const = 0 ;
+   virtual float getExperienceFor(Unit* u) const = 0 ;
    
    Game* getGame() const { return game; }
    
