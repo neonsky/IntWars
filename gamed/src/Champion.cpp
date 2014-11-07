@@ -171,7 +171,7 @@ void Champion::update(int64 diff) {
 
    bool levelup = false;
 
-   while (getStats().getLevel() < map->getExperienceToLevelUp().size() && getStats().getExp() >= map->getExperienceToLevelUp()[getStats().getLevel()]) {
+   while (getStats().getLevel() < map->getExperienceToLevelUp().size() && getStats().getExperience() >= map->getExperienceToLevelUp()[getStats().getLevel()]) {
       levelUp();
       levelup = true;
    }
