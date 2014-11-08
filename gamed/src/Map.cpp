@@ -198,7 +198,7 @@ void Map::stopTargeting(Unit* target) {
       
       if(u->getTargetUnit() == target) {
          u->setTargetUnit(0);
-         u->setLastTarget(0);
+         u->setAutoAttackTarget(0);
          game->notifySetTarget(u, 0);
       }
    }
@@ -219,7 +219,10 @@ std::vector<Champion*> Map::getChampionsInRange(Target* t, float range, bool isA
 
 bool Map::teamHasVisionOn(int team, Object* o) {
    
-
+   if (o == 0){
+      return false;
+   }
+   
    if(o->getTeam() == team) {
       return true;
    }

@@ -1,3 +1,3 @@
 @echo off
-cd build\gamed\
+cd codeblocksbuild\gamed\
 gdb intwars.exe

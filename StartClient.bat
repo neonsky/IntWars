@@ -4,7 +4,7 @@ echo -----------------------
 echo IntWars Solo Launcher
 echo -----------------------
 
-start /d "build\gamed" intwars.exe && (
+start /d "codeblocksbuild\gamed" intwars.exe && (
    echo Server started^^!
 ) || (
    echo Server not found^^!

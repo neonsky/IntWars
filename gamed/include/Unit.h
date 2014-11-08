@@ -39,7 +39,8 @@ public:
 	Unit(Map* map, uint32 id, std::string model, Stats* stats, uint32 collisionRadius = 40, float x = 0, float y = 0, uint32 visionRadius = 0) : Object(map, id, x, y, collisionRadius, visionRadius), stats(stats),
 		statUpdateTimer(0), model(model), autoAttackDelay(0), autoAttackProjectileSpeed(0), isAttacking(false),
 		autoAttackCurrentCooldown(0), autoAttackCurrentDelay(0), modelUpdated(false), moveOrder(MOVE_ORDER_MOVE), deathFlag(false),
-		targetUnit(0), lastTarget(0), distressCause(0), melee(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
+		targetUnit(0), autoAttackTarget(0), distressCause(0), melee(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
+
 	{ }
 	virtual ~Unit();
 	Stats& getStats() { return *stats; }
@@ -85,7 +86,7 @@ public:
 	Buff* getBuff(std::string name);
 	void setMoveOrder(MoveOrder moveOrder) { this->moveOrder = moveOrder; }
 	void setTargetUnit(Unit* target);
-	void setLastTarget(Unit* target);
+	void setAutoAttackTarget(Unit* target);
 	Unit* getTargetUnit() const { return targetUnit; }
 	virtual void refreshWaypoints();
 	bool isMelee() const { return melee; }
@@ -106,7 +107,7 @@ protected:
     * Unit we want to attack as soon as in range
     */
    Unit* targetUnit;
-   Unit* lastTarget;
+   Unit* autoAttackTarget;
    
    bool deathFlag;
    
