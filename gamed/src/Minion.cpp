@@ -96,16 +96,24 @@ void Minion::keepFocussingTarget()
 
 void Minion::walkToDestination()
 { 
-   if((waypoints.size() == 1) || (curWaypoint == 2 && ++curMainWaypoint < mainWaypoints.size())) 
+	if ((waypoints.size() == 1) || (curWaypoint == 2 && ++curMainWaypoint < mainWaypoints.size()))
 	{
-      //CORE_INFO("Minion reached a point! Going to %f; %f", mainWaypoints[curMainWaypoint].X, mainWaypoints[curMainWaypoint].Y);
-      vector<Vector2> newWaypoints = { Vector2(x, y), mainWaypoints[curMainWaypoint] };
+		//CORE_INFO("Minion reached a point! Going to %f; %f", mainWaypoints[curMainWaypoint].X, mainWaypoints[curMainWaypoint].Y);
+		vector<Vector2> newWaypoints = { Vector2(x, y), mainWaypoints[curMainWaypoint] };
 		setWaypoints(newWaypoints);
    }
 }
 
 void Minion::onCollision(Object * a_Collider)
 {
-	//setTarget(0);
-	//setTargetUnit(0);
+	if (a_Collider == targetUnit) // If we're colliding with the target, don't do anything.
+		return;
+	
+	if (targetUnit != 0)
+	{
+		// Thread this?
+		//Path newPath = Pathfinder::getPath(getPosition(), targetUnit->getPosition());
+		//if (newPath.error == PATH_ERROR_NONE)
+			//setWaypoints(newPath.getWaypoints());
+	}
 }

@@ -7,10 +7,10 @@
 #include "AIMesh.h"
 #include "Object.h"
 
-#define MAX_PATHFIND_TRIES 1000
+#define MAX_PATHFIND_TRIES 100
 
 #define TABLE_SIZE (2<<15)
-#define GRID_SIZE 512
+#define GRID_SIZE 1024
 #define GRID_WIDTH GRID_SIZE
 #define GRID_HEIGHT GRID_SIZE
 
@@ -65,8 +65,8 @@ class AIMesh;
 enum PathError
 {
    PATH_ERROR_NONE = 0,
-   PATH_ERROR_OUT_OF_TRIES,
-   PATH_ERROR_OPENLIST_EMPTY
+   PATH_ERROR_OUT_OF_TRIES = 1,
+   PATH_ERROR_OPENLIST_EMPTY = 2
 };
 
 class Path
@@ -119,7 +119,6 @@ protected:
    std::vector<PathNode*> openList, closedList;
    Grid map[GRID_SIZE][GRID_SIZE];
    Vector2 start, destination;
-   float gridNodeSize;
 };
 
 class Pathfinder

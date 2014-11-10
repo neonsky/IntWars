@@ -8,34 +8,59 @@
 #include <cstdlib>
 #include <chrono>
 #include "Logger.h"
+#include "Minion.h"
+#include "Champion.h"
 
 Map * Pathfinder::chart = 0;
-auto g_Clock = std::clock();
+auto g_Clock = std::clock(); 
+
+#define debugOutput() false //((std::clock() - g_Clock) > 4000)
 
 int successes = 0 , oot = 0, empties = 0;
 
+auto start_time = std::chrono::high_resolution_clock::now();
+unsigned int totalDuration = 0, durations = 0;
+
 Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 {
+	start_time = std::chrono::high_resolution_clock::now();
    Path path;
-   PathJob job;
-
-   if ((std::clock() - g_Clock) > 10000 && (successes + oot + empties)>0)
-   {
+	PathJob job; 
+	
+	if ((std::clock() - g_Clock) > 4000 && (successes + oot + empties) > 0)
+	{
 		CORE_INFO("Pathfinding successrate: %f", (((float)successes / (float)(successes + oot + empties))*(100.0f)));
+	}
+
+   if (debugOutput())
+   {
+		CORE_INFO("Recording this minion movement.");
    } 
 
    if (chart == 0) CORE_FATAL("Tried to find a path without setting the map.");
    if (getMesh() == 0) CORE_FATAL("Can't start pathfinding without initialising the AIMesh");
 
+
    job.start = job.fromPositionToGrid(from); // Save start in grid info
    job.destination = job.fromPositionToGrid(to); // Save destination in grid info
+
+	if (debugOutput())
+	{
+		CORE_INFO("Going from (%f, %f) to (%f, %f)", job.start.X, job.start.Y, job.destination.X, job.destination.Y);
+	}
 
    job.insertObstructions(chart, getMesh()); // Ready the map.
           
    job.addToOpenList(job.start, 0); // Let's start at the start.
+	
+	int tries;
+   for ( tries = 0; job.openList.size() != 0; tries++) // Go through the open list while it's not empty
+	{
+		if (debugOutput())
+		{
+			CORE_INFO("Going through openlist. Tries: %d | Objects on list: %d", tries, job.openList.size());
+		}
 
-   for (int tries = 0; job.openList.size() != 0; tries++) // Go through the open list while it's not empty
-   {
       if (tries == MAX_PATHFIND_TRIES)
       {
          path.error = PATH_ERROR_OUT_OF_TRIES;
@@ -58,6 +83,11 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
       }
    }
 
+	if (debugOutput())
+	{
+		CORE_INFO("Going through openlist. Tries: %d | Objects on list: %d", tries, job.openList.size());
+	}
+
 	//CORE_WARNING("PATH_ERROR_OPENLIST_EMPTY");
    path.error = PATH_ERROR_OPENLIST_EMPTY;
    empties++;
@@ -69,7 +99,19 @@ Path Pathfinder::getPath(Vector2 from, Vector2 to, float boxSize)
 
 bool PathJob::traverseOpenList(bool first)
 {
-   if (openList.size() == 0) return true;
+	if (openList.size() == 0)
+	{
+		if (debugOutput())
+		{
+			CORE_INFO("In OpenList, but failed, we are empty.");
+		}
+		return false;
+	}
+	else if (debugOutput())
+	{
+		CORE_INFO("TraverseOpenList! First: %d", first);
+	}
+
    
    // This sorts every iteration, which means that everything but the last couple of elements are sorted.
    // TODO: That means, this can probably be optimised. Sort only the last elements and add them into the vector where they belong.
@@ -79,7 +121,16 @@ bool PathJob::traverseOpenList(bool first)
    PathNode * currentNode = openList.back();
    openList.pop_back();
 
-   bool atDestination = (currentNode->x == (int)destination.X && currentNode->y == (int)destination.Y);
+	bool atDestination = (abs(currentNode->x - (int)destination.X) <= 1 && abs(currentNode->y-(int)destination.Y) <= 1);
+
+	if (debugOutput() && atDestination)
+	{
+		CORE_INFO("We're at our destination! (%d, %d)", currentNode->x, currentNode->y);
+	}
+	else if (debugOutput())
+	{
+		CORE_INFO("Difference: (%d, %d)", (int)destination.X - currentNode->x, (int)destination.Y-currentNode->y);
+	}
 
    if (!atDestination) // While we're not there
    {      
@@ -89,13 +140,17 @@ bool PathJob::traverseOpenList(bool first)
          {
             for (int dy = -1; dy <= 1; dy++)
             {
-               if (!(dx == 0 && dy == 0)) // in y 8 directions, ignore the x==y==0 where we dont move
+               if (!(dx == 0 && dy == 0)) // in all 8 directions, ignore the x==y==0 where we dont move
                {
                   if (!isGridNodeOccupied(currentNode->x + dx, currentNode->y + dy)) // Is something here?
                   {
                      PathNode* conflictingNode = isNodeOpen(currentNode->x + dx, currentNode->y + dy); // Nothing is here, did we already add this to the open list?
                      if (!conflictingNode) // We did not, add it
                      {
+								if (debugOutput())
+								{
+									CORE_INFO("Adding to open list: (%f, %f)", (float)(currentNode->x + dx), (float)(currentNode->y + dy));
+								}
                         addToOpenList(Vector2((float)(currentNode->x + dx), (float)(currentNode->y + dy)), currentNode);
                      }
                      else if (conflictingNode->g > CALC_G(currentNode->g)) // I found a shorter route to this node.
@@ -104,11 +159,16 @@ bool PathJob::traverseOpenList(bool first)
                         conflictingNode->setScore((int)CALC_H(conflictingNode->x, conflictingNode->y, destination.X, destination.Y), CALC_G(currentNode->g)); // set the new score.
                      }
                   }
+						else if (debugOutput())
+						{
+							CORE_INFO("Occupied: (%d, %d)", currentNode->x + dx, currentNode->y + dy);
+						}
                }
             }
          }
       }
    }
+
 
    closedList.push_back(currentNode);
    return atDestination;
@@ -157,6 +217,7 @@ std::vector<Vector2> PathJob::reconstructUnfinishedPath() // Let's go over the c
 
 void PathJob::cleanPath(Path &path)
 {
+	return;
    if (path.waypoints.size() < 2) return;
    int startSize = path.waypoints.size();
    CORE_WARNING("Cleaning path.. Current size is %d", startSize);
@@ -230,39 +291,91 @@ bool PathJob::isGridNodeOccupied(int x, int y)
    else return true;
 }
 
+#include <fstream>
+#include <iostream>
+
 
 void PathJob::insertObstructions(Map * chart, AIMesh *mesh) // insert all objects into the map
 {
    std::memset(map, false, sizeof(Grid)*GRID_WIDTH*GRID_HEIGHT); // Empty map
 
-   if (chart == NULL) return;
+	if (mesh != NULL)
+	{
+		// Now to draw the mesh onto the thing.
+		if (mesh->isLoaded()) // if we have loaded the mesh
+			for (int x = 0; x < GRID_WIDTH; x++) // for every grid piece
+				for (int y = 0; y < GRID_HEIGHT; y++)
+				{
+					Vector2 translated = fromGridToPosition(Vector2((float)x, (float)y));
+					if (!mesh->isWalkable(translated.X, translated.Y)) // If there's nothing at this position
+						map[x][y].occupied = true; // This is obstructed
+				}
+	}
 
-   const std::map<uint32, Object*>& objects = chart->getObjects();
+	if (chart != NULL)
+	{
+		const std::map<uint32, Object*>& objects = chart->getObjects();
+		for (auto i = objects.begin(); i != objects.end(); i++) // For every object
+		{
+			if (dynamic_cast<Minion*>(i->second) == 0 && dynamic_cast<Champion*>(i->second) == 0)
+				continue;
 
-   for (auto i = objects.begin(); i != objects.end(); i++) // For every object
-   {
-      Vector2 gridPos = fromPositionToGrid(i->second->getPosition()); // get the position in grid size
-      int radius = ((int)(i->second->getCollisionRadius() / gridNodeSize)) / 2; // How many boxes does the radius of this object cover?
-      
-      for (int dx = -radius; dx < radius; dx++) // For the whole radius in the width
-         if (gridPos.X + dx >= 0 && gridPos.X + dx <GRID_WIDTH) // As long as we're in the map (x)
-            for (int dy = -radius; dy < radius; dy++) // for the whole radius in the y
-               if (gridPos.Y + dy >= 0 && gridPos.Y + dy < GRID_HEIGHT) // As long as we're in the map (y)
-                  map[(int)gridPos.X + dx][(int)gridPos.Y + dy].occupied = true; // Occupy this piece of the map.
-   }
+			Vector2 gridPos = fromPositionToGrid(i->second->getPosition()); // get the position in grid size
 
-   if (mesh == NULL) return;
+			int radius = ((int)ceil((float)i->second->getCollisionRadius() / (float)PATH_DEFAULT_BOX_SIZE(mesh->getSize()))) / 2; // How many boxes does the radius of this object cover?
 
-   // Now to draw the mesh onto the thing.
-   if (mesh->isLoaded()) // if we have loaded the mesh
-      for (int x = 0; x < GRID_WIDTH; x++) // for every grid piece
-         for (int y = 0; y < GRID_WIDTH; y++)
-         {
-            Vector2 translated = fromGridToPosition(Vector2((float)x, (float)y));
-            if (mesh->getY(translated.X, translated.Y) < 0.1f) // If there's nothing at this position
-               map[x][y].occupied = true; // This is obstructed
-         }
+			if (debugOutput())
+			{
+				CORE_INFO("We're drawing a minion with a width of (%d/%f)/2=%d pixels at (%f, %f)", i->second->getCollisionRadius(), (float)PATH_DEFAULT_BOX_SIZE(mesh->getSize()), radius, gridPos.X, gridPos.Y);
+			}
 
+			for(int dx = -radius; dx < radius; dx++) // For the whole radius in the width
+				if (gridPos.X + dx >= 0 && gridPos.X + dx < GRID_WIDTH) // As long as we're in the map (x)
+					for (int dy = -radius; dy < radius; dy++) // for the whole radius in the y
+						if (gridPos.Y + dy >= 0 && gridPos.Y + dy < GRID_HEIGHT) // As long as we're in the map (y)
+							map[(int)gridPos.X + dx][(int)gridPos.Y + dy].occupied = true; // Occupy this piece of the map.
+		}
+	}
+
+	if (debugOutput())
+	{
+		auto width = GRID_WIDTH;
+		auto height = GRID_HEIGHT;
+#define MIN(a,b) (((a)>(b))?(b):(a))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+		std::ofstream imageFile("..\\..\\test.tga", std::ios::out | std::ios::binary);
+		if (!imageFile) return;
+
+		// The image header
+		unsigned char header[18] = { 0 };
+		header[2] = 1;  // truecolor
+		header[12] = width & 0xFF;
+		header[13] = (width >> 8) & 0xFF;
+		header[14] = height & 0xFF;
+		header[15] = (height >> 8) & 0xFF;
+		header[16] = 24;  // bits per pixel
+
+		imageFile.write((const char*)header, 18);
+
+		//for (int y = 0; y < height; y++)
+		for (int y = height - 1; y >= 0; y--)
+			for (int x = 0; x < width; x++)
+			{
+			/* blue */  imageFile.put(map[x][y].occupied * 128);
+			/* green */ imageFile.put(map[x][y].occupied * 128);
+			/* red */   imageFile.put(map[x][y].occupied * 128);
+			}
+
+		// The file footer. This part is totally optional.
+		static const char footer[26] =
+			"\0\0\0\0"  // no extension area
+			"\0\0\0\0"  // no developer directory
+			"TRUEVISION-XFILE"  // Yep, this is a TGA file
+			".";
+		imageFile.write(footer, 26);
+
+		imageFile.close();
+	}
 }
 
 #ifdef USE_OPTIMISATION
@@ -316,12 +429,23 @@ void PathNode::operator delete(void * object)
 
 void PathJob::cleanLists()
 {
-   for (auto i = openList.begin(); i != openList.end(); i++) 
-      delete (*i);
-   openList.clear();
-   for (auto i = closedList.begin(); i != closedList.end(); i++) 
-      delete (*i);
-   closedList.clear();
+	for (auto i = openList.begin(); i != openList.end(); i++)
+		delete (*i);
+	openList.clear();
+	for (auto i = closedList.begin(); i != closedList.end(); i++)
+		delete (*i);
+	closedList.clear();
+
+	auto end_time = std::chrono::high_resolution_clock::now();
+
+	totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+	durations++;
+
+	if ((std::clock() - g_Clock) > 4000)
+	{
+		CORE_INFO("%f milliseconds, %d paths.", (float)totalDuration/(float)durations, durations);
+		g_Clock = std::clock();
+	}
 }
 
 void Pathfinder::setMap(Map * map)

@@ -13,7 +13,7 @@ class Object;
 struct CollisionDivision
 {
    Vector2 min, max;
-	vector<Object*> objects;
+	std::vector<Object*> objects;
 	unsigned int objectCount = 0;
 
 	void push(Object * a);
