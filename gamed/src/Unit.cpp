@@ -29,7 +29,7 @@ void Unit::update(int64 diff) {
    if (isDead()) {
       if (targetUnit) {
          setTargetUnit(0);
-         lastTarget = 0;
+         autoAttackTarget = 0;
          isAttacking = false;
          map->getGame()->notifySetTarget(this, 0);
          initialAttackDone = false;
@@ -37,69 +37,64 @@ void Unit::update(int64 diff) {
       return;
    }
 
-   Turret* selfTurret = dynamic_cast<Turret*>(this);
-   Turret* turretTarget = dynamic_cast<Turret*>(targetUnit);
-   if (targetUnit && targetUnit->isDead() || targetUnit && !getMap()->teamHasVisionOn(getTeam(), targetUnit) && !turretTarget && !selfTurret) {
-      setTargetUnit(0);
-      isAttacking = false;
-      map->getGame()->notifySetTarget(this, 0);
-      initialAttackDone = false;
-   }
+   if(targetUnit){
+      if (targetUnit->isDead() || !getMap()->teamHasVisionOn(getTeam(), targetUnit)) {
+         setTargetUnit(0);
+         isAttacking = false;
+         map->getGame()->notifySetTarget(this, 0);
+         initialAttackDone = false;
+         
+      } else if (isAttacking && autoAttackTarget) {
+         autoAttackCurrentDelay += diff / 1000000.f;
+         if (autoAttackCurrentDelay >= autoAttackDelay/stats->getAttackSpeedMultiplier()) {
+            if (!isMelee()) {
+               Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, autoAttackTarget, 0, autoAttackProjectileSpeed, 0);
+               map->addObject(p);
+               map->getGame()->notifyShowProjectile(p);
+            } else {
+               autoAttackHit(autoAttackTarget);
+            }
+            autoAttackCurrentCooldown = 1.f / (stats->getTotalAttackSpeed());
+            isAttacking = false;
+         }
+         
+      } else if (distanceWith(targetUnit) <= stats->getRange()) {
+         refreshWaypoints();
+         nextAutoIsCrit = rand() % 100 + 1 <= stats->getCritChance() * 100;
+         if (autoAttackCurrentCooldown <= 0) {
+            isAttacking = true;
+            autoAttackCurrentDelay = 0;
+            autoAttackProjId = GetNewNetID();
+            autoAttackTarget = targetUnit;
 
-   if (!targetUnit && isAttacking) {
-      Turret* lastTurretTarget = dynamic_cast<Turret*>(lastTarget);
-      if (!lastTarget || lastTarget && lastTarget->isDead() || lastTarget && !getMap()->teamHasVisionOn(getTeam(), lastTarget) && !lastTurretTarget && !selfTurret) {
+            if (!initialAttackDone) {
+               initialAttackDone = true;
+               map->getGame()->notifyBeginAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit);
+            } else {
+               nextAttackFlag = !nextAttackFlag; // The first auto attack frame has occurred
+               map->getGame()->notifyNextAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
+            }
+
+            AttackType attackType = isMelee() ? ATTACK_TYPE_MELEE : ATTACK_TYPE_TARGETED;
+            map->getGame()->notifyOnAttack(this, targetUnit, attackType);
+         }
+         
+      } else {
+         refreshWaypoints();
+      }
+      
+   } else if (isAttacking) {
+      if (!autoAttackTarget || 
+          autoAttackTarget->isDead() || 
+          !getMap()->teamHasVisionOn(getTeam(), autoAttackTarget)) {
          isAttacking = false;
          initialAttackDone = false;
-         lastTarget = 0;
+         autoAttackTarget = 0;
       }
    }
-
-   if (isAttacking && lastTarget) {
-      autoAttackCurrentDelay += diff / 1000000.f;
-      if (autoAttackCurrentDelay >= autoAttackDelay/stats->getAttackSpeedMultiplier()) {
-         if (!isMelee()) {
-            Projectile* p = new Projectile(map, autoAttackProjId, x, y, 5, this, lastTarget, 0, autoAttackProjectileSpeed, 0);
-            map->addObject(p);
-            map->getGame()->notifyShowProjectile(p);
-         } else {
-            autoAttackHit(lastTarget);
-         }
-         autoAttackCurrentCooldown = 1.f / (stats->getTotalAttackSpeed());
-         isAttacking = false;
-
-         if (!targetUnit) {
-            lastTarget = 0;
-            initialAttackDone = false;
-         }
-      }
-   } else if (targetUnit && distanceWith(targetUnit) <= stats->getRange()) {
-      refreshWaypoints();
-      nextAutoIsCrit = ((rand() % 100 + 1) <= stats->getCritChance() * 100) ? true : false;
-      if (autoAttackCurrentCooldown <= 0) {
-         isAttacking = true;
-         autoAttackCurrentDelay = 0;
-         autoAttackProjId = GetNewNetID();
-         isAttacking = true;
-         lastTarget = targetUnit;
-
-         if (!initialAttackDone) {
-            initialAttackDone = true;
-            map->getGame()->notifyBeginAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit);
-         } else {
-            nextAttackFlag = !nextAttackFlag; // The first auto attack frame has occurred
-            map->getGame()->notifyNextAutoAttack(this, targetUnit, autoAttackProjId, nextAutoIsCrit, nextAttackFlag);
-         }
-
-         AttackType attackType = isMelee() ? ATTACK_TYPE_MELEE : ATTACK_TYPE_TARGETED;
-         map->getGame()->notifyOnAttack(this, targetUnit, attackType);
-      }
-   } else {
-      refreshWaypoints();
-
-      Object::update(diff);
-   }
-
+   
+   Object::update(diff);
+   
    if (autoAttackCurrentCooldown > 0) {
       autoAttackCurrentCooldown -= diff / 1000000.f;
    }
@@ -253,8 +248,8 @@ void Unit::setTargetUnit(Unit* target)
    refreshWaypoints();
 }
 
-void Unit::setLastTarget(Unit* target) {
-   lastTarget = target;
+void Unit::setAutoAttackTarget(Unit* target) {
+   autoAttackTarget = target;
 }
 
 void Unit::refreshWaypoints() {

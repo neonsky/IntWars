@@ -31,6 +31,8 @@ void Turret::update(int64 diff)
             continue;
          }
          
+         // Note: this method means that if there are two champions within turret range,
+         // The player to have been added to the game first will always be targeted before the others
          if (!targetUnit) {
             auto priority = classifyTarget(u);
             if (priority < nextTargetPriority) {
@@ -38,16 +40,18 @@ void Turret::update(int64 diff)
                nextTargetPriority = priority;
             }
          } else {
-            Champion* currentTarget = dynamic_cast<Champion*>(targetUnit);
+            Champion* targetIsChampion = dynamic_cast<Champion*>(targetUnit);
             
             // Is the current target a champion? If it is, don't do anything
-            if (!currentTarget) {
+            if (!targetIsChampion) {
                // Find the next champion in range targeting an enemy champion who is also in range
-               Champion* c = dynamic_cast<Champion*>(u);
-               if (c && c->getTargetUnit() != 0) {
-                  Champion* target = dynamic_cast<Champion*>(c->getTargetUnit());
-                  if (target && c->distanceWith(target) <= c->getStats().getRange() && distanceWith(target) <= TURRET_RANGE) {
-                     nextTarget = c; // No priority required
+               Champion* enemyChamp = dynamic_cast<Champion*>(u);
+               if (enemyChamp&& enemyChamp->getTargetUnit() != 0) {
+                  Champion* enemyChampTarget = dynamic_cast<Champion*>(enemyChamp->getTargetUnit());
+                  if (enemyChampTarget &&                                                                   // Enemy Champion is targeting an ally
+                      enemyChamp->distanceWith(enemyChampTarget) <= enemyChamp->getStats().getRange() &&    // Enemy within range of ally
+                      distanceWith(enemyChampTarget) <= TURRET_RANGE) {                                     // Enemy within range of this turret
+                     nextTarget = enemyChamp; // No priority required
                      break;
                   }
                }
