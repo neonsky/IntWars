@@ -51,48 +51,6 @@ void Minion::update(int64 diff)
 
 bool Minion::scanForTargets()
 {
-	if (!targetUnit) // if we have got no targetUnit
-		focusTargetInRange();
-	
-	focusChampionsInDistress(); 
-	// Regardless of whether we did or did not have a target, 
-	// focus a champion nearby if it's in trouble.
-
-	return targetUnit;
-}
-
-void Minion::focusChampionsInDistress()
-{
-	Unit* nextTarget = 0;
-	Champion * curTargetChampion = dynamic_cast<Champion*>(targetUnit);
-	if (curTargetChampion &&															// If we're currently targetting a champion
-		 dynamic_cast<Champion*>(curTargetChampion->getTargetUnit()) &&	// If that champ is attacking a friendly champion.
-		 curTargetChampion->getTargetUnit()->isInDistress())					// And he is in distress (attacked)
-	{ 
-		return; // Don't look for a new target. Attack this one instead.
-	}
-
-	for (Champion* u : map->getChampionsInRange(this, DETECT_RANGE, true))
-	{
-		// Targets have to be:
-		if (u->getTeam() == getTeam() ||					// not on our team
-			!getMap()->teamHasVisionOn(getTeam(), u)) // visible to this minion
-			continue; // If not, look for something else
-
-		Champion* potentialTarget = dynamic_cast<Champion*>(u);
-		Champion* target = dynamic_cast<Champion*>(potentialTarget->getTargetUnit());
-
-		if (target && target->isInDistress() &&		 // If it's a champion, in distress
-			distanceWith(target) <= stats->getRange()) // and the minion is in range of him.
-		{
-			targetUnit = potentialTarget; // Then target him next.
-			return;
-		}
-	}
-}
-
-void Minion::focusTargetInRange()
-{
 	Unit* nextTarget = 0;
 	unsigned int nextTargetPriority = 9e5;
 
@@ -121,12 +79,15 @@ void Minion::focusTargetInRange()
 	{
 		setTargetUnit(nextTarget); // Set the new target and refresh waypoints
 		map->getGame()->notifySetTarget(this, nextTarget);
+		return true;
 	}
+	return false;
 }
 
 void Minion::keepFocussingTarget()
 {
 	if (isAttacking && (!targetUnit || distanceWith(targetUnit) > stats->getRange()))
+	// If target is dead or out of range
 	{
 		map->getGame()->notifyStopAutoAttack(this);
 		isAttacking = false;
@@ -145,6 +106,6 @@ void Minion::walkToDestination()
 
 void Minion::onCollision(Object * a_Collider)
 {
-	setTarget(0);
-	setTargetUnit(0);
+	//setTarget(0);
+	//setTargetUnit(0);
 }

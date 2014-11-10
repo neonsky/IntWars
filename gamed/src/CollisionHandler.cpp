@@ -16,6 +16,9 @@ CollisionHandler::CollisionHandler(Map*map) : chart(map)
 
    divisionCount = -1;
 	// We have no divisions yet. Waiting for the AIMesh to initialise.
+
+	if (simple)
+		CORE_WARNING("Using simple collision. This could impact performance with larger amounts of minions.");
 }
 
 void CollisionHandler::init(int divisionsOverWidth)
@@ -45,7 +48,6 @@ void CollisionHandler::init(int divisionsOverWidth)
 
 void CollisionHandler::checkForCollisions(int pos)
 {
-	return;
 	// Check for collisions in the managed division
    auto curDiv = managedDivisions[pos];
 
@@ -68,22 +70,48 @@ void CollisionHandler::checkForCollisions(int pos)
 }
 
 void CollisionHandler::update(float deltatime)
-{
-	// If we added or removed a minion or champion.
-	//if (dirty) redoDatabase();
+{	
+	if (!simple) // Faster
+	{
+		// If we added or removed a minion or champion.
+		//if (dirty) redoDatabase();
 
-	// Correct the unmanaged division (minions outside the map)
-	//correctUnmanagedDivision();
+		// Correct the unmanaged division (minions outside the map)
+		//correctUnmanagedDivision();
 
-	// For every managed division
-   for (int i = 0; i < divisionCount*divisionCount; i++)
-   {
-		// Correct the divisions it should be in
-		correctDivisions(i);
-		
-		// Check for collisions inside this division
-		checkForCollisions(i);
-   }
+		// For every managed division
+		for (int i = 0; i < divisionCount*divisionCount; i++)
+		{
+			// Correct the divisions it should be in
+			correctDivisions(i);
+
+			// Check for collisions inside this division
+			checkForCollisions(i);
+		}
+	}
+	else // Slower, but works 
+	{ // TODO: Fix collisions.
+		for (auto& objectRef : chart->getObjects())
+		{
+			auto o1 = objectRef.second;
+			if (dynamic_cast<Minion*>(o1) == 0 && dynamic_cast<Champion*>(o1) == 0)
+				continue;
+
+			for (auto& objectRef2 : chart->getObjects()) if (objectRef != objectRef2)
+			{
+				auto o2 = objectRef2.second;
+				if (dynamic_cast<Minion*>(o2) == 0 && dynamic_cast<Champion*>(o2) == 0)
+					continue;
+
+				auto displ = (o2->getPosition() - o1->getPosition());
+				if (displ.SqrLength() < (o1->getCollisionRadius() + o2->getCollisionRadius())*(o1->getCollisionRadius() + o2->getCollisionRadius()))
+				{
+					o1->onCollision(o2);
+					//o2->onCollision(o1); // Is being done by the second iteration.
+				}
+			}
+		}
+	}
 }
 
 void CollisionHandler::correctDivisions(int pos)
@@ -93,6 +121,7 @@ void CollisionHandler::correctDivisions(int pos)
    {
       Object* o = curDiv.objects[j];
 
+		if (o)
 		//if (o->isMovementUpdated())  // Only check if they moved around.
       {
 			// If they are no longer in this division..
@@ -166,6 +195,9 @@ void CollisionHandler::redoDatabase()
 
 void CollisionHandler::addObject(Object *object)
 {
+	if (dynamic_cast<Minion*>(object) == 0 && dynamic_cast<Champion*>(object) == 0)//&& dynamic_cast<Turret*>(object) == 0 && dynamic_cast<LevelProp*>(object) == 0)
+		return;
+
 	if (divisionCount == -1) // If we have not initialised..
    {
       //CORE_ERROR("Added an object before we initialised the CollisionHandler!");

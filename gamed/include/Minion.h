@@ -31,13 +31,12 @@ public:
 
 	void onCollision(Object * a_Collider);
 
+	virtual bool isInDistress() const override { return distressCause!=0; }
 protected:
 	// AI tasks
 	bool scanForTargets();
 	void walkToDestination();
 	void keepFocussingTarget();
-	void focusTargetInRange();
-	void focusChampionsInDistress();
 
 
    MinionSpawnPosition spawnPosition;

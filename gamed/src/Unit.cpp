@@ -245,10 +245,10 @@ void Unit::setTargetUnit(Unit* target)
 	if (target == 0) // If we are unsetting the target (moving around)
 	{
 		if (targetUnit != 0) // and we had a target
-			targetUnit->setDistressCall(false);	// Unset the distress call	
+			targetUnit->setDistressCall(0);	// Unset the distress call	
 		// TODO: Replace this with a delay?
 	}
-	else target->setDistressCall(true); // Otherwise set the distress call
+	else target->setDistressCall(this); // Otherwise set the distress call
 	targetUnit = target;
    refreshWaypoints();
 }
@@ -283,8 +283,59 @@ Buff* Unit::getBuff(std::string name){
 }
 
 //Prioritize targets
-unsigned int Unit::classifyTarget(Unit* target) {
-   Turret* t = dynamic_cast<Turret*>(target);
+unsigned int Unit::classifyTarget(Unit* target) 
+{
+	/*
+	Under normal circumstances, a minion’s behavior is simple. Minions follow their attack route until they reach an enemy to engage. 
+	Every few seconds, they will scan the area around them for the highest priority target. When a minion receives a call for help 
+	from an ally, it will evaluate its current target in relation to the target designated by the call. It will switch its attack 
+	to the new target if and only if the new target is of a higher priority than their current target. Minions prioritize targets 
+	in the following order:
+	
+		1. An enemy champion designated by a call for help from an allied champion. (Enemy champion attacking an Allied champion)
+		2. An enemy minion designated by a call for help from an allied champion. (Enemy minion attacking an Allied champion)
+		3. An enemy minion designated by a call for help from an allied minion. (Enemy minion attacking an Allied minion)
+		4. An enemy turret designated by a call for help from an allied minion. (Enemy turret attacking an Allied minion)
+		5. An enemy champion designated by a call for help from an allied minion. (Enemy champion attacking an Allied minion)
+		6. The closest enemy minion.
+		7. The closest enemy champion.
+	*/
+
+	if (target->targetUnit && target->targetUnit->isInDistress()) // If an ally is in distress, target this unit. (Priority 1~5)
+	{
+		if (dynamic_cast<Champion*>(target) != 0 && dynamic_cast<Champion*>(target->targetUnit) != 0) // If it's a champion attacking a friendly champion
+			return 1;
+		else if (dynamic_cast<Minion*>(target) != 0 && dynamic_cast<Champion*>(target->targetUnit) != 0) // If it's a minion attacking a friendly champion.
+			return 2;
+		else if (dynamic_cast<Minion*>(target) != 0 && dynamic_cast<Minion*>(target->targetUnit) != 0) // Minion attacking minion
+			return 3;
+		else if (dynamic_cast<Turret*>(target) != 0 && dynamic_cast<Minion*>(target->targetUnit) != 0) // Turret attacking minion
+			return 4;
+		else if (dynamic_cast<Champion*>(target) != 0 && dynamic_cast<Minion*>(target->targetUnit) != 0) // Champion attacking minion
+			return 5;
+	}
+	
+	Minion* m = dynamic_cast<Minion*>(target);
+	if (m) 
+	{
+		switch (m->getType()) 
+		{
+		case MINION_TYPE_MELEE:
+			return 6;
+		case MINION_TYPE_CASTER:
+			return 7;
+		case MINION_TYPE_CANNON:
+		case MINION_TYPE_SUPER:
+			return 8;
+		}
+	}
+
+	if (dynamic_cast<Champion*>(target)) 
+		return 9;
+
+	return 10;
+
+   /*Turret* t = dynamic_cast<Turret*>(target);
    
    // Turrets before champions
    if (t) {
@@ -313,5 +364,5 @@ unsigned int Unit::classifyTarget(Unit* target) {
    //Trap (Shaco box) return 1
    //Pet (Tibbers) return 2
 
-   return 10;
+   return 10;*/
 }

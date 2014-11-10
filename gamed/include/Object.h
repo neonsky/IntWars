@@ -8,12 +8,9 @@
 #pragma warning(disable:4458)
 
 #include <vector>
-
 #include "Target.h"
 #include "stdafx.h"
 #include "Vector2.h"
-#include <cfenv>
-#include <climits>
 
 #pragma STDC FENV_ACCESS ON
 
@@ -33,10 +30,10 @@ struct MovementVector {
 	 operator Vector2() { return Vector2(2.0f*x + MAP_WIDTH, 2.0f*y + MAP_HEIGHT); }
     
     static int16 targetXToNormalFormat(float _x){
-		 return (int16)((round(_x) - MAP_WIDTH )/2.0f);
+		 return (int16)(((_x) - MAP_WIDTH )/2.0f);
     }
     static int16 targetYToNormalFormat(float _y){
-		 return (int16)((round(_y) - MAP_HEIGHT)/2.0f);
+		 return (int16)(((_y) - MAP_HEIGHT)/2.0f);
     }
     
 };

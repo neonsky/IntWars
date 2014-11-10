@@ -39,7 +39,7 @@ public:
 	Unit(Map* map, uint32 id, std::string model, Stats* stats, uint32 collisionRadius = 40, float x = 0, float y = 0, uint32 visionRadius = 0) : Object(map, id, x, y, collisionRadius, visionRadius), stats(stats),
 		statUpdateTimer(0), model(model), autoAttackDelay(0), autoAttackProjectileSpeed(0), isAttacking(false),
 		autoAttackCurrentCooldown(0), autoAttackCurrentDelay(0), modelUpdated(false), moveOrder(MOVE_ORDER_MOVE), deathFlag(false),
-		targetUnit(0), lastTarget(0), inDistress(false), melee(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
+		targetUnit(0), lastTarget(0), distressCause(0), melee(false), nextAutoIsCrit(false), initialAttackDone(false), nextAttackFlag(false), killDeathCounter(0)
 	{ }
 	virtual ~Unit();
 	Stats& getStats() { return *stats; }
@@ -77,9 +77,9 @@ public:
 		}
 	}
 
-	void setDistressCall(bool distress) { inDistress = distress; }
-	bool getDistressCall() { return inDistress; }
-	bool isInDistress() { return inDistress; }
+	void setDistressCall(Unit* distress) { distressCause = distress; }
+	Unit* getDistressCall() { return distressCause; }
+	virtual bool isInDistress() const { return false; /*return distressCause;*/ }
 
 	//todo: use statmods
 	Buff* getBuff(std::string name);
@@ -96,7 +96,8 @@ protected:
 
    float autoAttackDelay, autoAttackProjectileSpeed;
    float autoAttackCurrentCooldown, autoAttackCurrentDelay;
-	bool isAttacking, modelUpdated, melee, initialAttackDone, nextAttackFlag, inDistress;
+	bool isAttacking, modelUpdated, melee, initialAttackDone, nextAttackFlag;
+	Unit *distressCause;
    uint64 statUpdateTimer;
    uint32 autoAttackProjId;
    MoveOrder moveOrder;

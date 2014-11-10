@@ -38,7 +38,9 @@ public:
    
    void setSkin(uint8 skin) { this->skin = skin; }
    uint32 getChampionHash();
-   
+
+	virtual bool isInDistress() const override { return distressCause!=0; }
+
    uint8 getSkillPoints() const { return skillPoints; }
    void levelUp();
    

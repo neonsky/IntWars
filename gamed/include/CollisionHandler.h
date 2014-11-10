@@ -51,7 +51,7 @@ private:
    CollisionDivision unmanagedDivision;
    int divisionCount;
    Map* chart;
-   bool dirty = true;
+   bool dirty = true, simple = false;
 };
 
 #endif
