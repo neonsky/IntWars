@@ -6,9 +6,6 @@
 #include "Vector2.h"
 #include "Logger.h"
 
-#define MANAGED_DIVISION_COUNT 3*3
-#define MAX_COLLISION_OBJECTS 1024
-
 class Object;
 struct CollisionDivision
 {
@@ -27,10 +24,7 @@ class CollisionHandler
 public:
    CollisionHandler(Map * map);
    void init(int divisionsOverWidth);
-   ~CollisionHandler(){ /*std::free(managedDivisions);*/ }
-
-	void stackChanged(Object *object);// { dirty = true; }
-	void redoDatabase();// { dirty = true; }
+	~CollisionHandler(){}
 
    void addObject(Object *object);
    void removeObject(Object* object);
@@ -47,11 +41,11 @@ private:
    
    void removeFromDivision(Object* object, int i);
    int width, height;
-   CollisionDivision managedDivisions[MANAGED_DIVISION_COUNT];
+   CollisionDivision managedDivisions[3*3];
    CollisionDivision unmanagedDivision;
    int divisionCount;
    Map* chart;
-   bool dirty = true, simple = false;
+   bool simple = false;
 };
 
 #endif

@@ -10,7 +10,7 @@
 #include <iostream>
 
 CollisionHandler::CollisionHandler(Map*map) : chart(map)
-{ 
+{
    Pathfinder::setMap(map);
 	// Initialise the pathfinder.
 
@@ -28,7 +28,8 @@ void CollisionHandler::init(int divisionsOverWidth)
    height = chart->getAIMesh()->getHeight();
 
 	// Get the square root of the division count. This is why it requires to be squared. (It's a map of 3x3 by default)
-   divisionCount = sqrt(MANAGED_DIVISION_COUNT);
+	//CORE_INFO("CollisionHandler has %d divisions.", divisionsOverWidth*divisionsOverWidth);
+	divisionCount = divisionsOverWidth;
 
 	// Setup the division dimensions
    for (int y = 0; y < divisionsOverWidth; y++)
@@ -43,7 +44,7 @@ void CollisionHandler::init(int divisionsOverWidth)
 
 			managedDivisions[y*divisionsOverWidth + x].objectCount = 0;
       }
-   }
+	}
 }
 
 void CollisionHandler::checkForCollisions(int pos)
@@ -51,13 +52,13 @@ void CollisionHandler::checkForCollisions(int pos)
 	// Check for collisions in the managed division
    auto curDiv = managedDivisions[pos];
 
-   for (int i = 0; i < curDiv.objectCount; i++) // for each object in the current division
+   for (int i = 0; i < curDiv.objects.size(); i++) // for each object in the current division
    {
-      auto o1 = curDiv.objects[i];
-
-      for (int j = 0; j < curDiv.objectCount; j++) if (j != i)
+		auto o1 = curDiv.objects[i];
+		
+		for (int j = 0; j < curDiv.objects.size(); j++) if (j != i)
       {
-         auto o2 = curDiv.objects[j];
+			auto o2 = curDiv.objects[j];
 
          auto displ = (o2->getPosition() - o1->getPosition());
          if (displ.SqrLength() < (o1->getCollisionRadius() + o2->getCollisionRadius())*(o1->getCollisionRadius() + o2->getCollisionRadius()))
@@ -66,16 +67,13 @@ void CollisionHandler::checkForCollisions(int pos)
             //o2->onCollision(o1); // Is being done by the second iteration.
          }  
       }
-   }
+	}
 }
 
 void CollisionHandler::update(float deltatime)
 {	
 	if (!simple) // Faster
 	{
-		// If we added or removed a minion or champion.
-		//if (dirty) redoDatabase();
-
 		// Correct the unmanaged division (minions outside the map)
 		//correctUnmanagedDivision();
 
@@ -90,7 +88,7 @@ void CollisionHandler::update(float deltatime)
 		}
 	}
 	else // Slower, but works 
-	{ // TODO: Fix collisions.
+	{ 
 		for (auto& objectRef : chart->getObjects())
 		{
 			auto o1 = objectRef.second;
@@ -117,13 +115,22 @@ void CollisionHandler::update(float deltatime)
 void CollisionHandler::correctDivisions(int pos)
 {
    CollisionDivision curDiv = managedDivisions[pos];
-   for (int j = 0; j < curDiv.objectCount; j++) // For all objects inside this division
+	for (int j = 0; j < curDiv.objects.size(); j++) // For all objects inside this division
    {
       Object* o = curDiv.objects[j];
 
 		if (o)
 		//if (o->isMovementUpdated())  // Only check if they moved around.
-      {
+		{
+			while (o->getMap() != chart)
+			{
+				CORE_WARNING("I have found an object that is not healthy. His map pointer is %x (not %x). Removing it from the database (%d/%d in div %d).", o->getMap(), chart, j, curDiv.objects.size(), pos);
+				removeObject(o);
+				if (j < curDiv.objects.size())
+					o = curDiv.objects[j];
+				else break;
+			}
+
 			// If they are no longer in this division..
          if ((o->getPosition().X - o->getCollisionRadius() > curDiv.max.X || o->getPosition().Y - o->getCollisionRadius() > curDiv.max.Y ||
             o->getPosition().X + o->getCollisionRadius() < curDiv.min.X || o->getPosition().Y + o->getCollisionRadius() < curDiv.min.Y))
@@ -139,13 +146,13 @@ void CollisionHandler::correctDivisions(int pos)
             addObject(o); // Reset in what divisions this object is.
          }
       }
-   }
+	}
 }
 
 void CollisionHandler::correctUnmanagedDivision()
 {
    CollisionDivision curDiv = unmanagedDivision;
-	for (int j = 0; j < curDiv.objectCount; j++) // For everything outside the map
+	for (int j = 0; j < curDiv.objects.size(); j++) // For everything outside the map
    {
       Object* o = (curDiv.objects[j]);
 
@@ -157,52 +164,27 @@ void CollisionHandler::correctUnmanagedDivision()
          if ((o->getPosition().X - o->getCollisionRadius() > width || o->getPosition().Y - o->getCollisionRadius() > height ||
             o->getPosition().X + o->getCollisionRadius() < 0 || o->getPosition().Y + o->getCollisionRadius() < 0))
          {
-            removeFromDivision(o, -1);
+				removeFromDivision(o, -1);
+				//CORE_INFO("Minion moving from unmanaged!");
             addObject(o);
          }
       }
-   }
-}
-
-void CollisionHandler::stackChanged(Object *object)
-{
-	if (dynamic_cast<Minion*>(object) == 0 && dynamic_cast<Champion*>(object) == 0)//&& dynamic_cast<Turret*>(object) == 0 && dynamic_cast<LevelProp*>(object) == 0)
-		return;
-
-	dirty = true;
-}
-
-void CollisionHandler::redoDatabase()
-{
-	for (int i = -1; i < divisionCount; i++)
-	{
-		CollisionDivision* curDiv;
-		if (i == -1) curDiv = &unmanagedDivision;
-		else curDiv = &managedDivisions[i];
-
-		for (int i = 0; i < curDiv->objectCount; i++) curDiv->objects[i] = 0;
-		curDiv->clear();
 	}
-	
-	for (auto& it : chart->getObjects())
-	{
-		Object* object = it.second;
-		if(dynamic_cast<Minion*>(object) != 0 || dynamic_cast<Champion*>(object) != 0) 
-			addObject(object);
-	}
-	dirty = false;
 }
 
 void CollisionHandler::addObject(Object *object)
 {
-	if (dynamic_cast<Minion*>(object) == 0 && dynamic_cast<Champion*>(object) == 0)//&& dynamic_cast<Turret*>(object) == 0 && dynamic_cast<LevelProp*>(object) == 0)
-		return;
-
 	if (divisionCount == -1) // If we have not initialised..
    {
-      //CORE_ERROR("Added an object before we initialised the CollisionHandler!");
-      //addUnmanagedObject(object);
+      CORE_ERROR("Tried to add an object before we initialised the CollisionHandler!");
+		return;
    }
+
+	if (object->getMap() != chart)
+	{
+		CORE_INFO("Map is adding an object that is not healthy. His map pointer is %x (not %x). Not adding it.", object->getMap(), chart);
+		return;
+	}
 
    float divX = object->getPosition().X / (float)(width / divisionCount); // Get the division position.
    float divY = object->getPosition().Y / (float)(height / divisionCount);
@@ -211,8 +193,8 @@ void CollisionHandler::addObject(Object *object)
 
    if (divX < 0 || divX > divisionCount || divY < 0 || divY > divisionCount)  // We're not inside the map! Add to the unmanaged objects.
    {
-      //CORE_ERROR("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
-      //addUnmanagedObject(object);
+      CORE_ERROR("Object spawned outside of map. (%f, %f)", object->getPosition().X, object->getPosition().Y);
+		//addUnmanagedObject(object);
    }
    else
    {
@@ -230,9 +212,9 @@ void CollisionHandler::addObject(Object *object)
       if (abs(object->getPosition().Y - curDiv.min.Y) < object->getCollisionRadius()) // Or above?
          b = true, addToDivision(object, (int)divX, (int)divY - 1);
 
-      if (a && b)																			// If we are touching all four, add the left-upper one.
+      if (a && b)																							  // If we are touching all four, add the left-upper one.
          b = true, addToDivision(object, (int)divX - 1, (int)divY - 1);
-   }
+	}
 }
 
 void CollisionHandler::getDivisions(Object *object, CollisionDivision *divs[], int &divCount)
@@ -296,6 +278,7 @@ void CollisionHandler::addToDivision(Object* object, int x, int y)
       if (managedDivisions[pos].find(object)==-1) // Are we not in this division?
       {
          managedDivisions[pos].push(object); // Add it
+			//CORE_INFO("MINION %d ADDED TO DIVISION %d", managedDivisions[pos].objects.size() - 1, pos);
       }
    }
 }
@@ -306,27 +289,28 @@ void CollisionHandler::addUnmanagedObject(Object* object)
    {
 		if (unmanagedDivision.find(object)==-1)
       {
-         unmanagedDivision.push(object);
+			unmanagedDivision.push(object);
+			//CORE_INFO("MINION %d ADDED TO UNMANAGED DIVISION", unmanagedDivision.objects.size() - 1);
       }
-   }
+	}
 }
 
 
 void CollisionHandler::removeObject(Object* object)
 {
    CollisionDivision * curDiv;
-   for (int i = -1; i < divisionCount; i++)
+   for (int i = -1; i < divisionCount*divisionCount; i++)
    {
       if (i == -1) curDiv = &unmanagedDivision;
       else curDiv = &managedDivisions[i];
 
-      auto j = curDiv->find(object);
+      auto j = curDiv->find(object);			
       while (j != -1)
 		{
 			curDiv->remove(j);
 			j = curDiv->find(object);
       }
-   }
+	}
 }
 
 void CollisionHandler::removeFromDivision(Object* object, int i)
@@ -347,7 +331,7 @@ void CollisionHandler::removeFromDivision(Object* object, int i)
 
 int CollisionDivision::find(Object* a)
 {
-	for (int i = 0; i < objectCount; i++)
+	for (int i = 0; i <objects.size(); i++)
 		if (a == objects[i])
 			return i;
 
@@ -356,19 +340,20 @@ int CollisionDivision::find(Object* a)
 
 void CollisionDivision::clear()
 {
-	for (int i = 0; i < objectCount; i++)
+	for (int i = 0; i < objects.size(); i++)
 		objects[i] = 0;
-	objectCount = 0;
 }
 
 void CollisionDivision::push(Object * a)
 {
 	objects.push_back(a);
-	objectCount++;
 }
 
 void CollisionDivision::remove(unsigned int i)
 {
-	objects.erase(objects.begin() + i);
-	objectCount--;
+	if (i >= 0 && i < objects.size())
+	{
+
+		objects.erase(objects.begin() + i);
+	}
 }

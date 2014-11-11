@@ -18,7 +18,6 @@ Map::~Map()
 }
 
 void Map::update(int64 diff) {
-   collisionHandler->update(diff);
 
    for(auto kv = objects.begin(); kv != objects.end();) {
 	   if (kv->second->isToRemove() && kv->second->getAttackerCount() == 0) 
@@ -79,8 +78,7 @@ void Map::update(int64 diff) {
               u->buffs[i-1]->update(diff);
           }
       }
-      
-      
+
       if(!u->getStats().getUpdatedStats().empty()) {
          game->notifyUpdatedStats(u);
          u->getStats().clearUpdatedStats();
@@ -98,7 +96,9 @@ void Map::update(int64 diff) {
       
       kv->second->update(diff);
       ++kv;
-   }
+	}
+
+	collisionHandler->update(diff);
 
    for (auto i = announcerEvents.begin(); i != announcerEvents.end(); i++) {
       bool isCompleted = (*i).first;
@@ -153,14 +153,13 @@ Object* Map::getObjectById(uint32 id) {
 void Map::addObject(Object* o) {
    objects[o->getNetId()] = o;
    
-	//collisionHandler->stackChanged(o);
-	collisionHandler->addObject(o);
-
    Unit* u = dynamic_cast<Unit*>(o);
    if(!u) {
       return;
    }
-   
+
+	collisionHandler->addObject(o);
+
    visionUnits[o->getTeam()][o->getNetId()] = u;
    
    Minion* m = dynamic_cast<Minion*>(u);
