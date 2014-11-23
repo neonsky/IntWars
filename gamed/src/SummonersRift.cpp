@@ -1,7 +1,7 @@
 #include "SummonersRift.h"
 #include "Turret.h"
 #include "Game.h"
-#include "collisionHandler.h"
+#include "CollisionHandler.h"
 #include "LevelProp.h"
 #include "Minion.h"
 
