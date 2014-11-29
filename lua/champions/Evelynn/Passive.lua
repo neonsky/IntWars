@@ -1,14 +1,11 @@
 function onUpdate(diff)
---print("Onupdate")
+    --print("Onupdate")
 end
 
-function onDamageTaken(attacker, damage, dmgType, source) --todo add callbacks for these 
-print("Damage taken is ".. damage)
+function onDamageTaken(attacker, damage, dmgType, source) 
+    print("Damage taken is ".. damage)
 end
 
 function onAutoAttack(us, target)
-print("We just auto attacked!")
-
-
-
+    print("We just auto attacked!")
 end
