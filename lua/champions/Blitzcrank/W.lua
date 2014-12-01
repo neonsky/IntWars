@@ -1,11 +1,12 @@
 function finishCasting()
-   local amt = 12 + getSpellLevel()*4
-   print("Speed increase" ..amt)
-   local buff = Buff.new("Overdrive", 8.0, BUFFTYPE_TEMPORARY, getOwner())
-   buff:setMovementSpeedPercentModifier(amt)
-   addBuff(buff)
+    local speedIncrease = 12 + getSpellLevel() * 4
+    local buff = Buff.new("Overdrive", 8.0, BUFFTYPE_TEMPORARY, getOwner())
+    
+    print("Speed increase" ..speedIncrease)
+    
+    buff:setMovementSpeedPercentModifier(speedIncrease)
+    addBuff(buff)
 end
 
 function applyEffects()
-
 end

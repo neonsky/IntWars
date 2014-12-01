@@ -1,11 +1,12 @@
 function finishCasting()
-   local amt = 7 + getSpellLevel()
-   print("Speed increase" ..amt)
-   local buff = Buff.new("BloodBoil", 12.0, BUFFTYPE_TEMPORARY, getOwner())
-   buff:setMovementSpeedPercentModifier(amt)
-   addBuff(buff)
+    local speedIncrease = 7 + getSpellLevel()
+    local buff = Buff.new("BloodBoil", 12.0, BUFFTYPE_TEMPORARY, getOwner())
+    
+    print("Speed increase" .. speedIncrease)
+    
+    buff:setMovementSpeedPercentModifier(speedIncrease)
+    addBuff(buff)
 end
 
 function applyEffects()
-
 end
