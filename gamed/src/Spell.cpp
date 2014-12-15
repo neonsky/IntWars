@@ -277,6 +277,14 @@ void Spell::loadLua(LuaScript& script){
       return;
    });
 
+   script.lua.set_function("getUnitsInRange", [this](Target* t, float range, bool isAlive) {
+      return owner->getMap()->getUnitsInRange(t, range, isAlive);
+   });
+
+   script.lua.set_function("getChampionsInRange", [this](Target* t, float range, bool isAlive) {
+      return owner->getMap()->getChampionsInRange(t, range, isAlive);
+   });
+
    try{
       script.loadScript(scriptloc); //todo: abstract class that loads a lua file for any lua
      }catch(sol::error e){//lua error? don't crash the whole server
