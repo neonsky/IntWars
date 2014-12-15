@@ -4,7 +4,7 @@ function finishCasting()
     local buff = Buff.new("RaiseMorale", 7.0, BUFFTYPE_TEMPORARY, getOwner())
     
     buff:setMovementSpeedPercentModifier(getEffectValue(3))
-    addBuff(buff)
+    addBuff(buff, getOwner())
 end
 
 function applyEffects()
