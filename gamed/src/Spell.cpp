@@ -151,6 +151,7 @@ void Spell::loadLua(LuaScript& script){
    script.lua.set_function("getSpellLevel", [this]() { return getLevel(); });
    script.lua.set_function("getOwnerLevel", [this]() { return owner->getStats().getLevel(); });
    script.lua.set_function("getChampionModel", [this]() { return owner->getModel(); });
+   script.lua.set_function("getCastTarget", [this]() { return this->target; });
    
    script.lua.set_function("setChampionModel", [this](const std::string& newModel) {
       owner->setModel(newModel); 
@@ -203,8 +204,24 @@ void Spell::loadLua(LuaScript& script){
       return;
    });
    
+   script.lua.set_function("addProjectileTarget", [this](Target *t) { 
+      Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->getX(), owner->getY(), 30, owner, t, this, projectileSpeed, RAFFile::getHash(spellName +"Missile"), projectileFlags ? projectileFlags : flags);
+      owner->getMap()->addObject(p);
+      owner->getMap()->getGame()->notifyProjectileSpawn(p);
+
+      return;
+   });
+   
    script.lua.set_function("addProjectileCustom", [this](const std::string& name, float projSpeed, float toX, float toY) { 
       Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->getX(), owner->getY(), 30, owner, new Target(toX, toY), this, projectileSpeed, RAFFile::getHash(name), projectileFlags ? projectileFlags : flags);
+      owner->getMap()->addObject(p);
+      owner->getMap()->getGame()->notifyProjectileSpawn(p);
+
+      return;
+   });
+   
+   script.lua.set_function("addProjectileTargetCustom", [this](const std::string& name, float projSpeed, Target *t) { 
+      Projectile* p = new Projectile(owner->getMap(), GetNewNetID(), owner->getX(), owner->getY(), 30, owner, t, this, projectileSpeed, RAFFile::getHash(name), projectileFlags ? projectileFlags : flags);
       owner->getMap()->addObject(p);
       owner->getMap()->getGame()->notifyProjectileSpawn(p);
 
