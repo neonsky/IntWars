@@ -69,7 +69,7 @@ bool RAFManager::readFile(const std::string& path, vector<unsigned char>& toFill
 }
 std::string RAFManager::findGameBasePath()
 {
-   string sValue = "D:\\code\\IntWars\\League of Legends\\RADS\\projects\\lol_game_client\\";
+   string sValue = "D:\\GitHub\\League of Legends\\RADS\\projects\\lol_game_client\\";
    std::replace(sValue.begin(), sValue.end(), '\\', '/');
    CORE_INFO("LOL PATH: %s", sValue.c_str());
    return sValue;
