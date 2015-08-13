@@ -1,7 +1,7 @@
 players = {
 	["player1"] = {
-		["rank"] = "DIAMOND",
-		["name"] = "Test",
+		["rank"] = "CHALLENGER",
+		["name"] = "TSM Dyrone",
 		["champion"] = "Ezreal",
 		["team"] = "BLUE", -- BLUE or PURPLE
 		["skin"] = 0,
